@@ -1,0 +1,3 @@
+dependency_overrides:
+  arcgis_maps:
+    path: ../arcgis_maps_package

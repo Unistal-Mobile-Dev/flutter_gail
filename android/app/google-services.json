@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "217680825989",
+    "project_id": "gail-b0233",
+    "storage_bucket": "gail-b0233.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:217680825989:android:88b63bd0d3393a40f0e3ec",
+        "android_client_info": {
+          "package_name": "unistal.app.gail"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApCvyoHH7Kh70b31KhlVO7ZjecEOus5Ww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

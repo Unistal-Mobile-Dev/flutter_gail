@@ -1,0 +1,78 @@
+{
+  "data" : [
+    {
+      "keyword" : "name",
+      "label" : "Enter your full name",
+      "type" : "inputBox",
+      "required" : true,
+      "inputType" : "test",
+      "list" : [],
+      "api" : ""
+    },
+    {
+      "keyword" : "locationName",
+      "label" : "Enter your Location",
+      "type" : "inputBox",
+      "required" : false,
+      "inputType" : "number",
+      "list" : [],
+      "api" : ""
+    },
+    {
+      "keyword" : "locationName",
+      "label" : "Enter your Address",
+      "type" : "inputBox",
+      "required" : false,
+      "inputType" : "text",
+      "list" : [],
+      "api" : ""
+    },
+    {
+      "keyword" : "markLocation",
+      "label" : "Mark Location",
+      "type" : "radioButton",
+      "required" : true,
+      "inputType" : "",
+       "list" : [
+         {
+           "id" : 1,
+           "name" : "Radio Button 1",
+           "value" : ""
+         },
+         {
+           "id" : 2,
+           "name" : "Radio Button 2",
+           "value" : ""
+         }
+       ],
+      "api" : ""
+    },
+    {
+      "keyword" : "attachedFile",
+      "label" : "Profile Photo",
+      "type" : "file",
+      "required" : true,
+      "inputType" : "",
+      "list" : [],
+      "api" : ""
+    },
+    {
+      "keyword" : "alignment_sheet_id",
+      "label" : "Select Alignment",
+      "type" : "searchDropDown",
+      "required" : true,
+      "inputType" : "",
+      "list" : [],
+      "api" : "alignment"
+    },
+    {
+      "keyword" : "weather",
+      "label" : "Select Weather",
+      "type" : "normalDropDown",
+      "required" : true,
+      "inputType" : "",
+      "list" : [],
+      "api" : "weather"
+    }
+  ]
+}

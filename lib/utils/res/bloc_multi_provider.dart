@@ -1,0 +1,27 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
+import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
+import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
+import 'package:flutter_gail/feature/task/addMarker/domain/bloc/add_marker_bloc.dart';
+import 'package:flutter_gail/feature/task/createTask/domain/bloc/create_task_bloc.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
+
+MultiProvider blocMultiProvider({required Widget child}) {
+  return MultiProvider(
+    providers: [
+      BlocProvider(create: (BuildContext context) => LoginBloc()),
+      BlocProvider(create: (BuildContext context) => DashboardBloc()),
+      BlocProvider(create: (BuildContext context) => HomeBloc()),
+      BlocProvider(create: (BuildContext context) => MapBloc()),
+      BlocProvider(create: (BuildContext context) => CreateTaskBloc()),
+      BlocProvider(create: (BuildContext context) => TaskBloc()),
+      BlocProvider(create: (BuildContext context) => AddMarkerBloc()),
+       BlocProvider(create: (BuildContext context) => AddCrossingBloc()),
+       BlocProvider(create: (BuildContext context) => AddIncidentBloc()),
+
+    ],
+    child: child,
+  );
+}

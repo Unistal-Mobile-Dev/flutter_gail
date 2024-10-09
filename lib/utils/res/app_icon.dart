@@ -1,0 +1,32 @@
+class AppIcon {
+  static get gailLogo => "assets/gail_logo.png";
+
+  static get transperentBackground => "assets/transperent_background.png";
+
+  static get gpsMovedIcon => "assets/ic_gps_moved.png";
+
+  static get startLocationIcon => "assets/ic_pin_loc.png";
+
+  static get endLocationIcon => "assets/ic_flag_end.png";
+
+  static get wmIcon => "assets/ic_wm.png";
+
+  static get kmIcon => "assets/ic_km.png";
+
+  static get dmIcon => "assets/ic_dm.png";
+
+  static get tlpIcon => "assets/ic_tlp.png";
+
+  static get bpIcon => "assets/ic_bp.png";
+
+  static get railCrossingIcon => "assets/ic_railcrossing.png";
+
+  static get riverCrossingIcon => "assets/ic_rivercrossing.png";
+
+  static get roadCrossingIcon => "assets/ic_roadcrossing.png";
+
+  static get incidentIcon => "assets/ic_incident.png";
+
+  static get warningIcon => "assets/ic_warning.png";
+
+}
