@@ -58,12 +58,11 @@ class LocationHelper {
         LocationSettings locationSettings = const LocationSettings(
           accuracy: LocationAccuracy.high, //accuracy of the location data
           distanceFilter: 0, //minimum distance (measured in meters) a
-          //device must move horizontally before an update event is generated;
         );
         LocationPermission permission = await Geolocator.checkPermission();
         if (permission != LocationPermission.denied) {
           Position position = await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.high);
+             locationSettings: locationSettings);
           return _getAddressFromLatLng(position);
         } else {
           return null;
@@ -82,9 +81,13 @@ class LocationHelper {
         }
         LocationPermission permission = await Geolocator.checkPermission();
         if (permission != LocationPermission.denied) {
+          LocationSettings locationSettings = const LocationSettings(
+            accuracy: LocationAccuracy.high, //accuracy of the location data
+            distanceFilter: 0, //minimum distance (measured in meters) a
+          );
           Position position = await Geolocator.getCurrentPosition(
-                  desiredAccuracy: LocationAccuracy.best)
-              .timeout(const Duration(seconds: 4));
+            locationSettings: locationSettings
+          ).timeout(const Duration(seconds: 20));
           Map<String, dynamic> location = {
             "lat": position.latitude,
             "long": position.longitude,

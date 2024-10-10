@@ -101,19 +101,22 @@ class AddMarkerHelper {
           locationData =  locationRes;
         }
         var json = {
-          "task_id" : taskData.objectId.toString(),
+          "task_id" : taskData.taskId.toString(),
           "inspectiondate" : DateTime.now().toString(),
           "featuretype" : markerTypeData.name.toString(),
           "featuresubtype" : "",
           "comments" : remark.toString(),
           "marker_condition" : condition.toString(),
           "marker_paint" : painting.toString(),
-          "latitude" : locationData.lat != null ? locationData.lat.toString() : "",
-          "longitude" : locationData.long != null ? locationData.long.toString() : "",
+          "latitude": locationData.lat != null ? locationData.lat.toString() : "0.0",
+          "longitude": locationData.long != null
+              ? locationData.long.toString()
+              : "0.0",
         };
         var res =  await ServerRequest.postDataWithFile(urlEndPoint: url,
             body: json, context: !context.mounted ? context :context, fileList: fileList);
-        if(res != null){
+        if(res != null &&  res['message'] != null){
+          SnackBarSuccessWidget(!context.mounted ? context :context).show(message: res['message'].toString());
           return res;
         }
         return null;

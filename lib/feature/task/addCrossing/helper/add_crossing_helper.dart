@@ -94,7 +94,7 @@ class AddCrossingHelper {
         locationData = locationRes;
       }
       var json = {
-        "task_id": taskData.objectId.toString(),
+        "task_id": taskData.taskId.toString(),
         "inspectiondate": DateTime.now().toString(),
         "featuretype": crossingTypeData.name.toString(),
         "featuresubtype": "",
@@ -102,16 +102,17 @@ class AddCrossingHelper {
         "marker_condition": markerCondition.toString(),
         "vent_drain": drainCondition.toString(),
         "bank_condition": bankCondition.toString(),
-        "latitude": locationData.lat != null ? locationData.lat.toString() : "",
+        "latitude": locationData.lat != null ? locationData.lat.toString() : "0.0",
         "longitude": locationData.long != null
             ? locationData.long.toString()
-            : "",
+            : "0.0"
       };
       var res = await ServerRequest.postDataWithFile(urlEndPoint: url,
           body: json,
           context: !context.mounted ? context : context,
           fileList: fileList);
-      if (res != null) {
+      if (res != null && res['message'] != null) {
+        SnackBarSuccessWidget(!context.mounted ? context : context).show(message: res['message'].toString());
         return res;
       }
       return null;

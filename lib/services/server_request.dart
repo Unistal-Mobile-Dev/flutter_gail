@@ -239,12 +239,9 @@ class ServerRequest {
           if (fileData.file.path.isNotEmpty) {
             String fileExtention = fileData.file.path.split(".").last;
             String filePath0 =
-                (fileExtention.toString().toLowerCase() == "pdf"
-                    || fileExtention.toString().toLowerCase() == "mp4"
-                    || fileExtention.toString().toLowerCase() == "xls"
-                    || fileExtention.toString().toLowerCase() == "xlsx"
-                    || fileExtention.toString().toLowerCase() == "csv"
-                    || fileExtention.toString().toLowerCase() == "mov")
+                (fileExtention.toString().toLowerCase() != "png"
+                    || fileExtention.toString().toLowerCase() != "jpg"
+                    || fileExtention.toString().toLowerCase() != "jpeg")
                     ? fileData.file.path.toString()
                     : await fileCompress(file: fileData.file);
             if (fileData.file.toString().isNotEmpty) {
@@ -264,12 +261,9 @@ class ServerRequest {
           if (filePath.isNotEmpty) {
             File file = File(filePath);
             String fileExtention = filePath.split(".").last;
-            String filePath1 = fileExtention.toString().toLowerCase() != "pdf"
-                || fileExtention.toString().toLowerCase() != "mp4"
-                || fileExtention.toString().toLowerCase() != "mov"
-                || fileExtention.toString().toLowerCase() != "xls"
-                || fileExtention.toString().toLowerCase() != "xlsx"
-                || fileExtention.toString().toLowerCase() != "csv"
+            String filePath1 = fileExtention.toString().toLowerCase() == "png"
+                || fileExtention.toString().toLowerCase() == "jpg"
+                || fileExtention.toString().toLowerCase() == "jpeg"
                 ? await fileCompress(file: file)
                 : file.path.toString();
             var uploadFile = await MultipartFile.fromPath(keyWord, filePath1,
@@ -288,15 +282,11 @@ class ServerRequest {
         var result = json.decode(String.fromCharCodes(responseData));
         log(result.toString());
         return result;
-      } else if (response.statusCode == 415) {
-        var result = json.decode(String.fromCharCodes(responseData));
-        log(result.toString());
-        return result;
-      } else if (response.statusCode == 400) {
-        var result = json.decode(String.fromCharCodes(responseData));
-        log(result.toString());
-        return result;
       } else {
+        var result = json.decode(String.fromCharCodes(responseData));
+        if(result.toString().contains("message")){
+          SnackBarErrorWidget(!context.mounted ? context : context).show(message: result['message'].toString());
+        }
         return null;
       }
     } catch (e) {

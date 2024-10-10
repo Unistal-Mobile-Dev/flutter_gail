@@ -7,14 +7,14 @@ class TaskModel {
   String? taskId;
   String? patrollRouteId;
   String? patrollRouteName;
-  int? patrollRouteLength;
+  dynamic patrollRouteLength;
   String? shiftName;
   String? sgCode;
   String? assignedStartDate;
   String? assignedEndDate;
   String? repeatFrequency;
-  int? userId;
-  int? patrollManStatus;
+  dynamic userId;
+  dynamic patrollManStatus;
 
   TaskModel(
       {this.objectId,

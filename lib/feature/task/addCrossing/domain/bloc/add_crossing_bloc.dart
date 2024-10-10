@@ -128,7 +128,7 @@ class AddCrossingBloc extends Bloc<AddCrossingEvent, AddCrossingState> {
         voiceFile: voiceRecordFile,
         videoFile: videoFile);
     if(res != null){
-
+      Navigator.pop(!event.context.mounted ? event.context : event.context);
     }
     isLoader =  false;
     _eventCompleted(emit);

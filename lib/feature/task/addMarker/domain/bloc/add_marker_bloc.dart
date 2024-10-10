@@ -119,7 +119,15 @@ class AddMarkerBloc extends Bloc<AddMarkerEvent, AddMarkerState> {
         remark: remarkController.text.toString(),
         cameraFile: cameraFile, voiceFile: voiceRecordFile, videoFile: videoFile);
     if(res != null){
-
+      isLoader =  false;
+      markerTypeData =  MarkerTypeModel();
+      condition = "1";
+      painting = "1";
+      remarkController.text = "";
+      cameraFile = File("");
+      videoFile = File("");
+      voiceRecordFile = File("");
+      Navigator.pop(!event.context.mounted ? event.context : event.context);
     }
     isLoader = false;
     _eventCompleted(emit);
