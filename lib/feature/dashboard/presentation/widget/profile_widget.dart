@@ -45,13 +45,13 @@ class ProfileWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextWidget(
-                    userData.name.toString(),
+                   "${ userData.users!.firstName.toString()} ${ userData.users!.surName.toString()}",
                     color: AppColor.black,
                     fontSize: AppFont.font_15,
                     fontWeight: FontWeight.w700,
                   ),
                   TextWidget(
-                    userData.email.toString(),
+                    userData.users!.emailId.toString(),
                     color: AppColor.grey,
                     fontSize: AppFont.font_13,
                     fontWeight: FontWeight.w400,

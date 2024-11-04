@@ -14,8 +14,8 @@ final class CreateTaskPageLoadState extends CreateTaskInitial {}
 
 final class FetchCreateTaskDataState extends CreateTaskInitial {
   final bool isLoader;
-  final List<ShiftModel> shiftList;
-  final ShiftModel shiftData;
+  final List<ShiftTypeModel> shiftList;
+  final ShiftTypeModel shiftData;
   final List<LineModel> lineList;
   final LineModel lineData;
   final TextEditingController startPatrollingDateController;
@@ -23,6 +23,30 @@ final class FetchCreateTaskDataState extends CreateTaskInitial {
   final TextEditingController startPatrollingTimeController;
   final TextEditingController endPatrollingTimeController;
   final TextEditingController taskDateController;
+  final List<TaskTypeModel> taskTypeList;
+  final TaskTypeModel taskTypeData;
+  final List<RegionTypeModel> regionTypeList;
+  final RegionTypeModel regionTypeData;
+  final List<MaintenanceTypeModel> maintenanceTypeList;
+  final MaintenanceTypeModel maintenanceTypeData ;
+  final List<PipelineModel> pipelineList;
+  final PipelineModel pipelineData;
+  final List<RouteModel> routeList;
+  final RouteModel routeData;
+  final List<ShiftGroupModel> shiftGroupList;
+  final ShiftGroupModel shiftGroupData;
+  final List<UserTypeModel> userTypeList;
+  final UserTypeModel userTypeData;
+  final List<VendorModel> vendorList;
+  final VendorModel vendorData;
+  final List<WalkerModel> walkerList;
+  final WalkerModel walkerData;
+  final List<SectionModel> sectionList;
+  final SectionModel sectionData;
+  final List<RepeatFrequencyModel> repeatFrequencyList;
+  final List<RepeatFrequencyModel> repeatFrequencyData;
+  final List<UserNameModel> userNameList;
+  final List<UserNameModel> userNameData;
 
   FetchCreateTaskDataState({
     required this.isLoader,
@@ -35,6 +59,30 @@ final class FetchCreateTaskDataState extends CreateTaskInitial {
     required this.startPatrollingDateController,
     required this.startPatrollingTimeController,
     required this.taskDateController,
+    required this.vendorData,
+    required this.userTypeData,
+    required this.shiftGroupData,
+    required this.routeData,
+    required this.pipelineData,
+    required this.taskTypeData,
+    required this.vendorList,
+    required this.maintenanceTypeData,
+    required this.maintenanceTypeList,
+    required this.pipelineList,
+    required this.regionTypeData,
+    required this.regionTypeList,
+    required this.routeList,
+    required this.shiftGroupList,
+    required this.taskTypeList,
+    required this.userTypeList,
+    required this.walkerData,
+    required this.walkerList,
+    required this.sectionList,
+    required this.sectionData,
+    required this.repeatFrequencyData,
+    required this.repeatFrequencyList,
+    required this.userNameData,
+    required this.userNameList,
   });
 
   @override
@@ -49,5 +97,29 @@ final class FetchCreateTaskDataState extends CreateTaskInitial {
     startPatrollingDateController,
     startPatrollingTimeController,
     taskDateController,
+    vendorData,
+    userTypeData,
+    shiftGroupData,
+    routeData,
+    pipelineData,
+    taskTypeData,
+    vendorList,
+    maintenanceTypeData,
+    maintenanceTypeList,
+    pipelineList,
+    regionTypeData,
+    regionTypeList,
+    routeList,
+    shiftGroupList,
+    taskTypeList,
+    userTypeList,
+    walkerData,
+    walkerList,
+    sectionList,
+    sectionData,
+    repeatFrequencyData,
+    repeatFrequencyList,
+    userNameData,
+    userNameList,
   ];
 }

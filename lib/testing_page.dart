@@ -32,7 +32,6 @@ class _TestPageState extends State<TestPage> {
     servicestatus = await Geolocator.isLocationServiceEnabled();
     if(servicestatus){
       permission = await Geolocator.checkPermission();
-
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
@@ -45,7 +44,6 @@ class _TestPageState extends State<TestPage> {
       }else{
         haspermission = true;
       }
-
       if(haspermission){
         setState(() {});
         getLocation();

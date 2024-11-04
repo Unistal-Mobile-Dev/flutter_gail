@@ -1,100 +1,196 @@
-import 'package:flutter_gail/ExportFile/app_export_file.dart';
 
-List<LoginDataModel> loginScreenResponseData(var json) {
-  return List<LoginDataModel>.from(json.map((x) => LoginDataModel.fromJson(x)));
-}
 
 LoginDataModel loginResponse(var json) {
   return LoginDataModel.fromJson(json);
 }
 
 class LoginDataModel {
-  dynamic userId;
-  String? email;
-  String? moduleId;
-  String? name;
-  dynamic userStatus;
-  String? pwdChanged;
-  dynamic modules;
-  String? schema;
-  String? spreadId;
-  String? sectionId;
-  String? password;
-  String? token;
-  RoleType? roleType;
-  String? role;
-  String? roleName;
-  String? roleId;
-  String? stationId;
-  dynamic mDbStatus;
-  dynamic employeeId;
+  Users? users;
+  List<Modules>? modules;
+  List<Roles>? roles;
+  List<dynamic>? groups;
+  List<dynamic>? verificationDetails;
+  Tokens? tokens;
 
-
-  LoginDataModel({
-    this.userId,
-    this.email,
-    this.moduleId,
-    this.name,
-    this.userStatus,
-    this.pwdChanged,
-    this.modules,
-    this.schema,
-    this.spreadId,
-    this.sectionId,
-    this.token,
-    this.roleType,
-    this.password,
-    this.role,
-    this.roleName,
-    this.roleId,
-    this.stationId,
-    this.mDbStatus,
-    this.employeeId,
-  });
+  LoginDataModel(
+      {this.users,
+      this.modules,
+      this.roles,
+      this.groups,
+      this.verificationDetails,
+      this.tokens});
 
   LoginDataModel.fromJson(Map<String, dynamic> json) {
-    userId = json['user_id'] ?? "";
-    email = json['email'] ?? "";
-    token = json['employee_id'] ?? "";
-    employeeId = json['token'] ?? "";
-    password = json['password'] ?? "";
-    moduleId = json['module_id'] ?? "";
-    name = json['name'] ?? "";
-    userStatus = json['status'] ?? "0";
-    pwdChanged = json['pwd_changed'] ?? "";
-    modules = json['modules'] ?? "";
-    schema = json['schema'] ?? "";
-    spreadId = json['spread_id'] ?? "";
-    sectionId = json['section_id'] ?? "";
-    role = json['user_type'] ?? "";
-    roleName = json['role'] ?? "";
-    roleId = json['role_id'] ?? "";
-    stationId = json['station_id'] ?? "";
-    mDbStatus = json['mdb_status'] ?? "0";
-    roleType = json['user_type'] != null
-        ? getRole(role: json['user_type'])
-        : RoleType.patrollingMan;
+    users = json['users'] != null ? Users.fromJson(json['users']) : null;
+    if (json['modules'] != null) {
+      modules = <Modules>[];
+      json['modules'].forEach((v) {
+        modules!.add(Modules.fromJson(v));
+      });
+    }
+    if (json['roles'] != null) {
+      roles = <Roles>[];
+      json['roles'].forEach((v) {
+        roles!.add(Roles.fromJson(v));
+      });
+    }
+
+    tokens = json['tokens'] != null ? Tokens.fromJson(json['tokens']) : null;
   }
 
-  getRole({required String role}) {
-    switch (role) {
-      case "SU":
-        return RoleType.patrollingMan;
-      case "SE":
-        return RoleType.shiftEngineer;
-      case "MI":
-        return RoleType.mi;
-      case "AMO":
-        return RoleType.amo;
-      case "CV":
-        return RoleType.cv;
-      case "CI":
-        return RoleType.ci;
-      case "LCVM":
-        return RoleType.lcvManager;
-      default:
-        return RoleType.noRole;
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (users != null) {
+      data['users'] = users!.toJson();
     }
+    if (modules != null) {
+      data['modules'] = modules!.map((v) => v.toJson()).toList();
+    }
+    if (roles != null) {
+      data['roles'] = roles!.map((v) => v.toJson()).toList();
+    }
+    if (tokens != null) {
+      data['tokens'] = tokens!.toJson();
+    }
+    return data;
+  }
+}
+
+class Users {
+  dynamic id;
+  String? firstName;
+  String? surName;
+  String? emailId;
+  String? mobileNo;
+  String? countryCode;
+  String? companyName;
+  String? department;
+  String? designation;
+  String? securityId;
+  dynamic status;
+  String? createdAt;
+  String? updatedAt;
+  dynamic updatedBy;
+  dynamic createdBy;
+  String? uuidUserId;
+  dynamic type;
+
+  Users(
+      {this.id,
+      this.firstName,
+      this.surName,
+      this.emailId,
+      this.mobileNo,
+      this.countryCode,
+      this.companyName,
+      this.department,
+      this.designation,
+      this.securityId,
+      this.status,
+      this.createdAt,
+      this.updatedAt,
+      this.updatedBy,
+      this.createdBy,
+      this.uuidUserId,
+      this.type});
+
+  Users.fromJson(Map<String, dynamic> json) {
+    id = json['id'] ?? "";
+    firstName = json['first_name'] ?? "";
+    surName = json['sur_name'] ?? "";
+    emailId = json['email_id'] ?? "";
+    mobileNo = json['mobile_no'] ?? "";
+    countryCode = json['country_code'] ?? "";
+    companyName = json['company_name'] ?? "";
+    department = json['department'] ?? "";
+    designation = json['designation'] ?? "";
+    securityId = json['security_id'] ?? "";
+    status = json['status'] ?? "";
+    createdAt = json['created_at'] ?? "";
+    updatedAt = json['updated_at'] ?? "";
+    updatedBy = json['updated_by'] ?? "";
+    createdBy = json['created_by'] ?? "";
+    uuidUserId = json['uuid_user_id'] ?? "";
+    type = json['type'] ?? "";
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['first_name'] = firstName;
+    data['sur_name'] = surName;
+    data['email_id'] = emailId;
+    data['mobile_no'] = mobileNo;
+    data['country_code'] = countryCode;
+    data['company_name'] = companyName;
+    data['department'] = department;
+    data['designation'] = designation;
+    data['security_id'] = securityId;
+    data['status'] = status;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    data['updated_by'] = updatedBy;
+    data['created_by'] = createdBy;
+    data['uuid_user_id'] = uuidUserId;
+    data['type'] = type;
+    return data;
+  }
+}
+
+class Modules {
+  String? permissionMask;
+  String? moduleName;
+
+  Modules({this.permissionMask, this.moduleName});
+
+  Modules.fromJson(Map<String, dynamic> json) {
+    permissionMask = json['permission_mask'] ?? "";
+    moduleName = json['module_name'] ?? "";
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['permission_mask'] = permissionMask;
+    data['module_name'] = moduleName;
+    return data;
+  }
+}
+
+class Roles {
+  int? roleId;
+  String? roleName;
+
+  Roles({this.roleId, this.roleName});
+
+  Roles.fromJson(Map<String, dynamic> json) {
+    roleId = json['role_id'] ?? "";
+    roleName = json['role_name'] ?? "";
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['role_id'] = roleId;
+    data['role_name'] = roleName;
+    return data;
+  }
+}
+
+class Tokens {
+  String? access;
+  int? expiresIn;
+
+  Tokens({this.access, this.expiresIn});
+
+  Tokens.fromJson(Map<String, dynamic> json) {
+    access = json['access'] ?? "";
+    expiresIn = json['expiresIn'] ?? "";
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['access'] = access;
+    data['expiresIn'] = expiresIn;
+    return data;
   }
 }
 
@@ -108,15 +204,27 @@ class LoginScreenRequestModel {
       {required this.userEmailId,
       required this.password,
       required this.firebaseId,
-      required this.deviceId
-      });
+      required this.deviceId});
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
       "email": userEmailId,
       "password": password,
-      "firebaseId": firebaseId,
-      "deviceId": deviceId,
+      "browserDetails": {
+        "browserName": "",
+        "browserVersion": "",
+        "userAgent": "",
+        "platform": "android"
+      },
+      "ipAddress": "",
+      "location": {
+        "city": "",
+        "region": "",
+        "country": "",
+        "postal": "",
+        "latitude": 0,
+        "longitude": 0,
+      }
     };
     return map;
   }

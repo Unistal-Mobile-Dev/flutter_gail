@@ -74,12 +74,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(HomePageLoadState());
     _bottomTabIndex = 0;
     _userData = UserInfo.instance!.userData!;
-    _roleType = userData.roleType!;
     _bottomNavigationBarItemList = [];
     _restaurantMenu = [];
     _pageWidgetList = [];
     FirebaseService.instance.setupInteractedMessage();
-    _title = "Complaint ( ${userData.roleName} )";
     _childWidget = const DashboardPage();
     _actionButtonWidget = const SizedBox.shrink();
 

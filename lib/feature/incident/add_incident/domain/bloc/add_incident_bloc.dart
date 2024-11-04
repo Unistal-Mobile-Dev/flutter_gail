@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/model/incident_type_model.dart';
+import 'package:flutter_gail/feature/incident/add_incident/helper/add_incident_helper.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 
 part 'add_incident_event.dart';
 part 'add_incident_state.dart';
@@ -14,11 +17,13 @@ class AddIncidentBloc extends Bloc<AddIncidentEvent, AddIncidentState> {
   File imageFile =  File("");
   File audioRecordFile =  File("");
   File videoFile =  File("");
+  TaskModel taskData =  TaskModel();
 
   AddIncidentBloc() : super(AddIncidentInitial()) {
     on<AddIncidentPageLoadEvent>(_pageLoad);
     on<AddIncidentSelectTypeEvent>(_selectIncidentType);
     on<AddIncidentSelectImageEvent>(_selectImage);
+    on<AddIncidentSelectAudioEvent>(_selectAudio);
     on<AddIncidentSelectVideoEvent>(_selectVideo);
     on<AddIncidentSubmitEvent>(_submit);
   }
@@ -32,6 +37,14 @@ class AddIncidentBloc extends Bloc<AddIncidentEvent, AddIncidentState> {
     imageFile =  File("");
     audioRecordFile =  File("");
     videoFile =  File("");
+    taskData =  BlocProvider.of<TaskBloc>(!event.context.mounted?  event.context : event.context).taskData;
+
+     if(incidentTypeList.isEmpty){
+       var res =  await AddIncidentHelper.fetchIncidentTypeData();
+       if(res != null){
+         incidentTypeList =  res;
+       }
+     }
     _eventComplete(emit);
   }
 
@@ -55,6 +68,11 @@ class AddIncidentBloc extends Bloc<AddIncidentEvent, AddIncidentState> {
     _eventComplete(emit);
   }
 
+  _selectAudio(AddIncidentSelectAudioEvent event, emit) {
+    audioRecordFile =  File(event.audioPath);
+    _eventComplete(emit);
+  }
+
   _selectVideo(AddIncidentSelectVideoEvent event, emit) async {
     if(event.mediaType == 1){
       var res =  await DashboardHelper.videoPiker(context: event.context);
@@ -73,6 +91,23 @@ class AddIncidentBloc extends Bloc<AddIncidentEvent, AddIncidentState> {
 
   _submit(AddIncidentSubmitEvent event, emit) async {
 
+    bool isTextFieldValidation =  await AddIncidentHelper.textFieldValidation(
+        context: !event.context.mounted ? event.context : event.context,
+        incidentTypeData: incidentTypeData, incidentReport: incidentReportController.text.toString());
+    if(isTextFieldValidation == false){
+      return false;
+    }
+    isLoader = true;
+    _eventComplete(emit);
+    var res =  await AddIncidentHelper.saveIncidentData(context: !event.context.mounted ? event.context : event.context,
+        taskData: taskData, incidentTypeData: incidentTypeData,
+        incidentReport: incidentReportController.text.toString(),
+        imageFile: imageFile, audioFile: audioRecordFile, videoFile: videoFile);
+    if(res != null){
+      Navigator.pop(!event.context.mounted ? event.context : event.context);
+    }
+    isLoader = false;
+    _eventComplete(emit);
   }
 
   _eventComplete(Emitter<AddIncidentState>emit) {

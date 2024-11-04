@@ -125,7 +125,7 @@ class ServerRequest {
   }
 
   static Future<dynamic> postData(
-      {required var urlEndPoint, required var body}) async {
+      {required var urlEndPoint, required var body, required BuildContext context}) async {
     try {
       String url = APIs.baseUrl + urlEndPoint;
       log(url);
@@ -138,10 +138,17 @@ class ServerRequest {
       if (response.statusCode == 200) {
         updateCookie(response);
         return jsonDecode(response.body);
-      } else if (response.statusCode == 500) {
+      }
+      else if (response.statusCode == 201) {
+        updateCookie(response);
         return jsonDecode(response.body);
-      } else if (response.statusCode == 401) {
-        return jsonDecode(response.body);
+      }
+      else {
+        var json = jsonDecode(response.body);
+        if(json.toString().contains("message")){
+          SnackBarErrorWidget(!context.mounted ? context : context).show(message: json['message'].toString());
+        }
+        return null;
       }
     } catch (e) {
       if (kDebugMode) {
@@ -305,10 +312,15 @@ class ServerRequest {
   }
 
   static addToken() {
-    String token = UserInfo.instanceInit()!.userData != null
-        ? "Bearer ${UserInfo.instanceInit()!.userData!.token.toString()}"
-        : "";
-    header["Authorization"] = token;
+    try{
+      String token = UserInfo.instanceInit()!.userData!.tokens!.access != null
+          ? "Bearer ${UserInfo.instanceInit()!.userData!.tokens!.access.toString()}"
+          : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ik9jdG9iZXIhQDI0IiwiZW1haWwiOiJ1bmJoYXNrYXJAZ2FpbC5jby5pbiIsInJvbGVzIjpbInN1cGVyLWFkbWluIl0sImlhdCI6MTcyODQ3MDcxMywiZXhwIjoxNzI4NTU3MTEzfQ.RcSrJgyB2zCh8H2-ngdZgBdlBv2kt7lr_LvykL_mQ9M";
+      header["Authorization"] = token;
+    } catch(_){
+      header["Authorization"] = "";
+    }
+
   }
 
   static Future<String> fileCompress({required File file}) async {

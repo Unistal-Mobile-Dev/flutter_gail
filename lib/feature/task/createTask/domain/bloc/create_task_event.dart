@@ -12,7 +12,7 @@ class CreateTaskPageLoadEvent extends CreateTaskEvent {
 }
 
 class CreateTaskSelectShitDataEvent extends CreateTaskEvent {
-  final ShiftModel shiftData;
+  final ShiftTypeModel shiftData;
   const CreateTaskSelectShitDataEvent({required this.shiftData});
   @override
   List<Object?> get props => [shiftData];
@@ -73,6 +73,87 @@ class CreateTaskDateEvent extends CreateTaskEvent {
   @override
   List<Object?> get props => [context, dateTime];
 }
+
+class CreateTaskTypeEvent extends CreateTaskEvent {
+  final TaskTypeModel taskTypeData;
+  const CreateTaskTypeEvent({required this.taskTypeData});
+  @override
+  List<Object?> get props => [taskTypeData];
+}
+
+class CreateTaskRegionEvent extends CreateTaskEvent {
+  final RegionTypeModel regionTypeData;
+  const CreateTaskRegionEvent({required this.regionTypeData});
+  @override
+  List<Object?> get props => [regionTypeData];
+}
+
+class CreateTaskMaintenanceTypeEvent extends CreateTaskEvent {
+  final MaintenanceTypeModel maintenanceTypeData;
+  const CreateTaskMaintenanceTypeEvent({required this.maintenanceTypeData});
+  @override
+  List<Object?> get props => [maintenanceTypeData];
+}
+
+class CreateTaskPipelineTypeEvent extends CreateTaskEvent {
+  final PipelineModel pipelineData;
+  const CreateTaskPipelineTypeEvent({required this.pipelineData});
+  @override
+  List<Object?> get props => [pipelineData];
+}
+
+class CreateTaskSectionTypeEvent extends CreateTaskEvent {
+  final SectionModel sectionData;
+  const CreateTaskSectionTypeEvent({required this.sectionData});
+  @override
+  List<Object?> get props => [sectionData];
+}
+
+
+class CreateTaskRouteEvent extends CreateTaskEvent {
+  final RouteModel routeData;
+  const CreateTaskRouteEvent({required this.routeData});
+  @override
+  List<Object?> get props => [routeData];
+}
+
+class CreateTaskShiftGroupEvent extends CreateTaskEvent {
+  final String selectedValue;
+  final int index;
+  const CreateTaskShiftGroupEvent({
+    required this.selectedValue, required this.index});
+  @override
+  List<Object?> get props => [selectedValue, index];
+}
+
+class CreateTaskVendorEvent extends CreateTaskEvent {
+  final VendorModel vendorData;
+  const CreateTaskVendorEvent({required this.vendorData});
+  @override
+  List<Object?> get props => [vendorData];
+}
+
+class CreateTaskUserTypeEvent extends CreateTaskEvent {
+  final UserTypeModel userTypeData;
+  const CreateTaskUserTypeEvent({required this.userTypeData});
+  @override
+  List<Object?> get props => [userTypeData];
+}
+
+class CreateTaskRepeatFrequencyEvent extends CreateTaskEvent {
+  final List<RepeatFrequencyModel> repeatFrequencyData;
+  const CreateTaskRepeatFrequencyEvent({required this.repeatFrequencyData});
+  @override
+  List<Object?> get props => [repeatFrequencyData];
+}
+
+class CreateTaskUserNameEvent extends CreateTaskEvent {
+  final List<UserNameModel> userNameData;
+  const CreateTaskUserNameEvent({required this.userNameData});
+  @override
+  List<Object?> get props => [userNameData];
+}
+
 
 class CreateTaskSubmitEvent extends CreateTaskEvent {
   final BuildContext context;

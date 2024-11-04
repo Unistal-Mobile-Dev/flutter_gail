@@ -87,7 +87,6 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
       children: [
         IconButton(
           onPressed: () {
-
             mediaType(context: context,
                 onPressedCamera: () {
                   BlocProvider.of<AddIncidentBloc>(context)
@@ -100,8 +99,14 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
                   Navigator.pop(context);
                 }
             );
-          }, icon: Icon(Icons.camera_alt,
-          color: AppColor.grey,),
+          }, icon: dataState.imageFile.path.isEmpty
+            ? Icon(Icons.camera_alt, color: AppColor.grey,)
+            : ClipOval(child: Image.file(
+          dataState.imageFile,
+          height: MediaQuery.of(context).size.width * 0.10,
+          width: MediaQuery.of(context).size.width * 0.10,
+        ),
+        ),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),
 
@@ -131,8 +136,7 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
               BlocProvider.of<AddIncidentBloc>(!context.mounted ? context : context,)
                   .add(AddIncidentSelectAudioEvent(audioPath: res.toString()));
             }
-          }, icon: Icon(Icons.mic,
-          color: AppColor.grey,),
+          }, icon: Icon(Icons.mic, color: dataState.audioRecordFile.path.isNotEmpty ? AppColor.themeColor :AppColor.grey,),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),
 
@@ -151,18 +155,19 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
                 }
             );
           }, icon: Icon(Icons.video_camera_back,
-          color: AppColor.grey,),
+          color: dataState.videoFile.path.isNotEmpty ? AppColor.themeColor : AppColor.grey,),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),
       ],
     );
   }
-  
+
   Widget _submit({required FetchAddIncidentDataState dataState}) {
     return dataState.isLoader == false ?
         ButtonWidget(text: AppString.submit, 
             onPressed: () {
-          
+             BlocProvider.of<AddIncidentBloc>(context)
+                 .add(AddIncidentSubmitEvent(context: context));
             }
         ) : const DottedLoaderWidget();
   }

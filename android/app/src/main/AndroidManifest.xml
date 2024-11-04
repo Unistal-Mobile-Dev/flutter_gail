@@ -2,7 +2,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature android:name="android.hardware.camera"
-        android:required="false" tools:targetApi="eclair"/>
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="FLUTTER_NOTIFICATION_CLICK"/>
     <uses-permission android:name="android.intent.category.DEFAULT"/>
@@ -25,6 +26,7 @@
     <application
         android:label="flutter_gail"
         android:name="${applicationName}"
+        android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

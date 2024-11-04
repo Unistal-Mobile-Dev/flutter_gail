@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/helper/task_helper.dart';
 
@@ -13,10 +15,16 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   List<TaskModel> taskList = [];
   List<TaskModel> searchTaskList = [];
   TaskModel taskData =  TaskModel();
+  int tabIndex = 0;
+
+  DateTime startDate =  DateTime.now();
+  DateTime endDate =  DateTime.now();
 
   TaskBloc() : super(TaskInitial()) {
     on<TaskPageLoadEvent>(_pageLoad);
+    on<TaskPageSelectDateEvent>(_selectDate);
     on<TaskPageSelectDataEvent>(_selectTask);
+    on<TaskPagRefreshDataEvent>(_pageRefresh);
     on<TaskTabIndexEvent>(_tabIndex);
   }
 
@@ -25,30 +33,67 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     isLoader =  false;
     taskList = [];
     searchTaskList = [];
+    tabIndex = 0;
     taskData =  TaskModel();
+    startDate = DateTime.now().subtract(const Duration(days: 7));
+    endDate =  DateTime.now();
     var res = await TaskHelper.fetchTask();
     taskList =  res ?? [];
     searchTaskList  =  taskList;
-    taskList = searchTaskList.where((taskData) => taskData.patrollManStatus.toString() == "0").toList();
+    taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList();
     _eventComplete(emit);
   }
 
+  _selectDate(TaskPageSelectDateEvent event, emit) async {
+    try{
+      DateTimeRange? dateTimeRange = await showDateRangePicker(
+        context: !event.context.mounted ? event.context : event.context,
+        firstDate: startDate,
+        lastDate: endDate,
+        currentDate: DateTime.now(),
+        saveText: 'Done',
+      );
+      if(dateTimeRange != null){
+        startDate =  dateTimeRange!.start;
+        endDate =  dateTimeRange.end;
+      }
+    }catch(_){}
+  }
+
   _tabIndex(TaskTabIndexEvent event, emit) {
-    if(event.tabIndex == 0){
-      taskList = searchTaskList.where((taskData) => taskData.patrollManStatus.toString() == "0").toList();
+    tabIndex =  event.tabIndex;
+    if(tabIndex == 0){
+      taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList();
     }
-    else if(event.tabIndex == 1){
-      taskList = searchTaskList.where((taskData) => taskData.patrollManStatus.toString() != "0"
-           && taskData.patrollManStatus.toString() != "2" ).toList();
+    else if(tabIndex== 1){
+      taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.started
+          || taskData.taskStatus == TaskStatus.pause ).toList();
     }
-    else if(event.tabIndex == 2){
-      taskList = searchTaskList.where((taskData) => taskData.patrollManStatus.toString() == "2" ).toList();
+    else if(tabIndex == 2){
+      taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed  ).toList();
     }
     _eventComplete(emit);
   }
 
   _selectTask(TaskPageSelectDataEvent event, emit) {
     taskData =  taskList[event.index];
+    _eventComplete(emit);
+  }
+
+  _pageRefresh(TaskPagRefreshDataEvent event, emit) async {
+    var res = await TaskHelper.fetchTask();
+    taskList =  res ?? [];
+    searchTaskList  =  taskList;
+    if(tabIndex == 0){
+      taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList();
+    }
+    else if(tabIndex== 1){
+      taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.started
+          || taskData.taskStatus == TaskStatus.pause ).toList();
+    }
+    else if(tabIndex == 2){
+      taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed  ).toList();
+    }
     _eventComplete(emit);
   }
 

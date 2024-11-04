@@ -14,8 +14,8 @@ class IncidentTypeModel {
 
   factory IncidentTypeModel.fromJson(Map<String, dynamic> json) {
     return IncidentTypeModel(
-      id: json[''] ?? "",
-      name: json[''] ?? "",
+      id: json['id'] ?? "",
+      name: json['type'] ?? "",
     );
   }
 }

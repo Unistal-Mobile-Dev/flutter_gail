@@ -60,10 +60,10 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
             labelColor: Colors.white,
             unselectedLabelColor: Colors.black54,
             tabs:  [
-              TabItem(title: 'Pending', count: dataState.searchTaskList.where((taskData) => taskData.patrollManStatus.toString() == "0").toList().length),
-              TabItem(title: 'Ongoing', count: dataState.searchTaskList.where((taskData) => taskData.patrollManStatus.toString() != "0"
-                  && taskData.patrollManStatus.toString() != "2").toList().length),
-              TabItem(title: 'Completed', count: dataState.searchTaskList.where((taskData) => taskData.patrollManStatus.toString() == "2").toList().length),
+              TabItem(title: AppString.assigned, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList().length),
+              TabItem(title: AppString.onGoing, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.started
+                  || taskData.taskStatus == TaskStatus.pause).toList().length),
+              TabItem(title: AppString.completed, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed).toList().length),
             ],
             onTap: (index) {
               BlocProvider.of<TaskBloc>(context)
@@ -88,24 +88,33 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
 
   Widget _itemWidget({required FetchTaskDataState dataState}) {
     return dataState.taskList.isNotEmpty ?
-    ListView.builder(
-        padding: EdgeInsets.zero,
-        itemCount: dataState.taskList.length,
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-       return InkWell(
-           onTap: () {
-             if(dataState.taskList[index].patrollManStatus.toString() != "2"){
-               BlocProvider.of<TaskBloc>(context).add(TaskPageSelectDataEvent(index: index));
-               Navigator.push(
-                 !context.mounted ? context : context,
-                 FadeRoute(
-                     page: const MapPage()),
-               );
-             }
-           },
-           child: TaskItemBoxWidget(taskData: dataState.taskList[index]));
-    }) : Center(child: TextWidget("No Data", color: AppColor.black,),);
+    RefreshIndicator(
+      onRefresh:  _handleRefresh,
+      child: ListView.builder(
+          padding: EdgeInsets.zero,
+          itemCount: dataState.taskList.length,
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+         return InkWell(
+             onTap: () {
+               if(dataState.taskList[index].patrollManStatus.toString() != "3"){
+                 BlocProvider.of<TaskBloc>(context).add(TaskPageSelectDataEvent(index: index));
+                 Navigator.push(
+                   !context.mounted ? context : context,
+                   FadeRoute(
+                       page: const MapPage()),
+                 );
+               }
+             },
+             child: TaskItemBoxWidget(taskData: dataState.taskList[index]));
+      }),
+    ) : Center(child: TextWidget("No Data", color: AppColor.black,),);
+  }
+
+  Future<void> _handleRefresh() async {
+    await Future.delayed(const Duration(seconds: 1));
+    BlocProvider.of<TaskBloc>(!context.mounted ? context : context)
+        .add(TaskPagRefreshDataEvent(context: !context.mounted ? context : context));
   }
 
 }

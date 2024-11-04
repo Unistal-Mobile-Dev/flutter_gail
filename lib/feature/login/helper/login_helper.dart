@@ -62,35 +62,21 @@ class LoginHelper {
           firebaseId: firebaseToken.toString(),
           deviceId: deviceId,
         ).toJson();
+
         String url = APIs.login;
         var res = await ServerRequest.postData(
-            urlEndPoint: url, body: jsonEncode(json));
-        if (res != null &&
-            res["status"] != null &&
-            res['user_id'] != null) {
+            urlEndPoint: url, body: jsonEncode(json),
+            context: !context.mounted ? context : context);
+        if (res != null && res['users'] != null) {
           if (Platform.isAndroid) {
             await deleteCacheDir();
             await deleteAppDir();
           }
           return res;
-        } else if (res != null &&
-            res["status"] != null &&
-            res['status'] == 401 &&
-            res['messages'] != null) {
-          if (!context.mounted) return null;
-          SnackBarErrorWidget(context).show(message: res['messages'].toString().replaceAll("{", "").toString().replaceAll("}", ""));
-          return null;
-        } else {
-          if (!context.mounted) return null;
-          SnackBarErrorWidget(context).show(message: "Internal Server Error");
-          return null;
         }
       }
-      if (!context.mounted) return null;
-      SnackBarErrorWidget(context).show(message: "No internet Connection");
       return null;
     } catch (e) {
-      print(e.toString());
       if (!context.mounted) return null;
       SnackBarErrorWidget(context).show(message: "Internal server error");
       return null;

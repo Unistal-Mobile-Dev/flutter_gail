@@ -47,8 +47,7 @@ class _LoginScreenPageState extends State<LoginScreenPage> {
         builder: (context, state) {
           if (state is FetchLoginStateData) {
             return Center(
-              child:
-                  AppConfig.getDeviceType(context: context) == DeviceType.phone
+              child: AppConfig.getDeviceType(context: context) == DeviceType.phone
                       ? PhoneLoginWidget(dataState: state)
                       : TabletLoginWidget(
                           dataState: state,

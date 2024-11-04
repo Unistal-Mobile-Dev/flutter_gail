@@ -125,7 +125,33 @@ class AppString {
 
   static get incident => "Incident";
 
+  static get assigned => "Assigned";
 
+  static get pipelineName => "Pipeline Name";
+
+  static get sectionName => "Section Name";
+
+  static get patrolRouteName => "Patrol Route Name";
+
+  static get patrolRouteLength=> "Patrol Route Length";
+
+  static get shiftGroup => "Shift Group";
+
+  static get walkerDetails => "Walker Details";
+
+  static get assignedStartDate => "Assigned Start Data";
+
+  static get assignedEndDate => "Assigned End Date";
+
+  static get repeatFrequency => "Repeat Frequency";
+
+  static get userType => "User Type";
+
+  static get vendor => "Vendor";
+
+  static get patrollingStartDate =>  "Patrolling Start Date";
+
+  static get patrollingEndDate =>  "Patrolling End Date";
 
 
   static get logoutMessage =>

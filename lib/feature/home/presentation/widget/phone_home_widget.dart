@@ -26,7 +26,7 @@ class _PhoneHomeWidgetState extends State<PhoneHomeWidget> {
         extendBodyBehindAppBar: true,
         key: scaffoldKey,
         drawer: HomeDrawerWidget(),
-        // floatingActionButton: _addFloatingButton(),
+        floatingActionButton: _addFloatingButton(),
         appBar: AppBar(
           flexibleSpace: Container(
             decoration: BoxDecoration(

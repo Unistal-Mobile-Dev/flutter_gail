@@ -6,8 +6,13 @@ class DropDownSearchMultiSelectWidget extends StatelessWidget {
   final List<dynamic> items;
   final ValueChanged<dynamic> onChanged;
   final DropdownSearchItemAsString<dynamic>? itemAsString;
+  final DropdownSearchCompareFn<dynamic>? compareFn;
   final String hint;
   final List<dynamic>? selectedItem;
+  final OnItemAdded<dynamic>? onItemAdded;
+  final OnItemAdded<dynamic>? onItemRemoved;
+  final bool? showSearchBox;
+
 
   const DropDownSearchMultiSelectWidget({
     super.key,
@@ -15,7 +20,11 @@ class DropDownSearchMultiSelectWidget extends StatelessWidget {
     required this.onChanged,
     required this.itemAsString,
     required this.hint,
+    required this.compareFn,
     this.selectedItem,
+    this.onItemAdded,
+    this.onItemRemoved,
+    this.showSearchBox,
   });
 
   @override
@@ -24,7 +33,7 @@ class DropDownSearchMultiSelectWidget extends StatelessWidget {
       /*  height: MediaQuery.of(context).size.height * 0.07,*/
       child: DropdownSearch<dynamic>.multiSelection(
         selectedItems: selectedItem ?? [],
-        compareFn: (i, s) => i.isEqual(s),
+        compareFn: compareFn,
         decoratorProps: DropDownDecoratorProps(
           textAlign: TextAlign.start,
           textAlignVertical: TextAlignVertical.center,
@@ -50,6 +59,23 @@ class DropDownSearchMultiSelectWidget extends StatelessWidget {
         itemAsString: itemAsString,
         onChanged: onChanged,
         popupProps: PopupPropsMultiSelection.dialog(
+          onItemAdded: onItemAdded,
+          onItemRemoved: onItemRemoved,
+          searchFieldProps: TextFieldProps(
+            style: TextStyle(fontSize: AppFont.font_13),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(fontSize: AppFont.font_13),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(
+                  width: 1,
+                  style: BorderStyle.none,
+                ),
+              ),
+            ),
+          ),
+          showSearchBox: showSearchBox ?? false,
           validationBuilder: (ctx, selectedItems) {
             return Align(
               alignment: Alignment.centerRight,

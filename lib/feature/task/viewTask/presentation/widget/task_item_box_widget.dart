@@ -35,13 +35,77 @@ class TaskItemBoxWidget extends StatelessWidget {
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
              child: Row(
                children: [
-                 TextWidget(AppString.lineName + " : ",
+                 TextWidget(AppString.region + " : ",
+                   fontSize: AppFont.font_11,
+                   fontWeight: FontWeight.w700,
+                 ),
+                 Expanded(child: TextWidget(taskData.region.toString(),
+                   fontSize: AppFont.font_11,
+                 )
+                 )
+               ],
+             ),
+           ),
+
+           Padding(
+             padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+             child: Row(
+               children: [
+                 TextWidget(AppString.maintenanceBase + " : ",
                   fontSize: AppFont.font_11,
                   fontWeight: FontWeight.w700,
                  ),
-                 Expanded(child: TextWidget(taskData.patrollRouteName.toString(),
+                 Expanded(child: TextWidget(taskData.maintenanceBase.toString(),
                    fontSize: AppFont.font_11,
                    )
+                 )
+               ],
+             ),
+           ),
+
+           Padding(
+             padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+             child: Row(
+               children: [
+                 TextWidget(AppString.pipelineName + " : ",
+                   fontSize: AppFont.font_11,
+                   fontWeight: FontWeight.w700,
+                 ),
+                 Expanded(child: TextWidget(taskData.pipeline.toString(),
+                   fontSize: AppFont.font_11,
+                 )
+                )
+               ],
+             ),
+           ),
+
+           Padding(
+             padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+             child: Row(
+               children: [
+                 TextWidget(AppString.sectionName + " : ",
+                   fontSize: AppFont.font_11,
+                   fontWeight: FontWeight.w700,
+                 ),
+                 Expanded(child: TextWidget(taskData.section.toString(),
+                   fontSize: AppFont.font_11,
+                  )
+                 )
+               ],
+             ),
+           ),
+
+           Padding(
+             padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+             child: Row(
+               children: [
+                 TextWidget(AppString.patrolRouteName + " : ",
+                   fontSize: AppFont.font_11,
+                   fontWeight: FontWeight.w700,
+                 ),
+                 Expanded(child: TextWidget(taskData.patrollRouteName.toString(),
+                   fontSize: AppFont.font_11,
+                 )
                  )
                ],
              ),
@@ -51,7 +115,7 @@ class TaskItemBoxWidget extends StatelessWidget {
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
              child: Row(
                children: [
-                 TextWidget(AppString.lineLength + " : ",
+                 TextWidget(AppString.patrolRouteLength + " : ",
                    fontSize: AppFont.font_11,
                    fontWeight: FontWeight.w700,
                  ),
@@ -67,7 +131,7 @@ class TaskItemBoxWidget extends StatelessWidget {
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
              child: Row(
                children: [
-                 TextWidget(AppString.startPatrolling + " : ",
+                 TextWidget(AppString.patrollingStartDate + " : ",
                    fontSize: AppFont.font_11,
                    fontWeight: FontWeight.w700,
                  ),
@@ -83,7 +147,7 @@ class TaskItemBoxWidget extends StatelessWidget {
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
              child: Row(
                children: [
-                 TextWidget(AppString.endPatrolling + " : ",
+                 TextWidget(AppString.patrollingEndDate + " : ",
                    fontSize: AppFont.font_11,
                    fontWeight: FontWeight.w700,
                  ),
@@ -115,13 +179,30 @@ class TaskItemBoxWidget extends StatelessWidget {
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
              child: Row(
                children: [
+                 TextWidget(AppString.repeatFrequency + " : ",
+                   fontSize: AppFont.font_11,
+                   fontWeight: FontWeight.w700,
+                 ),
+                 Expanded(child: TextWidget(taskData.repeatFrequency.toString(),
+                   fontSize: AppFont.font_11,
+                 )
+                 )
+               ],
+             ),
+           ),
+
+           Padding(
+             padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+             child: Row(
+               children: [
                  TextWidget(AppString.taskStatus + " : ",
                    fontSize: AppFont.font_11,
                    fontWeight: FontWeight.w700,
                  ),
                  Expanded(child: TextWidget(
-                   taskData.patrollManStatus.toString() == "0" ? "Pending"
-                       : taskData.patrollManStatus.toString() == "2" ? "Completed" : "Ongoing",
+                   taskData.patrollManStatus.toString() == "0" ? "Not Started"
+                      :  taskData.patrollManStatus.toString() == "1" ? "Started"
+                       : taskData.patrollManStatus.toString() == "2" ? "Pause" : "Completed",
                    fontSize: AppFont.font_11,
                  )
                  )

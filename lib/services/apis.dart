@@ -27,5 +27,17 @@ class APIs {
 
   static get addCrossingPointApi => "patrolling-surveillance/crossing/add-crossing";
 
+  static get getIncidentTypeApi => "patrolling-surveillance/incident/types";
+
+  static get addIncidentDataApi => "patrolling-surveillance/incident/add-incident";
+
+  static get updateTaskApi => "patrolling-surveillance/patrollman-task/update-task-status";
+
+  static get createTaskValuesListApi => "patrolling-surveillance/patrollman-task/task-form-details";
+
+  static get areaStructureApi => "patrolling-surveillance/patrollman-task/area-structure";
+
+  static get assignTaskApi => "patrolling-surveillance/patrollman-task/assign-task";
+
   static get forgotPasswordApi => "";
 }

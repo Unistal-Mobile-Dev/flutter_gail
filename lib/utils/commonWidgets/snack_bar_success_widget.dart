@@ -6,10 +6,10 @@ class SnackBarSuccessWidget {
 
   SnackBarSuccessWidget(this.context);
 
-  show({required String message}) {
+  show({required dynamic message}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: TextWidget(
-        message,
+        message.toString(),
         fontSize: AppFont.font_14,
         color: AppColor.white,
       ),

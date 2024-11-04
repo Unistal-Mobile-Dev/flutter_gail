@@ -78,12 +78,12 @@ class HomeDrawerWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextWidget(
-                userData.name.toString(),
+                "${userData.users!.firstName.toString()} ${userData.users!.surName.toString()}",
                 fontSize: AppFont.font_14,
                 color: AppColor.white,
               ),
               TextWidget(
-                userData.email.toString(),
+                userData.users!.emailId.toString(),
                 color: AppColor.white,
                 fontSize: AppFont.font_12,
               ),

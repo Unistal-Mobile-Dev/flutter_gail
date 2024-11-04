@@ -104,15 +104,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       _eventCompleted(emit);
       if (res != null) {
         _loginData = loginResponse(res);
-        String _token = res['token'] ?? "";
-        _loginData.token = _token;
-        AppConfig.instanceInit()?.roleType = loginData.roleType;
-        if (loginData.roleType == RoleType.noRole) {
-          SnackBarErrorWidget(
-                  !event.context.mounted ? event.context : event.context)
-              .show(message: "Invalid role");
-          return;
-        }
+        // AppConfig.instanceInit()?.roleType = loginData.roleType;
+        // if (loginData.roleType == RoleType.noRole) {
+        //   SnackBarErrorWidget(
+        //           !event.context.mounted ? event.context : event.context)
+        //       .show(message: "Invalid role");
+        //   return;
+        // }
         UserInfo.instanceInit()?.userData = loginData;
         SharedPreferencesUtils.setString(
             key: PreferencesName.userName, value: email.toString());

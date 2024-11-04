@@ -11,12 +11,25 @@ class TaskPageLoadEvent extends TaskEvent {
   List<Object?> get props => [context];
 }
 
+class TaskPagRefreshDataEvent extends TaskEvent {
+  final BuildContext context;
+  const TaskPagRefreshDataEvent({required this.context});
+  @override
+  List<Object?> get props => [context];
+}
+
 class TaskPageSelectDataEvent extends TaskEvent {
   final int index;
   const TaskPageSelectDataEvent({required this.index});
   @override
   List<Object?> get props => [index];
+}
 
+class TaskPageSelectDateEvent extends TaskEvent {
+  final BuildContext context;
+  const TaskPageSelectDateEvent({required this.context});
+  @override
+  List<Object?> get props => [context];
 }
 
 class TaskTabIndexEvent extends TaskEvent {

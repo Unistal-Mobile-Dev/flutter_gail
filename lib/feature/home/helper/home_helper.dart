@@ -29,15 +29,13 @@ class HomeHelper {
     List<BottomNavigationBarItem> bottomNavigationBarItemList = [];
     try {
       LoginDataModel userData = UserInfo.instanceInit()!.userData!;
-      if (userData.roleType == RoleType.shiftEngineer) {
-        bottomNavigationBarItemList.add(BottomNavigationBarItem(
+/*        bottomNavigationBarItemList.add(BottomNavigationBarItem(
           icon: Image.asset(
             AppIcon.gailLogo,
             height: 20.0,
           ),
           label: AppString.appName,
-        ));
-      }
+        ));*/
     } catch (_) {}
 
     return bottomNavigationBarItemList;

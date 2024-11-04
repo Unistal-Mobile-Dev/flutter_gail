@@ -2,12 +2,15 @@ import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
+import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
 import 'package:flutter_gail/feature/map/presentation/widget/sample_state_support.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
 import 'package:flutter_gail/feature/task/addCrossing/presentation/page/add_crossing_page.dart';
 import 'package:flutter_gail/feature/task/addMarker/domain/bloc/add_marker_bloc.dart';
 import 'package:flutter_gail/feature/task/addMarker/presentation/page/add_marker_page.dart';
+import 'package:flutter_gail/pdf_helper.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
 
 class MapPage extends StatefulWidget {
@@ -114,6 +117,10 @@ Widget _actionButtons(){
             height: MediaQuery.of(context).size.width * 0.03,
           ),
           _addCrossingButton(),
+          SizedBox(
+            height: MediaQuery.of(context).size.width * 0.03,
+          ),
+          _addIncidentButton(),
         ],
       ),
     );
@@ -179,7 +186,7 @@ Widget _actionButtons(){
     return SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
-        label: TextWidget('Add marker',
+        label: TextWidget('Marker',
           color: AppColor.black,
           fontSize: AppFont.font_11,),
         icon: Icon(Icons.location_searching_sharp, color: AppColor.themeColor,
@@ -206,18 +213,47 @@ Widget _actionButtons(){
     return SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
-        label: TextWidget('Add Crossing',
+        label: TextWidget('Crossing',
           color: AppColor.black,
           fontSize: AppFont.font_11,),
         icon: Icon(Icons.transgender_outlined, color: AppColor.themeColor,
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () {
-               BlocProvider.of<AddCrossingBloc>(context).add(AddCrossingPageLoadEvent(context: context));
+               BlocProvider.of<AddCrossingBloc>(context)
+                   .add(AddCrossingPageLoadEvent(context: context));
           Navigator.push(
             !context.mounted ? context : context,
             FadeRoute(
                 page: const AddCrossingPage()),
           );
+        },
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
+          foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+          elevation: WidgetStateProperty.all<double>(3.0),
+          shadowColor: WidgetStateProperty.all<Color>(Colors.black),
+        ),
+      ),
+    );
+  }
+
+  Widget _addIncidentButton() {
+    return SizedBox(
+      height: MediaQuery.of(context).size.width * 0.10,
+      child: TextButton.icon(
+        label: TextWidget('Add Incident',
+          color: AppColor.black,
+          fontSize: AppFont.font_11,),
+        icon: Icon(Icons.gpp_maybe_sharp, color: AppColor.cardBlue,
+          size: MediaQuery.of(context).size.width * 0.05,),
+        onPressed: () async {
+          BlocProvider.of<AddIncidentBloc>(context).add(AddIncidentPageLoadEvent(context: context));
+/*          Navigator.push(
+            !context.mounted ? context : context,
+            FadeRoute(
+                page: const AddIncidentPage()),
+          );*/
+        PdfHelper.createPolyLine();
         },
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(Colors.white),

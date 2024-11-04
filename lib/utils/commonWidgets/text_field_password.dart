@@ -45,7 +45,7 @@ class TextFieldPasswordWidget extends StatelessWidget {
       obscureText: obscureText ?? false,
       style: TextStyle(
         fontSize: AppFont.font_14,
-        color: AppColor.themeSecondary,
+        color: AppColor.black,
       ),
       decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(
@@ -84,7 +84,7 @@ class TextFieldPasswordWidget extends StatelessWidget {
                     obscureText == true
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: AppColor.themeSecondary,
+                    color: AppColor.black,
                   ),
                 )
               : null),
