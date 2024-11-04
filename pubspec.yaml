@@ -62,6 +62,8 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1
+  build_runner: ^2.4.6
 
 flutter:
 
@@ -93,10 +95,10 @@ flutter:
 
 
 flutter_icons:
-    android: "ic_launcher_igl"
+    android: "ic_launcher_gail"
     ios: true
     remove_alpha_ios: true
-    image_path: "assets/ic_launcher_igl.png"
+    image_path: "assets/gail_logo.png"
     min_sdk_android: 21
 
 

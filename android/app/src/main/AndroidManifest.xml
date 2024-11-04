@@ -24,10 +24,10 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
-        android:label="flutter_gail"
+        android:label="Patrolling"
         android:name="${applicationName}"
         android:requestLegacyExternalStorage="true"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher_gail">
         <activity
             android:name=".MainActivity"
             android:exported="true"
