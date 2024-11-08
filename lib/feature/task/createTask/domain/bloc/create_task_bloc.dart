@@ -189,6 +189,12 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     regionTypeData =  event.regionTypeData;
     maintenanceTypeList = [];
     maintenanceTypeData =  MaintenanceTypeModel();
+    pipelineList = [];
+    pipelineData = PipelineModel();
+    sectionList = [];
+    sectionData =  SectionModel();
+    routeList = [];
+    routeData =  RouteModel();
     _eventComplete(emit);
 
     var resMaintenance = await CreateTaskHelper.fetchMaintenance(regionData: regionTypeData);
@@ -202,6 +208,10 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     maintenanceTypeData =  event.maintenanceTypeData;
     pipelineList = [];
     pipelineData = PipelineModel();
+    sectionList = [];
+    sectionData =  SectionModel();
+    routeList = [];
+    routeData =  RouteModel();
     _eventComplete(emit);
     var resPipeline = await CreateTaskHelper.fetchPipeline(
         regionData: regionTypeData, maintenanceTypeData: maintenanceTypeData);
@@ -220,6 +230,8 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     pipelineData =  event.pipelineData;
     sectionList = [];
     sectionData =  SectionModel();
+    routeList = [];
+    routeData =  RouteModel();
     _eventComplete(emit);
     var resSection = await CreateTaskHelper.fetchSection(
         regionData: regionTypeData,
@@ -228,6 +240,20 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     );
     if(resSection != null){
       sectionList =  resSection;
+    }
+    _eventComplete(emit);
+  }
+
+  _selectSection(CreateTaskSectionTypeEvent event, emit) async {
+    sectionData =  event.sectionData;
+    routeList = [];
+    routeData =  RouteModel();
+    _eventComplete(emit);
+    var resRoute = await CreateTaskHelper.fetchRoute(
+        sectionData: sectionData,
+    );
+    if(resRoute != null){
+      routeList =  resRoute;
     }
     _eventComplete(emit);
   }
@@ -272,10 +298,7 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     _eventComplete(emit);
   }
 
-  _selectSection(CreateTaskSectionTypeEvent event, emit) {
-    sectionData =  event.sectionData;
-    _eventComplete(emit);
-  }
+
 
   _selectRepeatFrequency(CreateTaskRepeatFrequencyEvent event, emit) {
     repeatFrequencyData = event.repeatFrequencyData;

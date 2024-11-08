@@ -111,9 +111,22 @@ class CreateTaskHelper {
     return null;
   }
 
-  static Future<TaskFromModel> fetchTaskDropDownValuesList() async {
+  static Future<dynamic> fetchRoute({
+    required SectionModel sectionData,
+  }) async {
     try{
+      String url =  APIs.createTaskValuesListApi+"?section=${sectionData.name}";
+      var res =  await ServerRequest.getData(urlEndPoint: url);
+      if(res != null && res['routeData'] != null){
+        return routeListResponse(res['routeData']);
+      }
+    }catch(_){}
+    return null;
+  }
 
+  static Future<TaskFromModel> fetchTaskDropDownValuesList() async {
+
+    try{
       String url =  APIs.createTaskValuesListApi;
       var res =  await ServerRequest.getData(urlEndPoint: url);
       if(res != null){
