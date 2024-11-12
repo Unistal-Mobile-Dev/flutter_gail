@@ -82,7 +82,7 @@ class AddIncidentHelper {
            locationData = locationRes;
          }
          var json = {
-           "task_id": taskData.taskId.toString(),
+           "task_id": taskData.subTaskId.toString().isEmpty ? taskData.taskId.toString() : taskData.subTaskId.toString(),
            "incident_report": incidentReport.toString(),
            "incident_type": incidentTypeData.id != null ? incidentTypeData.id.toString() : "",
            "latitude": locationData.lat != null ? locationData.lat.toString() : "0.0",

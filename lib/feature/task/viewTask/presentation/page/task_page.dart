@@ -98,7 +98,7 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
           itemBuilder: (context, index) {
          return InkWell(
              onTap: () {
-               if(dataState.taskList[index].patrollManStatus.toString() != "3"){
+               if(dataState.taskList[index].taskStatus !=  TaskStatus.completed){
                  BlocProvider.of<TaskBloc>(context).add(TaskPageSelectDataEvent(index: index));
                  BlocProvider.of<MapBloc>(context)
                      .add(MapPageLoadEvent(context: context));

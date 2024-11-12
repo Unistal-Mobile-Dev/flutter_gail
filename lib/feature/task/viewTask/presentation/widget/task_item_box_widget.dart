@@ -25,13 +25,16 @@ class TaskItemBoxWidget extends StatelessWidget {
                    topLeft: Radius.circular(10.0), topRight: Radius.circular(10.0)),
                color: AppColor.lightGrey,
              ),
-              child: TextWidget(taskData.taskId.toString(),
+              child: TextWidget(taskData.subTaskId.toString().isNotEmpty
+                  ? taskData.subTaskId.toString()
+                  : taskData.taskId.toString(),
                 fontWeight: FontWeight.w700,
                 fontSize: AppFont.font_12,
                 color: AppColor.themeColor,),
            ),
 
-           Padding(
+           taskData.region.toString().isNotEmpty
+           ? Padding(
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
              child: Row(
                children: [
@@ -45,7 +48,7 @@ class TaskItemBoxWidget extends StatelessWidget {
                  )
                ],
              ),
-           ),
+           ) : const SizedBox.shrink(),
 
            Padding(
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
@@ -143,7 +146,8 @@ class TaskItemBoxWidget extends StatelessWidget {
              ),
            ),
 
-           Padding(
+           taskData.assignedStartDate.toString().isNotEmpty
+            ? Padding(
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
              child: Row(
                children: [
@@ -157,9 +161,10 @@ class TaskItemBoxWidget extends StatelessWidget {
                  )
                ],
              ),
-           ),
+           ) : const SizedBox.shrink(),
 
-           Padding(
+           taskData.assignedEndDate.toString().isNotEmpty
+           ? Padding(
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
              child: Row(
                children: [
@@ -173,7 +178,7 @@ class TaskItemBoxWidget extends StatelessWidget {
                  )
                ],
              ),
-           ),
+           ) : const SizedBox.shrink(),
 
            Padding(
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
@@ -191,7 +196,8 @@ class TaskItemBoxWidget extends StatelessWidget {
              ),
            ),
 
-           Padding(
+           taskData.repeatFrequency.toString().isNotEmpty
+            ? Padding(
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
              child: Row(
                children: [
@@ -205,7 +211,7 @@ class TaskItemBoxWidget extends StatelessWidget {
                  )
                ],
              ),
-           ),
+           ) : const SizedBox.shrink(),
 
            Padding(
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
@@ -215,17 +221,20 @@ class TaskItemBoxWidget extends StatelessWidget {
                    fontSize: AppFont.font_11,
                    fontWeight: FontWeight.w700,
                  ),
-                 Expanded(child: TextWidget(
-                   taskData.patrollManStatus.toString() == "0" ? "Not Started"
-                      :  taskData.patrollManStatus.toString() == "1" ? "Started"
-                       : taskData.patrollManStatus.toString() == "2" ? "Pause" : "Completed",
+                 Expanded(
+                     child: TextWidget(
+                   taskData.taskStatus == TaskStatus.notStarted ? "Not Started"
+                      :  taskData.taskStatus == TaskStatus.started ? "Started"
+                       : taskData.taskStatus == TaskStatus.pause ? "Pause" : "Completed",
                    fontSize: AppFont.font_11,
-                 )
+                   color:  taskData.taskStatus == TaskStatus.notStarted ? Colors.orange
+                       :  taskData.taskStatus == TaskStatus.started ? Colors.blueGrey
+                       : taskData.taskStatus == TaskStatus.pause ?  Colors.red :  Colors.green,
+                  )
                  )
                ],
              ),
            ),
-
            SizedBox(
              height: MediaQuery.of(context).size.width * 0.02,
            ),

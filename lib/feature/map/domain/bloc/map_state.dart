@@ -16,6 +16,7 @@ final class FetchMapPageDataState extends MapInitial {
   final bool isStartPatrolling;
   final bool isEndPatrolling;
   final bool isNavigationBool;
+  final bool isTaskStatusChange;
   final List<MapModel> mapList;
   final List<ArcGISPoint> directionList;
   final TaskModel taskData;
@@ -25,6 +26,7 @@ final class FetchMapPageDataState extends MapInitial {
    required this.isStartPatrolling,
    required this.isEndPatrolling,
    required this.isNavigationBool,
+   required this.isTaskStatusChange,
    required this.mapList,
    required this.directionList,
    required this.taskData,
@@ -36,6 +38,7 @@ final class FetchMapPageDataState extends MapInitial {
     isStartPatrolling,
     isEndPatrolling,
     isNavigationBool,
+    isTaskStatusChange,
     mapList,
     directionList,
     taskData,

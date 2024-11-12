@@ -8,6 +8,7 @@ import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
+import 'package:flutter_gail/feature/task/viewTask/helper/task_helper.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 part 'map_event.dart';
@@ -27,11 +28,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   bool isStartPatrolling =  false;
   bool isEndPatrolling =  false;
   TaskModel taskData = TaskModel();
+  bool isTaskStatusChange =  false;
 
   MapBloc() : super(MapInitial()) {
     on<MapPageLoadEvent>(_pageLoadEvent);
     on<MapRouteDirection>(_routeDirection);
     on<MapRouteLocationCheck>(_locationCheck);
+    on<MapPageUpdateTaskEvent>(_updateTask);
   }
 
   _pageLoadEvent(MapPageLoadEvent event, emit) async {
@@ -40,11 +43,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     isNavigationBool =  false;
     isStartPatrolling =  false;
     isEndPatrolling =  false;
+    isTaskStatusChange =  false;
     mapList = [];
     directionList = [];
     lastPoint =  PointsModel();
      taskData = BlocProvider.of<TaskBloc>(event.context).taskData;
-     pointsList =  BlocProvider.of<TaskBloc>(event.context).taskData.shapeData!.pointsList!;
+     pointsList =  taskData.shapeData!.pointsList!;
     if(pointsList.isNotEmpty){
       startPoint = ArcGISPoint(x: pointsList[0].x, y: pointsList[0].y);
       endPoint = ArcGISPoint(x: pointsList[pointsList.length-1].x, y: pointsList[pointsList.length-1].y);
@@ -105,7 +109,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if(isStartPatrolling == true && isEndPatrolling == false) {
       double calculateDistance = MapHelper.calculateDistance(
           endPoint.y, endPoint.x, points.y, points.x) * 1000;
-      if(calculateDistance < 10){
+      if(calculateDistance < 80){
         isEndPatrolling = true;
         _eventComplete(emit);
       } else {
@@ -123,11 +127,30 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
   }
 
+  _updateTask(MapPageUpdateTaskEvent event, emit) async {
+    isLoader =  true;
+    TaskStatus taskStatus = event.taskStatus;
+    _eventComplete(emit);
+    var res =  await TaskHelper.updateTask(
+        taskData: taskData,
+        taskStatus: taskStatus == TaskStatus.started ? 1
+            : taskStatus == TaskStatus.pause ? 2
+            : taskStatus == TaskStatus.completed ? 3 : 0,
+        context: event.context);
+    if(res != null){
+      taskData.taskStatus =  taskStatus;
+      isTaskStatusChange =  true;
+    }
+    isLoader =  false;
+    _eventComplete(emit);
+  }
+
   _eventComplete(Emitter<MapState> emit) {
     emit(FetchMapPageDataState(
         isLoader: isLoader,
         isNavigationBool: isNavigationBool,
         isEndPatrolling: isEndPatrolling,
+        isTaskStatusChange: isTaskStatusChange,
         mapList: mapList,
         directionList: directionList,
         taskData: taskData,

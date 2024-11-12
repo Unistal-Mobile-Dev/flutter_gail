@@ -11,6 +11,14 @@ class MapPageLoadEvent extends MapEvent {
   List<Object?> get props => [context];
 }
 
+class MapPageUpdateTaskEvent extends MapEvent {
+  final BuildContext context;
+  final TaskStatus taskStatus;
+  const MapPageUpdateTaskEvent({required this.context, required this.taskStatus});
+  @override
+  List<Object?> get props => [context, taskStatus];
+}
+
 class MapRouteLocationCheck extends MapEvent {
   final BuildContext context;
   final ArcGISPoint currentPoint;

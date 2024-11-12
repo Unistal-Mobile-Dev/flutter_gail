@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
 import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
@@ -191,7 +190,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           _autoPanModeSubscription = _mapViewController.locationDisplay.onAutoPanModeChanged.listen((mode) {
             // setState(() => _autoPanMode = mode);
           });
-          List<PointsModel> pointsList =  BlocProvider.of<TaskBloc>(context).taskData.shapeData!.pointsList!;
+          List<PointsModel> pointsList = dataState.taskData.shapeData!.pointsList!;
           ArcGISPoint point = _mapViewController.locationDisplay.location!.position;
           if(pointsList.isNotEmpty){
             BlocProvider.of<MapBloc>(context).add(MapRouteDirection(context: context,
@@ -305,12 +304,11 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () async {
           BlocProvider.of<AddIncidentBloc>(context).add(AddIncidentPageLoadEvent(context: context));
-/*          Navigator.push(
+          Navigator.push(
             !context.mounted ? context : context,
             FadeRoute(
                 page: const AddIncidentPage()),
-          );*/
-        PdfHelper.createPolyLine();
+          );
         },
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
@@ -336,6 +334,20 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () {
 
+          TaskStatus taskStatus =  TaskStatus.notStarted;
+          if(dataSate.taskData.taskStatus == TaskStatus.notStarted){
+            taskStatus =  TaskStatus.started;
+          }
+          else if(dataSate.taskData.taskStatus == TaskStatus.started) {
+            taskStatus =  TaskStatus.pause;
+          }
+          else if(dataSate.taskData.taskStatus == TaskStatus.pause) {
+            taskStatus =  TaskStatus.started;
+          }
+          BlocProvider.of<MapBloc>(context).add(MapPageUpdateTaskEvent(
+            context: context,
+            taskStatus: taskStatus
+          ));
         },
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
@@ -357,7 +369,10 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
         icon: Icon(Icons.task_outlined, color: AppColor.themeColor,
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () {
-
+          BlocProvider.of<MapBloc>(context).add(MapPageUpdateTaskEvent(
+              context: context,
+              taskStatus: TaskStatus.completed
+          ));
         },
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
@@ -385,7 +400,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       ..width = 20
       ..height = 20;
 
-    List<PointsModel> pointsList =  BlocProvider.of<TaskBloc>(context).taskData.shapeData!.pointsList!;
+    List<PointsModel> pointsList =  BlocProvider.of<TaskBloc>(!context.mounted ? context : context).taskData.shapeData!.pointsList!;
     final startPoint1 = Viewpoint.withLatLongScale(
       latitude: pointsList[0].y,
       longitude: pointsList[0].x,
@@ -429,6 +444,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     ]);
 
     _mapViewController.locationDisplay.onLocationChanged.listen((onData) {
+      print(onData.additionalSourceProperties);
       BlocProvider.of<MapBloc>(!context.mounted ? context : context).add(MapRouteLocationCheck(
           context: !context.mounted ? context : context,
           currentPoint: ArcGISPoint(

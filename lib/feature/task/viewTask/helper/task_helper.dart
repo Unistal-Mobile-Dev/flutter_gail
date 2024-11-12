@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
@@ -44,11 +46,11 @@ class TaskHelper {
     try {
       String url = APIs.updateTaskApi;
       var json = {
-        "task_id": taskData.taskId.toString(),
+        "task_id": taskData.subTaskId.toString().isEmpty ? taskData.taskId.toString() : taskData.subTaskId.toString(),
         "patrollman_status": taskStatus.toString(),
       };
       var res = await ServerRequest.postData(
-          urlEndPoint: url, body: json, context: context);
+          urlEndPoint: url, body: jsonEncode(json), context: context);
       if (res != null && res['message'] != null) {
         SnackBarSuccessWidget(!context.mounted ? context : context)
             .show(message: res['message'].toString());
