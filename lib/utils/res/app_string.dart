@@ -143,6 +143,8 @@ class AppString {
 
   static get assignedEndDate => "Assigned End Date";
 
+  static get assignedDate => "Assigned Date";
+
   static get repeatFrequency => "Repeat Frequency";
 
   static get userType => "User Type";
@@ -152,6 +154,11 @@ class AppString {
   static get patrollingStartDate =>  "Patrolling Start Date";
 
   static get patrollingEndDate =>  "Patrolling End Date";
+
+  static get pause => "Pause";
+
+  static get start => "Start";
+
 
 
   static get logoutMessage =>

@@ -13,17 +13,32 @@ final class MapPageLoadState extends MapInitial {}
 
 final class FetchMapPageDataState extends MapInitial {
   final bool isLoader;
+  final bool isStartPatrolling;
+  final bool isEndPatrolling;
+  final bool isNavigationBool;
   final List<MapModel> mapList;
+  final List<ArcGISPoint> directionList;
+  final TaskModel taskData;
 
   FetchMapPageDataState({
    required this.isLoader,
+   required this.isStartPatrolling,
+   required this.isEndPatrolling,
+   required this.isNavigationBool,
    required this.mapList,
+   required this.directionList,
+   required this.taskData,
   });
 
   @override
   List<Object> get props => [
     isLoader,
-    mapList
+    isStartPatrolling,
+    isEndPatrolling,
+    isNavigationBool,
+    mapList,
+    directionList,
+    taskData,
   ];
 
 }

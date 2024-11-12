@@ -31,19 +31,19 @@ class AddMarkerHelper {
       markerTypeList.add(MarkerTypeModel(
         id: "1",
         markerUrl: AppIcon.wmIcon,
-        name: "Warning"
+        name: "WM"
       ));
 
       markerTypeList.add(MarkerTypeModel(
           id: "2",
           markerUrl: AppIcon.kmIcon,
-          name: "Direction"
+          name: "KM"
       ));
 
       markerTypeList.add(MarkerTypeModel(
           id: "3",
           markerUrl: AppIcon.dmIcon,
-          name: "Arial"
+          name: "DM"
       ));
 
       markerTypeList.add(MarkerTypeModel(
@@ -55,7 +55,7 @@ class AddMarkerHelper {
       markerTypeList.add(MarkerTypeModel(
           id: "5",
           markerUrl: AppIcon.bpIcon,
-          name: "Boundary"
+          name: "BP"
       ));
       return markerTypeList;
     }catch(_){}

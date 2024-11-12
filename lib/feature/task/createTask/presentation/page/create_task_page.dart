@@ -113,7 +113,8 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
   }
 
   Widget _maintenanceBaseDropdown({required FetchCreateTaskDataState dataState}) {
-    return DropDownSearchWidget(
+    return dataState.isMaintenanceLoader == false ?
+    DropDownSearchWidget(
       isRequired: true,
       selectedItem: dataState.maintenanceTypeData.name != null ? dataState.maintenanceTypeData : null,
       hint: AppString.maintenanceBase,
@@ -123,11 +124,15 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         BlocProvider.of<CreateTaskBloc>(context)
             .add(CreateTaskMaintenanceTypeEvent(maintenanceTypeData: value));
       },
+    ) : const Align(
+      alignment: Alignment.centerLeft,
+      child: DottedLoaderWidget(),
     );
   }
 
   Widget _pipelineNameDropdown({required FetchCreateTaskDataState dataState}) {
-    return DropDownSearchWidget(
+    return dataState.isPipelineNameLoader == false ?
+    DropDownSearchWidget(
       isRequired: true,
       selectedItem: dataState.pipelineData.name != null ? dataState.pipelineData : null,
       hint: AppString.pipelineName,
@@ -137,11 +142,15 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         BlocProvider.of<CreateTaskBloc>(context)
             .add(CreateTaskPipelineTypeEvent(pipelineData: value));
       },
+    ): const Align(
+      alignment: Alignment.centerLeft,
+      child: DottedLoaderWidget(),
     );
   }
 
   Widget _sectionNameDropdown({required FetchCreateTaskDataState dataState}) {
-    return DropDownSearchWidget(
+    return dataState.isSectionNameLoader == false ?
+    DropDownSearchWidget(
       isRequired: true,
       selectedItem: dataState.sectionData.name != null ? dataState.sectionData : null,
       hint: AppString.sectionName,
@@ -151,11 +160,15 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         BlocProvider.of<CreateTaskBloc>(context)
             .add(CreateTaskSectionTypeEvent(sectionData: value));
       },
+    ): const Align(
+      alignment: Alignment.centerLeft,
+      child: DottedLoaderWidget(),
     );
   }
 
   Widget _patrolRouteNameDropdown({required FetchCreateTaskDataState dataState}) {
-    return DropDownSearchWidget(
+    return dataState.isPatrolRouteNameLoader == false ?
+    DropDownSearchWidget(
       isRequired: true,
       selectedItem: dataState.routeData.name != null ? dataState.routeData : null,
       hint: AppString.patrolRouteName,
@@ -165,6 +178,9 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         BlocProvider.of<CreateTaskBloc>(context)
             .add(CreateTaskRouteEvent(routeData: value));
       },
+    ): const Align(
+      alignment: Alignment.centerLeft,
+      child: DottedLoaderWidget(),
     );
   }
 

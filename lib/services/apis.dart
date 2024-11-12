@@ -39,5 +39,9 @@ class APIs {
 
   static get assignTaskApi => "patrolling-surveillance/patrollman-task/assign-task";
 
+  static get getDailyTaskTrackingApi => "patrolling-surveillance/daily-task-tracking/list";
+
+  static get createDailyTaskApi => "patrolling-surveillance/daily-task-tracking/create";
+
   static get forgotPasswordApi => "";
 }

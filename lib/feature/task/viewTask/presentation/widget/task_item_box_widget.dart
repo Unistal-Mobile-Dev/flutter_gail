@@ -131,6 +131,22 @@ class TaskItemBoxWidget extends StatelessWidget {
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
              child: Row(
                children: [
+                 TextWidget(AppString.assignedDate + " : ",
+                   fontSize: AppFont.font_11,
+                   fontWeight: FontWeight.w700,
+                 ),
+                 Expanded(child: TextWidget(taskData.assignedDate.toString(),
+                   fontSize: AppFont.font_11,
+                 )
+                 )
+               ],
+             ),
+           ),
+
+           Padding(
+             padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+             child: Row(
+               children: [
                  TextWidget(AppString.patrollingStartDate + " : ",
                    fontSize: AppFont.font_11,
                    fontWeight: FontWeight.w700,

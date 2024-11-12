@@ -1,12 +1,31 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
+import 'package:flutter_gail/utils/commonClass/user_info.dart';
 
 class TaskHelper {
 
-  static Future<dynamic> fetchTask() async {
+  static Future<dynamic> fetchTask(
+      {required String startDate, required String endDate}) async {
     try {
-      String url = APIs.getTaskApi;
+      return fetchDailyTask(startDate: startDate, endDate: endDate);
+      String url = APIs.getTaskApi+"?startDate=$startDate&endDate=$endDate";
+      var res = await ServerRequest.getData(urlEndPoint: url);
+      if (res != null && res['data'] != null) {
+        return taskListResponse(res['data']);
+      }
+      return null;
+    } catch (_) {
+      print(_.toString());
+    }
+    return null;
+  }
+
+  static Future<dynamic> fetchDailyTask(
+      {required String startDate, required String endDate}) async {
+    try {
+      LoginDataModel userData =  UserInfo.instance!.userData!;
+      String url = APIs.getDailyTaskTrackingApi+"?user_id=${userData.users!.securityId.toString()}&startDate=$startDate&endDate=$endDate";
       var res = await ServerRequest.getData(urlEndPoint: url);
       if (res != null && res['data'] != null) {
         return taskListResponse(res['data']);

@@ -165,7 +165,6 @@ class ServerRequest {
         return e.toString();
       }
     }
-    return null;
   }
 
   static Future<dynamic> getGoogleData({required var url}) async {
@@ -177,7 +176,7 @@ class ServerRequest {
       log(url.toString());
       final response =
           await get(url, headers: header).timeout(const Duration(minutes: 1));
-      log(response.body);
+      // log(response.body);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else if (response.statusCode == 500) {

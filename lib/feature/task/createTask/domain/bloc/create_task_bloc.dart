@@ -76,6 +76,12 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
 
   List<ShiftTypeModel> allShiftList = [];
 
+  bool isMaintenanceLoader = false;
+  bool isPipelineNameLoader =  false;
+  bool isSectionNameLoader =  false;
+  bool isPatrolRouteNameLoader =  false;
+
+
   CreateTaskBloc() : super(CreateTaskInitial()) {
     on<CreateTaskPageLoadEvent>(_pageLoad);
     on<CreateTaskSelectLineDataEvent>(_lineData);
@@ -124,6 +130,10 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     pipelineData =  PipelineModel();
     sectionData =  SectionModel();
     shiftGroupList = [];
+    isMaintenanceLoader = false;
+    isPipelineNameLoader =  false;
+    isSectionNameLoader =  false;
+    isPatrolRouteNameLoader =  false;
 
 
     var resRegion =  await CreateTaskHelper.fetchArea();
@@ -195,12 +205,14 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     sectionData =  SectionModel();
     routeList = [];
     routeData =  RouteModel();
+    isMaintenanceLoader =  true;
     _eventComplete(emit);
 
     var resMaintenance = await CreateTaskHelper.fetchMaintenance(regionData: regionTypeData);
     if(resMaintenance != null){
       maintenanceTypeList =  resMaintenance;
     }
+    isMaintenanceLoader =  false;
     _eventComplete(emit);
   }
 
@@ -212,12 +224,14 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     sectionData =  SectionModel();
     routeList = [];
     routeData =  RouteModel();
+    isPipelineNameLoader =  true;
     _eventComplete(emit);
     var resPipeline = await CreateTaskHelper.fetchPipeline(
         regionData: regionTypeData, maintenanceTypeData: maintenanceTypeData);
     if(resPipeline != null){
       pipelineList =  resPipeline;
     }
+    isPipelineNameLoader =  false;
     _eventComplete(emit);
   }
 
@@ -232,6 +246,7 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     sectionData =  SectionModel();
     routeList = [];
     routeData =  RouteModel();
+    isSectionNameLoader =  true;
     _eventComplete(emit);
     var resSection = await CreateTaskHelper.fetchSection(
         regionData: regionTypeData,
@@ -241,6 +256,7 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     if(resSection != null){
       sectionList =  resSection;
     }
+    isSectionNameLoader =  false;
     _eventComplete(emit);
   }
 
@@ -248,6 +264,7 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     sectionData =  event.sectionData;
     routeList = [];
     routeData =  RouteModel();
+    isPatrolRouteNameLoader =  true;
     _eventComplete(emit);
     var resRoute = await CreateTaskHelper.fetchRoute(
         sectionData: sectionData,
@@ -255,6 +272,7 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     if(resRoute != null){
       routeList =  resRoute;
     }
+    isPatrolRouteNameLoader =  false;
     _eventComplete(emit);
   }
 
@@ -427,6 +445,10 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
       repeatFrequencyList: repeatFrequencyList,
       userNameData: userNameData,
       userNameList: userNameList,
+      isMaintenanceLoader: isMaintenanceLoader,
+      isPatrolRouteNameLoader: isPatrolRouteNameLoader,
+      isPipelineNameLoader: isPipelineNameLoader,
+      isSectionNameLoader: isSectionNameLoader,
     ));
   }
 }

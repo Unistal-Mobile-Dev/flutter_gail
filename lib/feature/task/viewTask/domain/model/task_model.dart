@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/model/shape_model.dart';
 
 List<TaskModel> taskListResponse(var json) {
   return List<TaskModel>.from(json.map((x) => TaskModel.fromJson(x)));
@@ -7,6 +11,7 @@ List<TaskModel> taskListResponse(var json) {
 class TaskModel {
   dynamic objectId;
   dynamic taskId;
+  dynamic subTaskId;
   String? maintenanceBase;
   String? pipeline;
   String? section;
@@ -16,6 +21,7 @@ class TaskModel {
   dynamic sgCode;
   String? assignedStartDate;
   String? assignedEndDate;
+  String? assignedDate;
   String? repeatFrequency;
   String? userType;
   String? userName;
@@ -27,10 +33,12 @@ class TaskModel {
   String? vendorName;
   String? region;
   TaskStatus? taskStatus;
+  ShapeModel? shapeData;
 
   TaskModel(
       {this.objectId,
         this.taskId,
+        this.subTaskId,
         this.patrollRouteId,
         this.patrollRouteName,
         this.patrollRouteLength,
@@ -38,15 +46,18 @@ class TaskModel {
         this.sgCode,
         this.assignedStartDate,
         this.assignedEndDate,
+        this.assignedDate,
         this.repeatFrequency,
         this.userId,
         this.patrollManStatus,
         this.taskStatus,
+        this.shapeData,
       });
 
   TaskModel.fromJson(Map<String, dynamic> json) {
-    objectId = json['objectid'] ?? "";
+    objectId = json['objectid'] ?? json['object_id'] ?? "";
     taskId = json['task_id'] ?? "";
+    subTaskId = json['subtask_id'] ?? "";
     maintenanceBase = json['maintenance_base'] ?? "";
     pipeline = json['pipeline'] ?? "";
     section = json['section'] ?? "";
@@ -56,19 +67,21 @@ class TaskModel {
     sgCode = json['sg_code'] ?? "";
     assignedStartDate = json['assigned_start_date'] ?? "";
     assignedEndDate = json['assigned_end_date'] ?? "";
+    assignedDate = json['assigned_date'] ?? "";
     repeatFrequency = json['repeat_frequency'] ?? "";
     userType = json['user_type'] ?? "";
     userName = json['user_name'] ?? "";
     userId = json['user_id'] ?? "";
     shiftName = json['shift_name'] ?? "";
-    patrollManStatus = json['patrollman_status'] ?? "";
+    patrollManStatus = json['patrollman_status'] ?? json['status'] ?? "0";
     createdAt = json['created_at'] ?? "";
     updatedAt = json['updated_at'] ?? "";
     vendorName = json['vendor_name'] ?? "";
     region = json['region'] ?? "";
-    taskStatus =  json['patrollman_status'] != null
-        ? getTaskStatus(json['patrollman_status'].toString())
-        : TaskStatus.notStarted;
+    shapeData =  json['shape'] != null ? ShapeModel.fromJson(json['shape']) :  ShapeModel();
+    taskStatus =  json['patrollman_status'] != null ? getTaskStatus(json['patrollman_status'].toString())
+        :  json['status'] != null ? getTaskStatus(json['status'].toString())
+        :  TaskStatus.notStarted;
   }
 
   getTaskStatus(String status) {

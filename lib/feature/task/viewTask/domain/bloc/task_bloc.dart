@@ -37,7 +37,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     taskData =  TaskModel();
     startDate = DateTime.now().subtract(const Duration(days: 7));
     endDate =  DateTime.now();
-    var res = await TaskHelper.fetchTask();
+    var res = await TaskHelper.fetchTask(startDate: startDate.toString(), endDate: endDate.toString());
     taskList =  res ?? [];
     searchTaskList  =  taskList;
     taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList();
@@ -48,16 +48,37 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     try{
       DateTimeRange? dateTimeRange = await showDateRangePicker(
         context: !event.context.mounted ? event.context : event.context,
-        firstDate: startDate,
-        lastDate: endDate,
+        firstDate: DateTime(2024, 1),
+        lastDate: DateTime.now(),
         currentDate: DateTime.now(),
+        initialDateRange: DateTimeRange(start: startDate, end: endDate),
         saveText: 'Done',
       );
       if(dateTimeRange != null){
-        startDate =  dateTimeRange!.start;
+        startDate =  dateTimeRange.start;
         endDate =  dateTimeRange.end;
+        isLoader =  true;
+        taskList = [];
+        searchTaskList = [];
+        _eventComplete(emit);
+        var res = await TaskHelper.fetchTask(startDate: startDate.toString(), endDate: endDate.toString());
+        taskList =  res ?? [];
+        searchTaskList  =  taskList;
+        if(tabIndex == 0){
+          taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList();
+        }
+        else if(tabIndex== 1){
+          taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.started
+              || taskData.taskStatus == TaskStatus.pause ).toList();
+        }
+        else if(tabIndex == 2){
+          taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed  ).toList();
+        }
       }
     }catch(_){}
+
+    isLoader =  false;
+    _eventComplete(emit);
   }
 
   _tabIndex(TaskTabIndexEvent event, emit) {
@@ -81,7 +102,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   }
 
   _pageRefresh(TaskPagRefreshDataEvent event, emit) async {
-    var res = await TaskHelper.fetchTask();
+    var res = await TaskHelper.fetchTask(startDate: startDate.toString(), endDate: endDate.toString());
     taskList =  res ?? [];
     searchTaskList  =  taskList;
     if(tabIndex == 0){

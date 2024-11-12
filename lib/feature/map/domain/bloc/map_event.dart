@@ -11,9 +11,40 @@ class MapPageLoadEvent extends MapEvent {
   List<Object?> get props => [context];
 }
 
+class MapRouteLocationCheck extends MapEvent {
+  final BuildContext context;
+  final ArcGISPoint currentPoint;
+
+  const MapRouteLocationCheck({
+    required this.context,
+    required this.currentPoint
+  });
+
+  @override
+  List<Object?> get props => [
+    context,
+    currentPoint,
+  ];
+}
+
 class MapRouteDirection extends MapEvent {
   final BuildContext context;
-  const MapRouteDirection({required this.context});
+  final ArcGISPoint startPoint;
+  final ArcGISPoint endPoint;
+  final ArcGISPoint currentPoint;
+
+  const MapRouteDirection({
+    required this.context,
+    required this.endPoint,
+    required this.startPoint,
+    required this.currentPoint
+  });
+
   @override
-  List<Object?> get props => [context];
+  List<Object?> get props => [
+    context,
+    endPoint,
+    startPoint,
+    currentPoint,
+  ];
 }

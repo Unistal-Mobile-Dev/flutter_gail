@@ -135,7 +135,6 @@ class PdfHelper {
         final value = result >> 1;
         final coordinateChange =
         (result & 1) != 0 ? (~BigInt.from(value)).toInt() : value;
-
         shift = result = 0;
         return coordinateChange;
       }

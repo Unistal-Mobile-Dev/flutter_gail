@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
 import 'package:flutter_gail/feature/map/presentation/page/map_page.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
 import 'package:flutter_gail/feature/task/addMarker/domain/bloc/add_marker_bloc.dart';
@@ -99,6 +100,8 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
              onTap: () {
                if(dataState.taskList[index].patrollManStatus.toString() != "3"){
                  BlocProvider.of<TaskBloc>(context).add(TaskPageSelectDataEvent(index: index));
+                 BlocProvider.of<MapBloc>(context)
+                     .add(MapPageLoadEvent(context: context));
                  Navigator.push(
                    !context.mounted ? context : context,
                    FadeRoute(

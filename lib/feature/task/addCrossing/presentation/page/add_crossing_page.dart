@@ -62,7 +62,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
 
   Widget _crossingListBuilder({required FetchAddCrossingDataState dataState}) {
     return SizedBox(
-      height: 50,
+      height: MediaQuery.of(context).size.width * 0.20,
       child: ListView.builder(
           shrinkWrap: true,
           itemCount: dataState.crossingTypeList.length,
@@ -75,18 +75,30 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
                   BlocProvider.of<AddCrossingBloc>(context)
                       .add(AddCrossingSelectCrossingEvent(index: index));
                 },
-                child: CircleAvatar(
-                  backgroundColor: dataState.crossingTypeList[index].isSelected == true
-                      ? AppColor.themeColor : AppColor.lightGrey,
-                  child: Padding(
-                    padding: const EdgeInsets.all(2), // Border radius
-                    child: ClipOval(child: Image.asset(
-                      dataState.crossingTypeList[index].crossingUrl.toString(),
-                      height: MediaQuery.of(context).size.width * 0.15,
-                      width: MediaQuery.of(context).size.width * 0.15,
-                    )
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: dataState.crossingTypeList[index].isSelected == true
+                          ? AppColor.themeColor : AppColor.lightGrey,
+                      child: Padding(
+                        padding: const EdgeInsets.all(2), // Border radius
+                        child: ClipOval(child: Image.asset(
+                          dataState.crossingTypeList[index].crossingUrl.toString(),
+                          height: MediaQuery.of(context).size.width * 0.15,
+                          width: MediaQuery.of(context).size.width * 0.15,
+                        )
+                        ),
+                      ),
                     ),
-                  ),
+                    TextWidget(
+                      dataState.crossingTypeList[index].name.toString(),
+                      color: dataState.crossingTypeList[index].isSelected == true
+                          ? AppColor.themeColor : AppColor.black,
+                      textAlign: TextAlign.center,
+                      fontSize: AppFont.font_10,
+                    ),
+                  ],
                 ),
               ),
             );

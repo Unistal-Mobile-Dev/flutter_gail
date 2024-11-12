@@ -47,6 +47,10 @@ final class FetchCreateTaskDataState extends CreateTaskInitial {
   final List<RepeatFrequencyModel> repeatFrequencyData;
   final List<UserNameModel> userNameList;
   final List<UserNameModel> userNameData;
+  final bool isMaintenanceLoader;
+  final bool isPipelineNameLoader;
+  final bool isSectionNameLoader;
+  final bool isPatrolRouteNameLoader;
 
   FetchCreateTaskDataState({
     required this.isLoader,
@@ -83,6 +87,10 @@ final class FetchCreateTaskDataState extends CreateTaskInitial {
     required this.repeatFrequencyList,
     required this.userNameData,
     required this.userNameList,
+    required this.isMaintenanceLoader,
+    required this.isPatrolRouteNameLoader,
+    required this.isPipelineNameLoader,
+    required this.isSectionNameLoader,
   });
 
   @override
@@ -121,5 +129,9 @@ final class FetchCreateTaskDataState extends CreateTaskInitial {
     repeatFrequencyList,
     userNameData,
     userNameList,
+    isMaintenanceLoader,
+    isPatrolRouteNameLoader,
+    isPipelineNameLoader,
+    isSectionNameLoader,
   ];
 }

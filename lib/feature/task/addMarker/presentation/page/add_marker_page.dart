@@ -61,7 +61,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
 
   Widget _markerListBuilder({required FetchAddMarkerDataState dataState}) {
     return SizedBox(
-      height: 50,
+      height: MediaQuery.of(context).size.width * 0.20,
       child: ListView.builder(
           shrinkWrap: true,
           itemCount: dataState.markerTypeList.length,
@@ -74,18 +74,30 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
                 BlocProvider.of<AddMarkerBloc>(context)
                     .add(AddMarkerSelectMarkerEvent(index: index));
               },
-              child: CircleAvatar(
-                backgroundColor: dataState.markerTypeList[index].isSelected == true
-                     ? AppColor.themeColor : AppColor.lightGrey,
-                child: Padding(
-                  padding: const EdgeInsets.all(2), // Border radius
-                  child: ClipOval(child: Image.asset(
-                      dataState.markerTypeList[index].markerUrl.toString(),
-                      height: MediaQuery.of(context).size.width * 0.15,
-                      width: MediaQuery.of(context).size.width * 0.15,
-                     )
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    backgroundColor: dataState.markerTypeList[index].isSelected == true
+                         ? AppColor.themeColor : AppColor.lightGrey,
+                    child: Padding(
+                      padding: const EdgeInsets.all(2), // Border radius
+                      child: ClipOval(child: Image.asset(
+                          dataState.markerTypeList[index].markerUrl.toString(),
+                          height: MediaQuery.of(context).size.width * 0.15,
+                          width: MediaQuery.of(context).size.width * 0.15,
+                         )
+                      ),
+                    ),
                   ),
-                ),
+                  TextWidget(
+                    dataState.markerTypeList[index].name.toString(),
+                    color: dataState.markerTypeList[index].isSelected == true
+                        ? AppColor.themeColor : AppColor.black,
+                    textAlign: TextAlign.center,
+                    fontSize: AppFont.font_10,
+                  ),
+                ],
               ),
             ),
           );

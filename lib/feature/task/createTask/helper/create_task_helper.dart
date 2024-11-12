@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
-import 'package:flutter_gail/feature/task/createTask/domain/model/line_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/maintenance_type_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/pipeline_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/region_type_model.dart';
@@ -21,10 +19,10 @@ class CreateTaskHelper {
   static Future<dynamic> fetchRepeatFrequency() async {
     try{
        List<RepeatFrequencyModel> repeatFrequencyList = [];
-       repeatFrequencyList.add(RepeatFrequencyModel(
+/*       repeatFrequencyList.add(RepeatFrequencyModel(
           id: "0",
           name: "Every Day"
-       ));
+       ));*/
        repeatFrequencyList.add(RepeatFrequencyModel(
            id: "1",
            name: "Monday"
@@ -276,7 +274,7 @@ class CreateTaskHelper {
 
       List<String> repeatFrequencyData = [];
       for(var data in repeatFrequencyList){
-        repeatFrequencyData.add(data.name.toString());
+        repeatFrequencyData.add(data.name.toString().toLowerCase());
       }
 
       List<String> userNameData = [];
@@ -319,13 +317,15 @@ class CreateTaskHelper {
       };
       var res =  await ServerRequest.postData(urlEndPoint: url,
           body: jsonEncode(json), context: context);
+        await ServerRequest.postData(urlEndPoint: APIs.createDailyTaskApi,
+          body: jsonEncode(json), context: !context.mounted ? context : context);
       if(res != null && res['message'] != null){
         SnackBarSuccessWidget(!context.mounted ? context : context)
             .show(message: res['message'].toString());
         return res;
       }
       return null;
-    }catch(e) {
+    } catch(e) {
       SnackBarErrorWidget(!context.mounted ? context : context).show(message: e.toString());
     }
     return null;
