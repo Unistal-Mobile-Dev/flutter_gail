@@ -93,9 +93,11 @@ class AddCrossingHelper {
       if (locationRes != null) {
         locationData = locationRes;
       }
+      final DateFormat formatter = DateFormat('dd-MM-yyyy');
+      final String currentDate = formatter.format(DateTime.now());
       var json = {
         "task_id": taskData.taskId.toString(),
-        "inspectiondate": DateTime.now().toString(),
+        "inspectiondate": currentDate.toString(),
         "featuretype": crossingTypeData.name.toString(),
         "featuresubtype": "",
         "comments": remark.toString(),

@@ -288,6 +288,10 @@ class ServerRequest {
         var result = json.decode(String.fromCharCodes(responseData));
         log(result.toString());
         return result;
+      }  else if (response.statusCode == 201) {
+        var result = json.decode(String.fromCharCodes(responseData));
+        log(result.toString());
+        return result;
       } else {
         var result = json.decode(String.fromCharCodes(responseData));
         if(result.toString().contains("message")){

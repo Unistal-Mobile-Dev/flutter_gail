@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/services/firebase/notification_service.dart';
 import 'package:flutter_gail/testing_page.dart';
@@ -24,7 +23,6 @@ class _RootState extends State<Root> {
   @override
   Widget build(BuildContext context) {
     Singleton.instance.setContext(context);
-    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     AppConfig.instanceInit()!.setClient(client: widget.client);
     return blocMultiProvider(
       child: MaterialApp(

@@ -74,7 +74,6 @@ class AddIncidentHelper {
                file: videoFile,
                keyName: "video_link"));
          }
-
          var locationRes = await LocationHelper.getLocationOfflineMode(
              context: context);
          LocationModel locationData = LocationModel();

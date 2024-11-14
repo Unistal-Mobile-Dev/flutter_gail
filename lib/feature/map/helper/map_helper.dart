@@ -118,4 +118,27 @@ class MapHelper {
     return radiusOfEarth * 2 * asin(sqrt(a));
   }
 
+  static double calculateBearing(lat1, lon1, lat2, lon2) {
+    final double startLat = toRadians(lat1);
+    final double startLng = toRadians(lon1);
+    final double endLat = toRadians(lat2);
+    final double endLng = toRadians(lon2);
+
+    final double deltaLng = endLng - startLng;
+    final double y = math.sin(deltaLng) * math.cos(endLat);
+    final double x = math.cos(startLat) * math.sin(endLat) -
+        math.sin(startLat) * math.cos(endLat) * math.cos(deltaLng);
+
+    final double bearing = math.atan2(y, x);
+    return (toDegrees(bearing) + 360) % 360;
+  }
+
+  static double toRadians(double degrees) {
+    return degrees * (math.pi / 180.0);
+  }
+
+  static double toDegrees(double radians) {
+    return radians * (180.0 / math.pi);
+  }
+
 }

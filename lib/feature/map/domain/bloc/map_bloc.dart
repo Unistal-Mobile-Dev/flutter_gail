@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
@@ -86,7 +87,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   _locationCheck(MapRouteLocationCheck event, emit) async {
     ArcGISPoint points =  event.currentPoint;
-
     if(taskData.taskStatus == TaskStatus.started
         || taskData.taskStatus == TaskStatus.pause) {
       isStartPatrolling =  true;

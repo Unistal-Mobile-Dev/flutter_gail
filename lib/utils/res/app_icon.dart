@@ -29,4 +29,6 @@ class AppIcon {
 
   static get warningIcon => "assets/ic_warning.png";
 
+  static get arrowIcon => "assets/arrow_icon.png";
+
 }

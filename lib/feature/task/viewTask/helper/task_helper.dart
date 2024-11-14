@@ -17,9 +17,7 @@ class TaskHelper {
         return taskListResponse(res['data']);
       }
       return null;
-    } catch (_) {
-      print(_.toString());
-    }
+    } catch (_) {}
     return null;
   }
 

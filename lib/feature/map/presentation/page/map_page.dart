@@ -6,6 +6,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
 import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
+import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/map/presentation/widget/sample_state_support.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
 import 'package:flutter_gail/feature/task/addCrossing/presentation/page/add_crossing_page.dart';
@@ -444,7 +445,6 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     ]);
 
     _mapViewController.locationDisplay.onLocationChanged.listen((onData) {
-      print(onData.additionalSourceProperties);
       BlocProvider.of<MapBloc>(!context.mounted ? context : context).add(MapRouteLocationCheck(
           context: !context.mounted ? context : context,
           currentPoint: ArcGISPoint(
@@ -463,21 +463,29 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     List<PointsModel> pointsList =  BlocProvider.of<TaskBloc>(context).taskData.shapeData!.pointsList!;
     List<List<dynamic>> addPath = [];
 
-    final imageStart = await ArcGISImage.fromAsset(AppIcon.wmIcon);
-    final routeStartPointMarker = PictureMarkerSymbol.withImage(imageStart)
-      ..width = 20
-      ..height = 20;
-    for(var pointData in pointsList){
-      addPath.add([pointData.x,pointData.y]);
-/*      _stopsGraphicsOverlay.graphics.addAll([
+    final imageStart = await ArcGISImage.fromAsset(AppIcon.arrowIcon);
+    for(int i = 0; i < pointsList.length; i++){
+      if(i != pointsList.length - 1)
+      {
+        double bearing =  MapHelper.calculateBearing(pointsList[i].y, pointsList[i].x,
+            pointsList[1+i].y, pointsList[1+i].x);
+        final routeStartPointMarker = PictureMarkerSymbol.withImage(imageStart)
+          ..width = 10
+          ..angle = bearing
+          ..angleAlignment =  SymbolAngleAlignment.arcGISMap
+          ..height = 10;
+       _stopsGraphicsOverlay.graphics.addAll([
         Graphic(geometry: ArcGISPoint(
-          x: pointData.x,
-          y:pointData.y,
-          z: pointData.z,
-          m: pointData.m,
+          x: pointsList[1+i].x,
+          y: pointsList[1+i].y,
           spatialReference: SpatialReference.wgs84,
         ), symbol: routeStartPointMarker)
-      ]);*/
+       ]);
+      }
+    }
+
+    for(var pointData in pointsList){
+      addPath.add([pointData.x,pointData.y]);
     }
     var json = {
       "paths": [addPath],
@@ -527,10 +535,8 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     });
 
     setState(() => _status = _locationDataSource.status);
-
     _autoPanModeSubscription = _mapViewController.locationDisplay.onAutoPanModeChanged.listen((mode) {
-          setState(() => _autoPanMode = mode);
-        });
+          setState(() => _autoPanMode = mode);});
     setState(() => _autoPanMode = _mapViewController.locationDisplay.autoPanMode);
     try {
        await _locationDataSource.start();
@@ -548,6 +554,56 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
   void direction({required FetchMapPageDataState datState}) async {
     if(datState.directionList.isNotEmpty){
       List<ArcGISPoint> pointsList =  datState.directionList;
+
+      final imageStart = await ArcGISImage.fromAsset(AppIcon.arrowIcon);
+
+      if( pointsList.length > 10 ){
+        int j = 10;
+        for(int i = 0; i < pointsList.length; i++){
+          if(i == j )
+          {
+            double bearing =  MapHelper.calculateBearing(pointsList[i].y, pointsList[i].x,
+                pointsList[1+i].y, pointsList[1+i].x);
+            final routeStartPointMarker = PictureMarkerSymbol.withImage(imageStart)
+              ..width = 10
+              ..angle = bearing
+              ..angleAlignment =  SymbolAngleAlignment.arcGISMap
+              ..height = 10;
+            _stopsGraphicsOverlay.graphics.addAll([
+              Graphic(geometry: ArcGISPoint(
+                x: pointsList[1+i].x,
+                y: pointsList[1+i].y,
+                spatialReference: SpatialReference.wgs84,
+              ), symbol: routeStartPointMarker)
+            ]);
+            int k = j+10;
+            j = k;
+          }
+        }
+      }
+      else
+      {
+        for(int i = 0; i < pointsList.length; i++){
+          if(i != pointsList.length - 1 )
+          {
+            double bearing =  MapHelper.calculateBearing(pointsList[i].y, pointsList[i].x,
+                pointsList[1+i].y, pointsList[1+i].x);
+            final routeStartPointMarker = PictureMarkerSymbol.withImage(imageStart)
+              ..width = 10
+              ..angle = bearing
+              ..angleAlignment =  SymbolAngleAlignment.arcGISMap
+              ..height = 10;
+            _stopsGraphicsOverlay.graphics.addAll([
+              Graphic(geometry: ArcGISPoint(
+                x: pointsList[1+i].x,
+                y: pointsList[1+i].y,
+                spatialReference: SpatialReference.wgs84,
+              ), symbol: routeStartPointMarker)
+            ]);
+          }
+        }
+      }
+
       List<List<dynamic>> addPath = [];
       for(var pointData in pointsList) {
         addPath.add([pointData.x, pointData.y]);
