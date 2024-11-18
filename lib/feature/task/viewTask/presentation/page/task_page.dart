@@ -100,22 +100,6 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
          return InkWell(
              onTap: () {
                if(dataState.taskList[index].taskStatus !=  TaskStatus.completed){
-
-                 TaskModel taskData = dataState.taskList[index];
-                 DateFormat formatter = DateFormat('yyyy-MM-dd');
-                 DateTime currentDate =  formatter.parse(DateTime.now().toString());
-                 DateTime dt1 = DateTime.parse(currentDate.toString());
-                 DateTime dt2 = DateTime.parse(taskData.assignedDate.toString().isNotEmpty
-                     ? taskData.assignedDate.toString() :DateTime.now().toString());
-
-                 if(dt1.compareTo(dt2) < 0){
-                   print("Feature Date");
-                 }
-
-                 if(dt1.compareTo(dt2) > 0){
-                   print("Back Date");
-                 }
-
                  BlocProvider.of<TaskBloc>(context).add(TaskPageSelectDataEvent(index: index));
                  BlocProvider.of<MapBloc>(context)
                      .add(MapPageLoadEvent(context: context));

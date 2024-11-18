@@ -201,7 +201,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       _eventComplete(emit);
       return;
     }
-    
 
     var res =  await TaskHelper.updateTask(
         taskData: taskData,
