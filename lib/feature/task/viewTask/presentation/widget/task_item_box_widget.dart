@@ -9,6 +9,23 @@ class TaskItemBoxWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    DateFormat formatter = DateFormat('yyyy-MM-dd');
+    DateTime _assignedDateFromate =  formatter.parse(
+        taskData.assignedDate.toString().isNotEmpty ?
+        taskData.assignedDate.toString() : DateTime.now().toString());
+    String assignedDate =  DateFormat('dd-MMM-yyyy').format(_assignedDateFromate);
+
+    DateTime _assignedStartDateFromate =  formatter.parse(
+        taskData.assignedStartDate.toString().isNotEmpty ?
+        taskData.assignedStartDate.toString() : DateTime.now().toString());
+    String assignedStartDate =  DateFormat('dd-MMM-yyyy').format(_assignedStartDateFromate);
+
+    DateTime _assignedEndDateFromate =  formatter.parse(
+        taskData.assignedEndDate.toString().isNotEmpty ?
+        taskData.assignedEndDate.toString() : DateTime.now().toString());
+    String assignedEndDate =  DateFormat('dd-MMM-yyyy').format(_assignedEndDateFromate);
+
     return Card(
       elevation: 2,
       shadowColor: AppColor.themeColor,
@@ -130,7 +147,8 @@ class TaskItemBoxWidget extends StatelessWidget {
              ),
            ),
 
-           Padding(
+           taskData.assignedDate.toString().isNotEmpty
+           ? Padding(
              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
              child: Row(
                children: [
@@ -138,13 +156,13 @@ class TaskItemBoxWidget extends StatelessWidget {
                    fontSize: AppFont.font_11,
                    fontWeight: FontWeight.w700,
                  ),
-                 Expanded(child: TextWidget(taskData.assignedDate.toString(),
+                 Expanded(child: TextWidget(assignedDate,
                    fontSize: AppFont.font_11,
                  )
                  )
                ],
              ),
-           ),
+           ) : const SizedBox.shrink(),
 
            taskData.assignedStartDate.toString().isNotEmpty
             ? Padding(
@@ -155,7 +173,7 @@ class TaskItemBoxWidget extends StatelessWidget {
                    fontSize: AppFont.font_11,
                    fontWeight: FontWeight.w700,
                  ),
-                 Expanded(child: TextWidget(taskData.assignedStartDate.toString(),
+                 Expanded(child: TextWidget(assignedStartDate,
                    fontSize: AppFont.font_11,
                  )
                  )
@@ -172,7 +190,7 @@ class TaskItemBoxWidget extends StatelessWidget {
                    fontSize: AppFont.font_11,
                    fontWeight: FontWeight.w700,
                  ),
-                 Expanded(child: TextWidget(taskData.assignedEndDate.toString(),
+                 Expanded(child: TextWidget(assignedEndDate,
                    fontSize: AppFont.font_11,
                  )
                  )

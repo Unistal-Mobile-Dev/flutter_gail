@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/services/firebase/notification_service.dart';
 import 'package:flutter_gail/testing_page.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
 
 class Root extends StatefulWidget {
   final Client client;

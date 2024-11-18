@@ -42,6 +42,10 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     searchTaskList  =  taskList;
     taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList();
     _eventComplete(emit);
+
+    if(taskList.isNotEmpty){
+      TaskHelper.showNotificationWithNumber();
+    }
   }
 
   _selectDate(TaskPageSelectDateEvent event, emit) async {

@@ -30,6 +30,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   bool isEndPatrolling =  false;
   TaskModel taskData = TaskModel();
   bool isTaskStatusChange =  false;
+  List<TaskModel> taskList = [];
 
   MapBloc() : super(MapInitial()) {
     on<MapPageLoadEvent>(_pageLoadEvent);
@@ -48,6 +49,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     mapList = [];
     directionList = [];
     lastPoint =  PointsModel();
+    taskList =  BlocProvider.of<TaskBloc>(event.context).searchTaskList;
      taskData = BlocProvider.of<TaskBloc>(event.context).taskData;
      pointsList =  taskData.shapeData!.pointsList!;
     if(pointsList.isNotEmpty){
@@ -63,11 +65,34 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     } else {
       isStartPatrolling =  false;
     }
-
     _eventComplete(emit);
   }
 
   _routeDirection(MapRouteDirection event, emit) async {
+
+    DateFormat formatter = DateFormat('yyyy-MM-dd');
+    DateTime currentDate =  formatter.parse(DateTime.now().toString());
+    DateTime dt1 = DateTime.parse(currentDate.toString());
+    DateTime dt2 = DateTime.parse(taskData.assignedDate.toString().isNotEmpty
+        ? taskData.assignedDate.toString() :DateTime.now().toString());
+
+    List<TaskModel> tempList =  taskList.where((data) =>
+    (data.taskStatus == TaskStatus.started)
+        && taskData.subTaskId !=  data.subTaskId).toList();
+
+    if(dt1.compareTo(dt2) < 0){
+      SnackBarErrorWidget(event.context).show(message: "This task are future date");
+      return;
+    }
+    else if(dt1.compareTo(dt2) > 0){
+      SnackBarErrorWidget(event.context).show(message: "This task are Back date");
+      return;
+    }
+    else if(tempList.isNotEmpty){
+      SnackBarErrorWidget(event.context).show(message: "Your already start another task.So please complete first old task then start.");
+      return;
+    }
+
     isLoader =  true;
     isNavigationBool =  true;
     directionList = [];
@@ -80,6 +105,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if(res != null){
       directionList =  res;
     }
+
+
     isLoader =  false;
     isNavigationBool =  directionList.isNotEmpty ? true : false;
     _eventComplete(emit);
@@ -145,6 +172,37 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     isLoader =  true;
     TaskStatus taskStatus = event.taskStatus;
     _eventComplete(emit);
+
+
+    DateFormat formatter = DateFormat('yyyy-MM-dd');
+    DateTime currentDate =  formatter.parse(DateTime.now().toString());
+    DateTime dt1 = DateTime.parse(currentDate.toString());
+    DateTime dt2 = DateTime.parse(taskData.assignedDate.toString().isNotEmpty
+        ? taskData.assignedDate.toString() :DateTime.now().toString());
+
+    List<TaskModel> tempList =  taskList.where((data) =>
+      (data.taskStatus == TaskStatus.started)
+          && taskData.subTaskId !=  data.subTaskId).toList();
+    if(dt1.compareTo(dt2) < 0){
+      SnackBarErrorWidget(event.context).show(message: "This task are future date");
+      isLoader =  false;
+      _eventComplete(emit);
+      return;
+    }
+    else if(dt1.compareTo(dt2) > 0){
+      SnackBarErrorWidget(event.context).show(message: "This task are Back date");
+      isLoader =  false;
+      _eventComplete(emit);
+      return;
+    }
+    else if(tempList.isNotEmpty){
+      SnackBarErrorWidget(event.context).show(message: "Your already start another task.So please complete first old task then start.");
+      isLoader =  false;
+      _eventComplete(emit);
+      return;
+    }
+    
+
     var res =  await TaskHelper.updateTask(
         taskData: taskData,
         taskStatus: taskStatus == TaskStatus.started ? 1
@@ -154,6 +212,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if(res != null){
       taskData.taskStatus =  taskStatus;
       isTaskStatusChange =  true;
+      BlocProvider.of<TaskBloc>(!event.context.mounted ? event.context : event.context)
+          .add(TaskPagRefreshDataEvent(context: !event.context.mounted ? event.context : event.context));
     }
     isLoader =  false;
     _eventComplete(emit);

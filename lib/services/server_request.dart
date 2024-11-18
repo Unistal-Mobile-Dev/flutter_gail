@@ -48,23 +48,29 @@ class ServerRequest {
   }
 
   static Future<dynamic> putData(
-      {required var urlEndPoint, required var body}) async {
+      {required var urlEndPoint, required var body, required BuildContext context}) async {
     try {
-      if (await ConnectivityHelper.allConnectivityCheck(context: context!) ==
-          false) {
-        return null;
-      }
       addToken();
       String url = APIs.baseUrl + urlEndPoint;
       log(url);
       final response =
-          await put(Uri.parse(url), headers: header, body: jsonEncode(body))
+          await put(Uri.parse(url), headers: header, body: body)
               .timeout(const Duration(minutes: 1));
       log(response.body);
       if (response.statusCode == 200) {
+        updateCookie(response);
         return jsonDecode(response.body);
-      } else if (response.statusCode == 500) {
+      }
+      else if (response.statusCode == 201) {
+        updateCookie(response);
         return jsonDecode(response.body);
+      }
+      else {
+        var json = jsonDecode(response.body);
+        if(json.toString().contains("message")){
+          SnackBarErrorWidget(!context.mounted ? context : context).show(message: json['message'].toString());
+        }
+        return null;
       }
     } catch (e) {
       if (e is SocketException) {
