@@ -7,6 +7,7 @@ import Foundation
 
 import arcgis_maps
 import audioplayers_darwin
+import battery_plus
 import device_info_plus
 import file_selector_macos
 import firebase_auth
@@ -31,6 +32,7 @@ import window_to_front
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   ArcGISMapsPlugin.register(with: registry.registrar(forPlugin: "ArcGISMapsPlugin"))
   AudioplayersDarwinPlugin.register(with: registry.registrar(forPlugin: "AudioplayersDarwinPlugin"))
+  BatteryPlusMacosPlugin.register(with: registry.registrar(forPlugin: "BatteryPlusMacosPlugin"))
   DeviceInfoPlusMacosPlugin.register(with: registry.registrar(forPlugin: "DeviceInfoPlusMacosPlugin"))
   FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
   FLTFirebaseAuthPlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseAuthPlugin"))

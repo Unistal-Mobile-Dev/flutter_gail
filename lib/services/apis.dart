@@ -43,5 +43,7 @@ class APIs {
 
   static get createDailyTaskApi => "patrolling-surveillance/daily-task-tracking/create";
 
+  static get saveLocationDataApi => "patrolling-surveillance/device-location/add-device-location";
+
   static get forgotPasswordApi => "";
 }

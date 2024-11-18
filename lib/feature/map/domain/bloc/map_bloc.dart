@@ -86,7 +86,17 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
   _locationCheck(MapRouteLocationCheck event, emit) async {
+    BuildContext context =  event.context;
     ArcGISPoint points =  event.currentPoint;
+    double speed = event.speed;
+    double verticalAccuracy =  event.verticalAccuracy;
+    if(lastPoint.y == null){
+      lastPoint =  PointsModel(
+        x: points.x,
+        y: points.y,
+      );
+    }
+
     if(taskData.taskStatus == TaskStatus.started
         || taskData.taskStatus == TaskStatus.pause) {
       isStartPatrolling =  true;
@@ -97,7 +107,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if(isStartPatrolling == false){
       double calculateDistance = MapHelper.calculateDistance(
           startPoint.y, startPoint.x, points.y, points.x) * 1000;
-      if(calculateDistance < 80){
+      if(calculateDistance < 100){
         isStartPatrolling = true;
         _eventComplete(emit);
       } else {
@@ -109,7 +119,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if(isStartPatrolling == true && isEndPatrolling == false) {
       double calculateDistance = MapHelper.calculateDistance(
           endPoint.y, endPoint.x, points.y, points.x) * 1000;
-      if(calculateDistance < 80){
+      if(calculateDistance < 100){
         isEndPatrolling = true;
         _eventComplete(emit);
       } else {
@@ -119,12 +129,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
 
     if(taskData.taskStatus == TaskStatus.started){
-      lastPoint =  PointsModel(
-        x: points.x,
-        y: points.y,
-      );
-      await MapHelper.locationSave(lastPoint: lastPoint, currentPoint: points);
+      await MapHelper.locationSave(
+          context: context,
+          lastPoint: lastPoint, currentPoint: points,
+          speed: speed, verticalAccuracy: verticalAccuracy, taskData: taskData);
     }
+
+    lastPoint =  PointsModel(
+      x: points.x,
+      y: points.y,
+    );
   }
 
   _updateTask(MapPageUpdateTaskEvent event, emit) async {

@@ -22,16 +22,22 @@ class MapPageUpdateTaskEvent extends MapEvent {
 class MapRouteLocationCheck extends MapEvent {
   final BuildContext context;
   final ArcGISPoint currentPoint;
+  final double speed;
+  final double verticalAccuracy;
 
   const MapRouteLocationCheck({
     required this.context,
-    required this.currentPoint
+    required this.currentPoint,
+    required this.speed,
+    required this.verticalAccuracy,
   });
 
   @override
   List<Object?> get props => [
     context,
     currentPoint,
+    speed,
+    verticalAccuracy,
   ];
 }
 

@@ -449,8 +449,11 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           context: !context.mounted ? context : context,
           currentPoint: ArcGISPoint(
           x: onData.position.x,
-          y: onData.position.y
-      )));
+          y: onData.position.y,
+      ),
+      verticalAccuracy: onData.verticalAccuracy,
+      speed: onData.speed,
+      ));
     });
     _startLocationDataSource();
     setState(() {});

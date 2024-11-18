@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
+import 'package:battery_plus/battery_plus.dart';
 import 'dart:math' show cos, sqrt, asin;
 import 'dart:math' as math;
 
@@ -61,13 +65,47 @@ class MapHelper {
 
   static Future<dynamic> locationSave(
       {required PointsModel lastPoint,
-    required ArcGISPoint currentPoint}) async {
+    required ArcGISPoint currentPoint,
+    required double speed,
+    required double verticalAccuracy,
+    required BuildContext context,
+    required TaskModel taskData,
+      }) async {
     try{
       String distance = "0.0";
+      double bearing = 0.0;
       if(lastPoint.y != null){
        double calculateDistance = MapHelper.calculateDistance(
             lastPoint.y, lastPoint.x, currentPoint.y, currentPoint.x) * 1000;
          distance  = calculateDistance.toStringAsFixed(2);
+      }
+      bearing =  calculateBearing(currentPoint.y, currentPoint.x, lastPoint.y, lastPoint.x);
+
+      var battery = Battery();
+      int batteryPercentage = await battery.batteryLevel;
+
+      var location =     {
+        "gpsx": currentPoint.x.toString(),
+        "gpsy": currentPoint.y.toString(),
+        "gpsdatetime": DateTime.now().toString(),
+        "gpsaccuracy": verticalAccuracy.toString(),
+        "provider": "GPS1",
+        "speed": speed.toString(),
+        "bearing":bearing.toString(),
+        "buffer": 15.0,
+        "distance": "0",
+        "battery" : batteryPercentage.toString(),
+     };
+      var json = {
+        "task_id" : taskData.taskId.toString(),
+        "subtask_id" : taskData.subTaskId.toString(),
+        "locations" : [location],
+      };
+      String url =  APIs.saveLocationDataApi;
+      var res =  await ServerRequest.postData(
+          urlEndPoint: url, body: jsonEncode(json), context: context);
+      if(res != null){
+        return res;
       }
     }catch(_){}
     return null;
