@@ -29,21 +29,21 @@ class AddMarkerHelper {
       List<MarkerTypeModel> markerTypeList = [];
 
       markerTypeList.add(MarkerTypeModel(
-        id: "1",
-        markerUrl: AppIcon.wmIcon,
-        name: "WM"
+          id: "1",
+          markerUrl: AppIcon.bpIcon,
+          name: "BP"
       ));
 
       markerTypeList.add(MarkerTypeModel(
           id: "2",
-          markerUrl: AppIcon.kmIcon,
-          name: "KM"
+          markerUrl: AppIcon.dmIcon,
+          name: "DM"
       ));
 
       markerTypeList.add(MarkerTypeModel(
           id: "3",
-          markerUrl: AppIcon.dmIcon,
-          name: "DM"
+          markerUrl: AppIcon.kmIcon,
+          name: "KM"
       ));
 
       markerTypeList.add(MarkerTypeModel(
@@ -54,8 +54,8 @@ class AddMarkerHelper {
 
       markerTypeList.add(MarkerTypeModel(
           id: "5",
-          markerUrl: AppIcon.bpIcon,
-          name: "BP"
+          markerUrl: AppIcon.wmIcon,
+          name: "WM"
       ));
       return markerTypeList;
     }catch(_){}

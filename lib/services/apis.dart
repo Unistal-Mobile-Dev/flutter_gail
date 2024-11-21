@@ -10,14 +10,8 @@ class APIs {
 
   static get sendNotificationApi => "https://fcm.googleapis.com/fcm/send";
 
-  static get googlePlaceAPI =>
-      "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
-
-  static get googlePlaceDetailsAPI =>
-      "https://maps.googleapis.com/maps/api/place/details/json?";
-
-  static get googleLatLongAPI =>
-      "https://maps.googleapis.com/maps/api/geocode/json?";
+  static get googleDirectionsApi =>
+      "https://maps.googleapis.com/maps/api/directions/json";
 
   static get login => "auth/login";
 
@@ -44,6 +38,8 @@ class APIs {
   static get createDailyTaskApi => "patrolling-surveillance/daily-task-tracking/create";
 
   static get saveLocationDataApi => "patrolling-surveillance/device-location/add-device-location";
+
+  static get getMarkerApi => "patrolling-surveillance/marker/details";
 
   static get forgotPasswordApi => "";
 }

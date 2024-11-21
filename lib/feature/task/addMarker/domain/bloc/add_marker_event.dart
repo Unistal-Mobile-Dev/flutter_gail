@@ -6,9 +6,11 @@ sealed class AddMarkerEvent extends Equatable {
 
 class AddMarkerPageLoadEvent extends AddMarkerEvent {
   final BuildContext context;
+  final dynamic data;
 
   const AddMarkerPageLoadEvent({
     required this.context,
+    required this.data,
  });
 
   @override

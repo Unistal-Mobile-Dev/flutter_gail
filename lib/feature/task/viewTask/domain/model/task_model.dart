@@ -15,6 +15,7 @@ class TaskModel {
   String? maintenanceBase;
   String? pipeline;
   String? section;
+  dynamic sectionCode;
   dynamic patrollRouteId;
   String? patrollRouteName;
   dynamic patrollRouteLength;
@@ -52,6 +53,8 @@ class TaskModel {
         this.patrollManStatus,
         this.taskStatus,
         this.shapeData,
+        this.sectionCode,
+        this.section
       });
 
   TaskModel.fromJson(Map<String, dynamic> json) {
@@ -61,6 +64,7 @@ class TaskModel {
     maintenanceBase = json['maintenance_base'] ?? "";
     pipeline = json['pipeline'] ?? "";
     section = json['section'] ?? "";
+    sectionCode =  json['section_code'] ?? "";
     patrollRouteId = json['patrollroute_id'] ?? "";
     patrollRouteName = json['patrollroute_name'] ?? "";
     patrollRouteLength = json['patrollroute_length'] ?? "";

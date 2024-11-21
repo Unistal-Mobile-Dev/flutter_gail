@@ -7,6 +7,7 @@ import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/helper/task_helper.dart';
@@ -31,6 +32,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   TaskModel taskData = TaskModel();
   bool isTaskStatusChange =  false;
   List<TaskModel> taskList = [];
+  List<MarkerModel> markerList = [];
 
   MapBloc() : super(MapInitial()) {
     on<MapPageLoadEvent>(_pageLoadEvent);
@@ -48,6 +50,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     isTaskStatusChange =  false;
     mapList = [];
     directionList = [];
+    markerList = [];
     lastPoint =  PointsModel();
     taskList =  BlocProvider.of<TaskBloc>(event.context).searchTaskList;
      taskData = BlocProvider.of<TaskBloc>(event.context).taskData;
@@ -65,7 +68,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     } else {
       isStartPatrolling =  false;
     }
+
+    if(taskData.sectionCode.toString().isNotEmpty){
+      var markerRes =  await MapHelper.fetchMarkerList(sectionCode: taskData.sectionCode.toString());
+      if(markerRes != null){
+        markerList =  markerRes;
+      }
+    }
     _eventComplete(emit);
+
   }
 
   _routeDirection(MapRouteDirection event, emit) async {
@@ -228,6 +239,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         directionList: directionList,
         taskData: taskData,
         isStartPatrolling: isStartPatrolling,
+        markerList: markerList,
     ));
   }
 

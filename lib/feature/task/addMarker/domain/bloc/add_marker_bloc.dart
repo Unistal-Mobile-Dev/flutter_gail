@@ -4,6 +4,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/addMarker/domain/model/marker_type_model.dart';
 import 'package:flutter_gail/feature/task/addMarker/helper/add_marker_helper.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 
 part 'add_marker_event.dart';
@@ -21,6 +22,7 @@ class AddMarkerBloc extends Bloc<AddMarkerEvent, AddMarkerState> {
   File cameraFile = File("");
   File videoFile = File("");
   File voiceRecordFile = File("");
+  MarkerModel markerData =  MarkerModel();
 
   AddMarkerBloc() : super(AddMarkerInitial()) {
     on<AddMarkerPageLoadEvent>(_pageLoad);
@@ -43,10 +45,26 @@ class AddMarkerBloc extends Bloc<AddMarkerEvent, AddMarkerState> {
     cameraFile = File("");
     videoFile = File("");
     voiceRecordFile = File("");
+    markerData =  MarkerModel();
+    var data =  event.data;
+
+    if(data.toString().isNotEmpty){
+      markerData =  MarkerModel.fromJson(data);
+    }
+
     taskData  =  BlocProvider.of<TaskBloc>(event.context).taskData;
     var res =  await AddMarkerHelper.fetchMarkerType();
     if(res != null){
       markerTypeList = res;
+      if(markerData.markerType != null){
+        for(int i = 0; i < markerTypeList.length; i++){
+          if(markerTypeList[i].id.toString() == markerData.markerType.toString())
+          {
+            markerTypeList[i].isSelected =  true;
+            markerTypeData =  markerTypeList[i];
+          }
+        }
+      }
     }
 
     _eventCompleted(emit);

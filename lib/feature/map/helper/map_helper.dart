@@ -4,6 +4,7 @@ import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:battery_plus/battery_plus.dart';
@@ -11,6 +12,18 @@ import 'dart:math' show cos, sqrt, asin;
 import 'dart:math' as math;
 
 class MapHelper {
+
+  static Future<dynamic> fetchMarkerList({required String sectionCode}) async {
+
+    try{
+       String url =  APIs.getMarkerApi+"?sectionCode=$sectionCode";
+       var res =  await ServerRequest.getData(urlEndPoint: url);
+       if(res != null){
+         return markerListResponse(res);
+       }
+    }catch(_){}
+    return null;
+  }
 
   static Future<dynamic> fetchRouteDirection(
       {required ArcGISPoint startPoint,
@@ -41,7 +54,7 @@ class MapHelper {
     required ArcGISPoint endPoint}) async {
     List<ArcGISPoint> directionList = [];
     try{
-      String url = "https://maps.googleapis.com/maps/api/directions/json?destination=${endPoint.y},${endPoint.x}&origin=${startPoint.y},${startPoint.x}&mode=walking&key=AIzaSyAiFoe5ZuDbEVu0B3wyCrQsODy0lFQTxZ0";
+      String url = APIs.googleDirectionsApi+"?destination=${endPoint.y},${endPoint.x}&origin=${startPoint.y},${startPoint.x}&mode=walking&key=AIzaSyAiFoe5ZuDbEVu0B3wyCrQsODy0lFQTxZ0";
       var res =  await ServerRequest.getGoogleData(url: Uri.parse(url));
       if(res != null && res['geocoded_waypoints'] != null){
         GoogleRouteModel routeData =  GoogleRouteModel.fromJson(res);
@@ -103,7 +116,7 @@ class MapHelper {
       };
       String url =  APIs.saveLocationDataApi;
       var res =  await ServerRequest.postData(
-          urlEndPoint: url, body: jsonEncode(json), context: context);
+          urlEndPoint: url, body: jsonEncode(json), context: !context.mounted ? context : context);
       if(res != null){
         return res;
       }

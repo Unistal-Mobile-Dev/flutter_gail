@@ -13,9 +13,12 @@ import 'package:flutter_gail/feature/task/addCrossing/presentation/page/add_cros
 import 'package:flutter_gail/feature/task/addMarker/domain/bloc/add_marker_bloc.dart';
 import 'package:flutter_gail/feature/task/addMarker/presentation/page/add_marker_page.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
 import 'package:flutter_gail/pdf_helper.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
+import 'package:flutter_gail/utils/commonWidgets/message_box_pop_button_widget.dart';
+import 'package:flutter_gail/utils/commonWidgets/message_box_two_button_pop.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -92,16 +95,31 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
 
     if (identifyGraphicsOverlayResult.graphics.isEmpty) return;
     if (mounted) {
-      for(var data in identifyGraphicsOverlayResult.graphics){
-         print(data.attributes.toString());
-      }
       final graphic = identifyGraphicsOverlayResult.graphics.first;
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(graphic.attributes.toString()));
-        },
-      );
+      Map<String, dynamic> jsonValue = graphic.attributes;
+      if(jsonValue['type'] != null && jsonValue['type'] == "marker")
+      {
+
+       var res =  await showDialog(
+          context: context,
+          builder: (context) {
+            return MessageBoxTwoButtonPopWidget(
+              message: "${jsonValue['markername']}\n${jsonValue['engroutename']}",
+              okButtonText: "Update",
+              onPressed: () => Navigator.pop(context, true),
+            );
+          },
+        );
+       if(res == true){
+         BlocProvider.of<AddMarkerBloc>(!context.mounted ? context : context)
+             .add(AddMarkerPageLoadEvent(context: !context.mounted ? context : context, data: jsonValue));
+         Navigator.push(
+           !context.mounted ? context : context,
+           FadeRoute(
+               page: const AddMarkerPage()),
+         );
+       }
+      }
     }
   }
 
@@ -249,7 +267,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
         icon: Icon(Icons.location_searching_sharp, color: AppColor.themeColor,
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () {
-          BlocProvider.of<AddMarkerBloc>(context).add(AddMarkerPageLoadEvent(context: context));
+          BlocProvider.of<AddMarkerBloc>(context).add(AddMarkerPageLoadEvent(context: context, data: ""));
           Navigator.push(
             !context.mounted ? context : context,
             FadeRoute(
@@ -421,6 +439,59 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       Graphic(geometry: startPoint1.targetGeometry, symbol: routeStartPointMarker, attributes: attributes1),
       Graphic(geometry: endPoint1.targetGeometry, symbol: routeEndPointMarker, attributes: attributes2),
     ]);
+
+
+    final bpIcon = await ArcGISImage.fromAsset(AppIcon.bpIcon);
+    final bpIconMarker = PictureMarkerSymbol.withImage(bpIcon)
+      ..width = 15
+      ..height = 15;
+
+    final dmIcon = await ArcGISImage.fromAsset(AppIcon.dmIcon);
+    final dmIconMarker = PictureMarkerSymbol.withImage(dmIcon)
+      ..width = 15
+      ..height = 15;
+
+    final kmIcon = await ArcGISImage.fromAsset(AppIcon.kmIcon);
+    final kmIconMarker = PictureMarkerSymbol.withImage(kmIcon)
+      ..width = 15
+      ..height = 15;
+
+    final tlpIcon = await ArcGISImage.fromAsset(AppIcon.tlpIcon);
+    final tlpIconMarker = PictureMarkerSymbol.withImage(tlpIcon)
+      ..width = 15
+      ..height = 15;
+
+    final wmIcon = await ArcGISImage.fromAsset(AppIcon.wmIcon);
+    final wmIconMarker = PictureMarkerSymbol.withImage(wmIcon)
+      ..width = 15
+      ..height = 15;
+
+
+    List<MarkerModel> markerList =  BlocProvider.of<MapBloc>(!context.mounted ? context : context).markerList;
+    for(var markerData in markerList){
+      final startPoint1 = Viewpoint.withLatLongScale(
+        latitude: markerData.gpsY!,
+        longitude: markerData.gpsX!,
+        scale: 2e4,
+      );
+
+      _stopsGraphicsOverlay.graphics.addAll([
+        Graphic(geometry: startPoint1.targetGeometry,
+            symbol: markerData.markerType.toString() == "1"
+                ? bpIconMarker
+                : markerData.markerType.toString() == "2"
+                ? dmIconMarker
+                : markerData.markerType.toString() == "3"
+                ? kmIconMarker
+                : markerData.markerType.toString() == "4"
+                ? tlpIconMarker
+                : markerData.markerType.toString() == "5"
+                ? wmIconMarker
+                : bpIconMarker,
+            attributes: markerData.toJson()),
+      ]);
+    }
+
     _initPolyline();
   }
 
