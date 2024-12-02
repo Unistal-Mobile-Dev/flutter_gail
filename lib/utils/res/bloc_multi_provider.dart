@@ -7,6 +7,7 @@ import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_b
 import 'package:flutter_gail/feature/task/addMarker/domain/bloc/add_marker_bloc.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/bloc/create_task_bloc.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
+import 'package:flutter_gail/feature/taskManagement/viewTask/domain/bloc/view_task_bloc.dart';
 
 MultiProvider blocMultiProvider({required Widget child}) {
   return MultiProvider(
@@ -20,6 +21,7 @@ MultiProvider blocMultiProvider({required Widget child}) {
       BlocProvider(create: (BuildContext context) => AddMarkerBloc()),
        BlocProvider(create: (BuildContext context) => AddCrossingBloc()),
        BlocProvider(create: (BuildContext context) => AddIncidentBloc()),
+       BlocProvider(create: (BuildContext context) => ViewTaskBloc()),
 
     ],
     child: child,
