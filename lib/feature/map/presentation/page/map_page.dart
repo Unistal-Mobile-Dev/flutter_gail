@@ -201,8 +201,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
               : 'Navigation',
           color: AppColor.black,
           fontSize: AppFont.font_11,),
-        icon: Icon(Icons.navigation, color: AppColor.themeSecondary,
-          size: MediaQuery.of(context).size.width * 0.05,),
+        icon: Image.asset(AppIcon.mapIcon, height: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () {
           _mapViewController.locationDisplay.autoPanMode =
               LocationDisplayAutoPanMode.navigation;
@@ -242,8 +241,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
         label: TextWidget('Re-centre',
           color: AppColor.black,
           fontSize: AppFont.font_11,),
-        icon: Icon(Icons.location_history, color: Colors.blueAccent,
-          size: MediaQuery.of(context).size.width * 0.05,),
+        icon: Image.asset(AppIcon.gpsIcon, height: MediaQuery.of(context).size.width * 0.05,), // MediaQuery.of(context).size.width * 0.05,
         onPressed: () {
           currentLocation();
         },
@@ -409,12 +407,12 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
         ArcGISMap.withBasemapStyle(BasemapStyle.arcGISStreets);
     _mapViewController.graphicsOverlays.add(_routeGraphicsOverlay);
     _mapViewController.graphicsOverlays.add(_stopsGraphicsOverlay);
-    final imageStart = await ArcGISImage.fromAsset(AppIcon.startLocationIcon);
+    final imageStart = await ArcGISImage.fromAsset(AppIcon.pointerIcon);
     final routeStartPointMarker = PictureMarkerSymbol.withImage(imageStart)
       ..width = 20
       ..height = 20;
 
-    final imageEnd = await ArcGISImage.fromAsset(AppIcon.endLocationIcon);
+    final imageEnd = await ArcGISImage.fromAsset(AppIcon.flagIcon);
     final routeEndPointMarker = PictureMarkerSymbol.withImage(imageEnd)
       ..width = 20
       ..height = 20;
@@ -597,12 +595,12 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     _mapViewController.locationDisplay.dataSource = _locationDataSource;
     _mapViewController.locationDisplay.autoPanMode = LocationDisplayAutoPanMode.recenter;
 
-    // final imageEnd = await ArcGISImage.fromAsset(AppIcon.gpsMovedIcon);
-    // final routeEndPointMarker = PictureMarkerSymbol.withImage(imageEnd)
-    //   ..width = 35
-    //   ..height = 35;
-    //
-    // _mapViewController.locationDisplay.courseSymbol = routeEndPointMarker;
+    final imageEnd = await ArcGISImage.fromAsset(AppIcon.personLocation);
+    final routeEndPointMarker = PictureMarkerSymbol.withImage(imageEnd)
+      ..width = 35
+      ..height = 35;
+
+    _mapViewController.locationDisplay.courseSymbol = routeEndPointMarker;
 
     _statusSubscription = _locationDataSource.onStatusChanged.listen((status) {
       setState(() => _status = status);

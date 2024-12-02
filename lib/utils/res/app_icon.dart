@@ -31,4 +31,14 @@ class AppIcon {
 
   static get arrowIcon => "assets/arrow_icon.png";
 
+  static get personLocation => "assets/ic_location_person.png";
+
+  static get pointerIcon => "assets/pointer.png";
+
+  static get flagIcon => "assets/flag.png";
+
+  static get gpsIcon => "assets/gps.png";
+
+  static get mapIcon => "assets/map.png";
+
 }
