@@ -7,21 +7,21 @@ class TaskDataModel {
   int? weekday;
   String? dayName;
   String? monthName;
+  String? year;
   String? name;
   String? title;
   String? date;
-  List<TaskModel>? taskList;
 
   TaskDataModel({
    this.name,
    this.id,
    this.day,
+   this.year,
    this.weekday,
    this.dayName,
    this.monthName,
    this.title,
    this.date,
-   this.taskList,
 });
 
 }

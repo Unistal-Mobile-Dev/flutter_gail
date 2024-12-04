@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
-import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/domain/bloc/view_task_bloc.dart';
+import 'package:flutter_gail/feature/taskManagement/viewTask/domain/model/task_model.dart';
 
 class TaskListDayWidget extends StatelessWidget {
   final FetchViewTaskDataState dataState;
-  final List<TaskModel> taskList;
+  final List<Task> taskList;
   const TaskListDayWidget({super.key,
   required this.dataState,
   required this.taskList,
@@ -14,8 +14,9 @@ class TaskListDayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-        itemCount: 6,
+        itemCount: taskList.length,
         shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
         return Card(
           elevation: 2,

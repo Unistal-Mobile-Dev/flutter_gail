@@ -1,8 +1,11 @@
+import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/taskManagement/viewTask/domain/bloc/view_task_bloc.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/domain/model/task_data_model.dart';
+import 'package:flutter_gail/feature/taskManagement/viewTask/domain/model/task_model.dart';
 
 class ViewTaskHelper {
 
-  static Future<dynamic> fetchTaskData({required DateTime dateTime}) async
+  static Future<dynamic> createDaysCalender({required DateTime dateTime}) async
   {
     List<TaskDataModel> taskDataList = [];
     try{
@@ -35,6 +38,108 @@ class ViewTaskHelper {
       return taskDataList;
     }catch(_){}
     return taskDataList;
+  }
+
+  static Future<dynamic> createMonthlyCalender({required DateTime dateTime}) async
+  {
+    List<TaskDataModel> taskDataList = [];
+    try{
+       for(int i = 0; i < 12; i++){
+         DateTime date =  DateTime(dateTime.year, 1+i, 1);
+         String month =  getMonth(1+i);
+         taskDataList.add(TaskDataModel(
+           id: 1+i,
+           monthName: month,
+           year: date.year.toString(),
+           date: date.toString(),
+         ));
+       }
+      return taskDataList;
+    }catch(_){}
+    return taskDataList;
+  }
+
+  static Future<dynamic> fetchTaskData({required DateTime dateTime}) async {
+    List<TaskModel> taskList = [];
+    List<TaskModel> tempList = [];
+    try{
+      var beginningNextMonth = (dateTime.month < 12)
+          ? DateTime(dateTime.year, dateTime.month + 1, 1)
+          : DateTime(dateTime.year + 1, 1, 1);
+      var lastDay = beginningNextMonth.subtract(const Duration(days: 1)).day;
+      for(int i = 0; i < lastDay; i++)
+      {
+        DateTime date =  DateTime(dateTime.year, dateTime.month, 1+i);
+        taskList.add(TaskModel(
+          id: i.toString(),
+          date: date.toString(),
+          month: date.month,
+          list: [],
+          )
+        );
+      }
+
+      List<Task> list = [];
+      list.add(Task(
+        name: "1",
+        date: "2024-12-01"
+        )
+      );
+      list.add(Task(
+          name: "1",
+          date: "2024-12-01"
+      ));
+      list.add(Task(
+          name: "1",
+          date: "2024-12-01"
+      ));
+      list.add(Task(
+          name: "1",
+          date: "2024-12-03"
+      ));
+      list.add(Task(
+          name: "1",
+          date: "2024-12-03"
+      ));
+      list.add(Task(
+          name: "1",
+          date: "2024-12-03"
+      ));
+
+      list.add(Task(
+          name: "1",
+          date: "2024-12-06"
+      ));
+      list.add(Task(
+          name: "1",
+          date: "2024-12-08"
+      ));
+      list.add(Task(
+          name: "1",
+          date: "2024-12-08"
+      ));
+      list.add(Task(
+          name: "1",
+          date: "2024-12-04"
+      ));
+
+
+      list.sort((a,b) {
+        var adate = a.date.toString(); //before -> var adate = a.expiry;
+        var bdate = b.date.toString(); //var bdate = b.expiry;
+        return -adate.compareTo(bdate);
+      });
+      for(var taskData in taskList){
+        for(var data in list.reversed){
+          if(taskData.date.toString().replaceAll(" 00:00:00.000", "").toString() == data.date)
+          {
+            taskData.list!.add(data);
+          }
+        }
+        tempList.add(taskData);
+      }
+    }catch(_){}
+    return tempList;
   }
 
    static String getDays(int day) {

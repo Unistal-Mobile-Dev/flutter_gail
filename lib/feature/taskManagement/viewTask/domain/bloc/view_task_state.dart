@@ -20,12 +20,18 @@ final class FetchViewTaskDataState extends ViewTaskInitial {
   final int selectedDay;
   final List<TaskFilterModel> taskFilterList;
   final bool isLoader;
+  final PageController pageController;
+  final TaskView taskView;
+  final List<TaskModel> taskList;
 
   FetchViewTaskDataState({
     required this.taskDataList,
     required this.selectedDay,
     required this.taskFilterList,
     required this.isLoader,
+    required this.pageController,
+    required this.taskView,
+    required this.taskList,
   });
 
   @override
@@ -34,5 +40,8 @@ final class FetchViewTaskDataState extends ViewTaskInitial {
     selectedDay,
     taskFilterList,
     isLoader,
+    pageController,
+    taskView,
+    taskList,
   ];
 }

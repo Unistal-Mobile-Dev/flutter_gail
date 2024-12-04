@@ -7,6 +7,7 @@ class DropdownWidget extends StatelessWidget {
   final ValueChanged<dynamic>? onChanged;
   final List<DropdownMenuItem<dynamic>>? items;
   final bool? isRequired;
+  final bool? isBoardRemoved;
 
   const DropdownWidget({
     super.key,
@@ -15,13 +16,15 @@ class DropdownWidget extends StatelessWidget {
     required this.items,
     required this.hint,
     this.isRequired,
+    this.isBoardRemoved,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      decoration: BoxDecoration(
+      decoration: isBoardRemoved == true ? null
+          :  BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
             color: AppColor.grey, style: BorderStyle.solid, width: 0.80),
@@ -31,7 +34,8 @@ class DropdownWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           dropdownValue != null
-              ? Padding(
+              ? hint.isNotEmpty ?
+              Padding(
                   padding: const EdgeInsets.only(top: 2, bottom: 2),
                   child: Text.rich(TextSpan(children: [
                     TextSpan(
@@ -47,10 +51,11 @@ class DropdownWidget extends StatelessWidget {
                           fontSize: AppFont.font_14,
                         )),
                   ])),
-                )
+                ) : const SizedBox.shrink()
               : const SizedBox.shrink(),
           DropdownButton<dynamic>(
-            hint: Text.rich(TextSpan(children: [
+            hint: hint.isNotEmpty ?
+            Text.rich(TextSpan(children: [
               TextSpan(
                   text: hint,
                   style: TextStyle(
@@ -63,7 +68,7 @@ class DropdownWidget extends StatelessWidget {
                     color: Colors.red,
                     fontSize: AppFont.font_14,
                   )),
-            ])),
+            ])) : null,
             underline: const SizedBox(),
             isExpanded: true,
             value: dropdownValue,
