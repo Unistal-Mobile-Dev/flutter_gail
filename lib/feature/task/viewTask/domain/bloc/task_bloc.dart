@@ -3,8 +3,10 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/login/domain/models/permissions_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/helper/task_helper.dart';
+import 'package:flutter_gail/utils/commonClass/user_info.dart';
 
 part 'task_event.dart';
 part 'task_state.dart';
@@ -20,6 +22,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   DateTime startDate =  DateTime.now();
   DateTime endDate =  DateTime.now();
 
+  bool isAssignTask = false;
+  LoginDataModel userData =  LoginDataModel();
+
   TaskBloc() : super(TaskInitial()) {
     on<TaskPageLoadEvent>(_pageLoad);
     on<TaskPageSelectDateEvent>(_selectDate);
@@ -31,12 +36,24 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   _pageLoad(TaskPageLoadEvent event, emit) async {
     emit(TaskPageLoadState());
     isLoader =  false;
+    isAssignTask = false;
     taskList = [];
     searchTaskList = [];
     tabIndex = 0;
     taskData =  TaskModel();
     startDate = DateTime.now().subtract(const Duration(days: 7));
     endDate =  DateTime.now();
+    userData =  UserInfo.instance!.userData!;
+    for(var moduleData in userData.modules!) {
+       if(moduleData.permissionList != null){
+         for(var permissionData in moduleData.permissionList!){
+           if(permissionData.name.toString().toLowerCase() == "write"){
+             isAssignTask =  permissionData.value ?? false;
+           }
+         }
+       }
+    }
+
     var res = await TaskHelper.fetchTask(startDate: startDate.toString(), endDate: endDate.toString());
     taskList =  res ?? [];
     searchTaskList  =  taskList;
@@ -125,6 +142,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   _eventComplete(Emitter<TaskState> emit) {
     emit(FetchTaskDataState(
         isLoader: isLoader,
+        isAssignTask: isAssignTask,
         taskList: taskList,
         searchTaskList: searchTaskList
     ));

@@ -47,5 +47,18 @@
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
     <string>This lets gail app record so you can send voice message to this marker point.</string>
+   <key>CFBundleURLTypes</key>
+   <array>
+     <dict>
+       <key>CFBundleURLSchemes</key>
+       <array>
+         <string>https</string>
+       </array>
+       <key>CFBundleURLName</key>
+       <string>unistal.com</string>
+     </dict>
+   </array>
+   <key>FlutterDeepLinkingEnabled</key>
+   <true/>
 </dict>
 </plist>

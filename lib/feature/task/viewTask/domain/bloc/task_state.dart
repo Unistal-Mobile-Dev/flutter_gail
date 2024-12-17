@@ -13,11 +13,13 @@ final class TaskPageLoadState extends TaskInitial {}
 
 final class FetchTaskDataState extends TaskInitial {
   final bool isLoader;
+  final bool isAssignTask;
   final List<TaskModel> taskList;
   final List<TaskModel> searchTaskList;
 
   FetchTaskDataState({
     required this.isLoader,
+    required this.isAssignTask,
     required this.taskList,
     required this.searchTaskList,
   });
@@ -25,6 +27,7 @@ final class FetchTaskDataState extends TaskInitial {
   @override
   List<Object> get props => [
     isLoader,
+    isAssignTask,
     taskList,
     searchTaskList];
 }

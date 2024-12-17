@@ -1,5 +1,7 @@
 
 
+import 'package:flutter_gail/feature/login/domain/models/permissions_model.dart';
+
 LoginDataModel loginResponse(var json) {
   return LoginDataModel.fromJson(json);
 }
@@ -11,6 +13,7 @@ class LoginDataModel {
   List<dynamic>? groups;
   List<dynamic>? verificationDetails;
   Tokens? tokens;
+
 
   LoginDataModel(
       {this.users,
@@ -140,12 +143,14 @@ class Users {
 class Modules {
   String? permissionMask;
   String? moduleName;
+  List<PermissionsModel>? permissionList;
 
   Modules({this.permissionMask, this.moduleName});
 
   Modules.fromJson(Map<String, dynamic> json) {
     permissionMask = json['permission_mask'] ?? "";
     moduleName = json['module_name'] ?? "";
+    permissionList = json['permissions'] != null ? permissionsListResponse(json['permissions']) :[];
   }
 
   Map<String, dynamic> toJson() {
@@ -155,6 +160,7 @@ class Modules {
     return data;
   }
 }
+
 
 class Roles {
   int? roleId;
