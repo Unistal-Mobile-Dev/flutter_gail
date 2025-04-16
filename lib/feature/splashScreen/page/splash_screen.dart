@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/login/domain/bloc/login_event.dart';
+import 'package:flutter_gail/feature/login/helper/login_helper.dart';
 import 'package:flutter_gail/feature/login/presentations/pages/login_screen_page.dart';
+import 'package:flutter_gail/utils/commonWidgets/message_box_two_button_pop.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -21,6 +24,18 @@ class _SplashScreenState extends State<SplashScreen> {
     await AppConfig.instanceInit()!.getPackageInfo();
     String userName =
         await SharedPreferencesUtils.getString(key: PreferencesName.userName);
+    if(kReleaseMode){
+      if(await LoginHelper.isDeveloperModeEnabled() == true){
+        if(await _onWillPop() == true){
+          await LoginHelper.openDevSettings();
+        } else {
+          Navigator.of(!context.mounted ? context : context).pop();
+        }
+        return;
+      }
+    }
+
+
     if (userName.isEmpty) {
       await Future.delayed(const Duration(seconds: 2));
       Navigator.pushAndRemoveUntil(
@@ -39,6 +54,16 @@ class _SplashScreenState extends State<SplashScreen> {
               context: !context.mounted ? context : context,
               isLoginPage: false));
     }
+  }
+
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+        context: context,
+        builder: (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
+            message: "We found developer option enabled",
+            okButtonText: "Open Setting",
+            onPressed: () => Navigator.of(context).pop(true)))) ??
+        false;
   }
 
   @override

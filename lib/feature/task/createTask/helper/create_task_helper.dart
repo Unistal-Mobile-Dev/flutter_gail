@@ -19,11 +19,23 @@ class CreateTaskHelper {
   static Future<dynamic> fetchRepeatFrequency() async {
     try{
        List<RepeatFrequencyModel> repeatFrequencyList = [];
+       repeatFrequencyList.add(RepeatFrequencyModel(
+           id: "1",
+           name: "Daily"
+       ));
+       repeatFrequencyList.add(RepeatFrequencyModel(
+           id: "2",
+           name: "Weekly"
+       ));
+       repeatFrequencyList.add(RepeatFrequencyModel(
+           id: "3",
+           name: "Monthly"
+       ));
 /*       repeatFrequencyList.add(RepeatFrequencyModel(
           id: "0",
           name: "Every Day"
        ));*/
-       repeatFrequencyList.add(RepeatFrequencyModel(
+/*       repeatFrequencyList.add(RepeatFrequencyModel(
            id: "1",
            name: "Monday"
        ));
@@ -50,7 +62,7 @@ class CreateTaskHelper {
        repeatFrequencyList.add(RepeatFrequencyModel(
            id: "7",
            name: "Sunday"
-       ));
+       ));*/
        return repeatFrequencyList;
     }catch(_){}
     return null;
@@ -69,7 +81,7 @@ class CreateTaskHelper {
 
   static Future<dynamic> fetchMaintenance({required RegionTypeModel regionData}) async {
     try{
-      String url =  APIs.areaStructureApi+"?regionCode=${regionData.code}";
+      String url =  APIs.areaStructureApi+"?region_code=${regionData.code}";
       var res =  await ServerRequest.getData(urlEndPoint: url);
       if(res != null && res['maintBaseData'] != null){
         return maintenanceTypeListResponse(res['maintBaseData']);
@@ -83,7 +95,7 @@ class CreateTaskHelper {
     required MaintenanceTypeModel maintenanceTypeData
   }) async {
     try{
-      String url =  APIs.areaStructureApi+"?regionCode=${regionData.code}"
+      String url =  APIs.areaStructureApi+"?region_code=${regionData.code}"
           "&maint_base_name=${maintenanceTypeData.name}";
       var res =  await ServerRequest.getData(urlEndPoint: url);
       if(res != null && res['pipelineData'] != null){
@@ -99,7 +111,7 @@ class CreateTaskHelper {
     required PipelineModel pipelineData
   }) async {
     try{
-      String url =  APIs.areaStructureApi+"?regionCode=${regionData.code}"
+      String url =  APIs.areaStructureApi+"?region_code=${regionData.code}"
           "&maint_base_name=${maintenanceTypeData.name}&pipeline_code=${pipelineData.code}";
       var res =  await ServerRequest.getData(urlEndPoint: url);
       if(res != null && res['sectionData'] != null){
@@ -113,7 +125,7 @@ class CreateTaskHelper {
     required SectionModel sectionData,
   }) async {
     try{
-      String url =  APIs.createTaskValuesListApi+"?section=${sectionData.name}";
+      String url =  APIs.createTaskValuesListApi+"?section=${sectionData.code}";
       var res =  await ServerRequest.getData(urlEndPoint: url);
       if(res != null && res['routeData'] != null){
         return routeListResponse(res['routeData']);
@@ -142,10 +154,10 @@ class CreateTaskHelper {
   }
 
   static Future<dynamic> fetchVendor(
-      {required UserTypeModel userTypeData}) async {
+      {required UserTypeModel userTypeData, required SectionModel sectionData}) async {
     try{
 
-      String url =  APIs.createTaskValuesListApi+"?user_type=${userTypeData.name}";
+      String url =  APIs.createTaskValuesListApi+"?user_type=${userTypeData.name}&section=${sectionData.code}";
       var res =  await ServerRequest.getData(urlEndPoint: url);
       if(res != null && res['vendorData'] != null){
         print(res['vendorData']);
@@ -185,7 +197,7 @@ class CreateTaskHelper {
         required UserTypeModel userTypeModel,
         required String assignedStartDate,
         required String assignedEndDate,
-        required List<RepeatFrequencyModel> repeatFrequencyList,
+        required RepeatFrequencyModel repeatFrequencyData,
         required VendorModel vendorData,
       }) async {
     try{
@@ -214,15 +226,7 @@ class CreateTaskHelper {
         SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select shift group");
         return false;
       }
-      else if(assignedStartDate.isEmpty){
-        SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please enter patrolling start date");
-        return false;
-      }
-      else if(assignedEndDate.isEmpty){
-        SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please enter patrolling end date");
-        return false;
-      }
-      else if(repeatFrequencyList.isEmpty){
+      else if(repeatFrequencyData.id == null){
         SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select repeat frequency");
         return false;
       }
@@ -230,7 +234,7 @@ class CreateTaskHelper {
         SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select user type");
         return false;
       }
-      else if(vendorData.name == null){
+      else if(userTypeModel.name.toString().toLowerCase() != "gail" && vendorData.name == null){
         SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select vendor name");
         return false;
       }
@@ -239,10 +243,15 @@ class CreateTaskHelper {
         return false;
       }
 
-      for(var data in shiftGroupList){
-        if(data.selectedValue.toString().isEmpty){
-          SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select user shift");
-          return false;
+      for (var data in shiftGroupList) {
+        if (data.userNameData?.name != null) {
+          List<ShiftTypeModel> selectedList = data.shiftList
+              ?.where((element) => element.isSelected == true)
+              .toList() ?? [];
+          if(selectedList.isEmpty){
+            SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select ${data.userNameData?.name} Shift");
+            return false;
+          }
         }
       }
       return true;
@@ -266,16 +275,12 @@ class CreateTaskHelper {
         required UserTypeModel userTypeModel,
         required String assignedStartDate,
         required String assignedEndDate,
-        required List<RepeatFrequencyModel> repeatFrequencyList,
+        required RepeatFrequencyModel repeatFrequencyData,
         required VendorModel vendorData,
       }) async {
 
     try{
 
-      List<String> repeatFrequencyData = [];
-      for(var data in repeatFrequencyList){
-        repeatFrequencyData.add(data.name.toString().toLowerCase());
-      }
 
       List<String> userNameData = [];
       for(var data in userNameList){
@@ -287,33 +292,33 @@ class CreateTaskHelper {
         userIdData.add(data.securityId.toString());
       }
 
-      List<String> siftData = [];
-      for(var data in shiftGroupList){
-        siftData.add(data.selectedValue.toString());
+      List<List<String>> shiftNameData = [];
+
+      for (var shift in shiftGroupList) {
+        List<String> data = [];
+
+        for (var shiftData in shift.shiftList!) {
+          data.add(shiftData.name.toString());
+        }
+        shiftNameData.add(data);
       }
 
       String url =  APIs.assignTaskApi;
       var json = {
-        "region_name": regionData.name.toString(),
-        "region_code": regionData.code.toString(),
-        "maintenance_base": maintenanceData.name.toString(),
-        "maintenance_base_code": maintenanceData.code.toString(),
-        "pipeline_name": pipelineData.name.toString(),
-        "pipeline_code": pipelineData.code.toString(),
-        "section_name": sectionData.name.toString(),
-        "section_code": sectionData.code.toString(),
+        "region": regionData.code.toString(),
+        "maintenance_base": maintenanceData.code.toString(),
+        "pipeline": pipelineData.code.toString(),
+        "section": sectionData.code.toString(),
         "patrollroute_id": routeModel.id.toString(),
         "patrollroute_name": routeModel.name.toString(),
         "patrollroute_length": routeLength.toString(),
         "sg_code": shiftData.sgCode.toString(),
-        "assigned_start_date": assignedStartDate.toString(),
-        "assigned_end_date": assignedEndDate.toString(),
-        "repeat_frequency": repeatFrequencyData,
-        "user_type": userTypeModel.name.toString(),
-        "user_name": userNameData,
+        "repeat_frequency": repeatFrequencyData.name.toString().toLowerCase(),
         "user_id": userIdData,
-        "shift_name": siftData,
+        "user_name": userNameData,
+        "shift_name": shiftNameData,
         "vendor": vendorData.name.toString(),
+        "user_type": userTypeModel.name.toString(),
       };
       var res =  await ServerRequest.postData(urlEndPoint: url,
           body: jsonEncode(json), context: context);

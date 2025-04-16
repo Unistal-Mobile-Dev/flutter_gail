@@ -19,27 +19,42 @@ class APIs {
 
   static get addMarkerPointApi => "patrolling-surveillance/marker/add-marker";
 
-  static get addCrossingPointApi => "patrolling-surveillance/crossing/add-crossing";
+  static get addCrossingPointApi =>
+      "patrolling-surveillance/crossing/add-crossing";
 
-  static get getIncidentTypeApi => "patrolling-surveillance/incident/types";
+  static get getIncidentTypeApi => "patrolling-surveillance/route-observer/incident-types";
 
-  static get addIncidentDataApi => "patrolling-surveillance/incident/add-incident";
+  static get addIncidentDataApi =>
+      "patrolling-surveillance/incident/add-incident";
 
-  static get updateTaskApi => "patrolling-surveillance/patrollman-task/update-task-status";
+  static get updateTaskApi =>
+      "patrolling-surveillance/patrollman-task/update-task-status";
 
-  static get createTaskValuesListApi => "patrolling-surveillance/patrollman-task/task-form-details";
+  static get createTaskValuesListApi =>
+      "patrolling-surveillance/patrollman-task/task-form-details";
 
-  static get areaStructureApi => "patrolling-surveillance/patrollman-task/area-structure";
+  static get areaStructureApi =>
+      "common-apis/area-structure";
 
-  static get assignTaskApi => "patrolling-surveillance/patrollman-task/assign-task";
+  static get assignTaskApi =>
+      "patrolling-surveillance/patrollman-task/assign-task";
 
-  static get getDailyTaskTrackingApi => "patrolling-surveillance/daily-task-tracking/list";
+  static get getDailyTaskTrackingApi =>
+      "patrolling-surveillance/patrollman-task/taskList";
 
-  static get createDailyTaskApi => "patrolling-surveillance/daily-task-tracking/create";
+  static get createDailyTaskApi =>
+      "patrolling-surveillance/daily-task-tracking/create";
 
-  static get saveLocationDataApi => "patrolling-surveillance/device-location/add-device-location";
+  static get saveLocationDataApi =>
+      "patrolling-surveillance/device-location/add-device-location";
 
   static get getMarkerApi => "patrolling-surveillance/marker/details";
+
+  static get getRouteApi => "patrolling-surveillance/patrollman-route/gps-coordinates/";
+
+  static get addRouteObserveApi => "patrolling-surveillance/route-observer/add-type";
+
+  static get addDeviceApi => "patrolling-surveillance/device/add-user-device";
 
   static get forgotPasswordApi => "";
 }

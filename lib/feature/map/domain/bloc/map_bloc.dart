@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/map/domain/model/coordinates_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
@@ -14,25 +15,26 @@ import 'package:flutter_gail/feature/task/viewTask/helper/task_helper.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 part 'map_event.dart';
+
 part 'map_state.dart';
 
 class MapBloc extends Bloc<MapEvent, MapState> {
-
-  bool isLoader =  false;
-  List<MapModel> mapList  = [];
-  MapModel mapData =  MapModel();
+  bool isLoader = false;
+  List<MapModel> mapList = [];
+  MapModel mapData = MapModel();
   List<ArcGISPoint> directionList = [];
-  bool isNavigationBool =  false;
+  bool isNavigationBool = false;
   List<PointsModel> pointsList = [];
   ArcGISPoint startPoint = ArcGISPoint(x: 0.0, y: 0.0);
   ArcGISPoint endPoint = ArcGISPoint(x: 0.0, y: 0.0);
-  PointsModel lastPoint =  PointsModel();
-  bool isStartPatrolling =  false;
-  bool isEndPatrolling =  false;
+  PointsModel lastPoint = PointsModel();
+  bool isStartPatrolling = false;
+  bool isEndPatrolling = false;
   TaskModel taskData = TaskModel();
-  bool isTaskStatusChange =  false;
+  bool isTaskStatusChange = false;
   List<TaskModel> taskList = [];
   List<MarkerModel> markerList = [];
+  List<List<PointsModel>> routes = [];
 
   MapBloc() : super(MapInitial()) {
     on<MapPageLoadEvent>(_pageLoadEvent);
@@ -44,17 +46,42 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   _pageLoadEvent(MapPageLoadEvent event, emit) async {
     emit(MapPageLoadState());
     isLoader = false;
-    isNavigationBool =  false;
-    isStartPatrolling =  false;
-    isEndPatrolling =  false;
-    isTaskStatusChange =  false;
+    isNavigationBool = false;
+    isStartPatrolling = false;
+    isEndPatrolling = false;
+    isTaskStatusChange = false;
     mapList = [];
     directionList = [];
     markerList = [];
-    lastPoint =  PointsModel();
-    taskList =  BlocProvider.of<TaskBloc>(event.context).searchTaskList;
-     taskData = BlocProvider.of<TaskBloc>(event.context).taskData;
-     pointsList =  taskData.shapeData!.pointsList!;
+    routes = [];
+    lastPoint = PointsModel();
+    taskList = BlocProvider.of<TaskBloc>(event.context).searchTaskList;
+    taskData = BlocProvider.of<TaskBloc>(event.context).taskData;
+
+    var routeRes = await MapHelper.fetchRoutes(
+        routeId: taskData.patrollRouteId.toString());
+    if (routeRes != null) {
+       mapData =  routeRes;
+       mapData = routeRes;
+       if (mapData.data != null) {
+         for (var data in mapData.data!) {
+           List<PointsModel> list  = [];
+           final geometryData = data.geometry;
+           if (geometryData != null) {
+             list.addAll(
+               geometryData.coordinates.map((coord) => PointsModel(
+                 y: coord.latitude,
+                 x: coord.longitude,
+                 m: 0.0,
+                 z: 0.0,
+               )),
+             );
+           }
+           routes.add(list);
+         }
+       }
+    }
+    //  pointsList =  taskData.shapeData!.pointsList!;
     if(pointsList.isNotEmpty){
       startPoint = ArcGISPoint(x: pointsList[0].x, y: pointsList[0].y);
       endPoint = ArcGISPoint(x: pointsList[pointsList.length-1].x, y: pointsList[pointsList.length-1].y);
@@ -62,90 +89,93 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       startPoint = ArcGISPoint(x: 0.0, y: 0.0);
     }
 
-    if(taskData.taskStatus == TaskStatus.started
-         || taskData.taskStatus == TaskStatus.pause) {
-      isStartPatrolling =  true;
+    if (taskData.taskStatus == TaskStatus.started ||
+        taskData.taskStatus == TaskStatus.pause) {
+      isStartPatrolling = true;
     } else {
-      isStartPatrolling =  false;
+      isStartPatrolling = false;
     }
 
-    if(taskData.sectionCode.toString().isNotEmpty){
-      var markerRes =  await MapHelper.fetchMarkerList(sectionCode: taskData.sectionCode.toString());
-      if(markerRes != null){
-        markerList =  markerRes;
+    if (taskData.sectionCode.toString().isNotEmpty) {
+      var markerRes = await MapHelper.fetchMarkerList(
+          sectionCode: taskData.sectionCode.toString());
+      if (markerRes != null) {
+        markerList = markerRes;
       }
     }
     _eventComplete(emit);
-
   }
 
   _routeDirection(MapRouteDirection event, emit) async {
-
     DateFormat formatter = DateFormat('yyyy-MM-dd');
-    DateTime currentDate =  formatter.parse(DateTime.now().toString());
+    DateTime currentDate = formatter.parse(DateTime.now().toString());
     DateTime dt1 = DateTime.parse(currentDate.toString());
     DateTime dt2 = DateTime.parse(taskData.assignedDate.toString().isNotEmpty
-        ? taskData.assignedDate.toString() :DateTime.now().toString());
+        ? taskData.assignedDate.toString()
+        : DateTime.now().toString());
 
-    List<TaskModel> tempList =  taskList.where((data) =>
-    (data.taskStatus == TaskStatus.started)
-        && taskData.subTaskId !=  data.subTaskId).toList();
+    final List<TaskModel> tempList =  taskList.where((data) {
+        return data.taskStatus == TaskStatus.started &&
+            taskData.subTaskId != data.subTaskId;
+    }).toList();
 
-    if(dt1.compareTo(dt2) < 0){
-      SnackBarErrorWidget(event.context).show(message: "This task are future date");
+
+    if (dt1.compareTo(dt2) < 0) {
+      SnackBarErrorWidget(event.context)
+          .show(message: "This task are future date");
+      return;
+    } else if (dt1.compareTo(dt2) > 0) {
+      SnackBarErrorWidget(event.context)
+          .show(message: "This task are Back date");
+      return;
+    } else if (tempList.isNotEmpty) {
+      SnackBarErrorWidget(event.context).show(
+          message:
+              "Your already start another task.So please complete first old task then start.");
       return;
     }
-    else if(dt1.compareTo(dt2) > 0){
-      SnackBarErrorWidget(event.context).show(message: "This task are Back date");
-      return;
-    }
-    else if(tempList.isNotEmpty){
-      SnackBarErrorWidget(event.context).show(message: "Your already start another task.So please complete first old task then start.");
-      return;
-    }
 
-    isLoader =  true;
-    isNavigationBool =  true;
+    isLoader = true;
+    isNavigationBool = true;
     directionList = [];
     _eventComplete(emit);
 
-    var res =  await MapHelper.fetchRouteDirection(
+    var res = await MapHelper.fetchRoute(
         startPoint: event.startPoint,
-        endPoint: event.endPoint,
-        currentPoint: event.currentPoint);
-    if(res != null){
-      directionList =  res;
+        endPoint: event.endPoint);
+    if (res != null) {
+      directionList = res;
     }
 
-
-    isLoader =  false;
-    isNavigationBool =  directionList.isNotEmpty ? true : false;
+    isLoader = false;
+    isNavigationBool = directionList.isNotEmpty ? true : false;
     _eventComplete(emit);
   }
 
   _locationCheck(MapRouteLocationCheck event, emit) async {
-    BuildContext context =  event.context;
-    ArcGISPoint points =  event.currentPoint;
+    BuildContext context = event.context;
+    ArcGISPoint points = event.currentPoint;
     double speed = event.speed;
-    double verticalAccuracy =  event.verticalAccuracy;
-    if(lastPoint.y == null){
-      lastPoint =  PointsModel(
+    double verticalAccuracy = event.verticalAccuracy;
+    if (lastPoint.y == null) {
+      lastPoint = PointsModel(
         x: points.x,
         y: points.y,
       );
     }
 
-    if(taskData.taskStatus == TaskStatus.started
-        || taskData.taskStatus == TaskStatus.pause) {
-      isStartPatrolling =  true;
+    if (taskData.taskStatus == TaskStatus.started ||
+        taskData.taskStatus == TaskStatus.pause) {
+      isStartPatrolling = true;
     } else {
-      isStartPatrolling =  false;
+      isStartPatrolling = false;
     }
 
-    if(isStartPatrolling == false){
+    if (isStartPatrolling == false) {
       double calculateDistance = MapHelper.calculateDistance(
-          startPoint.y, startPoint.x, points.y, points.x) * 1000;
-      if(calculateDistance < 100){
+              startPoint.y, startPoint.x, points.y, points.x) *
+          1000;
+      if (calculateDistance < 100) {
         isStartPatrolling = true;
         _eventComplete(emit);
       } else {
@@ -154,10 +184,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       }
     }
 
-    if(isStartPatrolling == true && isEndPatrolling == false) {
+    if (isStartPatrolling == true && isEndPatrolling == false) {
       double calculateDistance = MapHelper.calculateDistance(
-          endPoint.y, endPoint.x, points.y, points.x) * 1000;
-      if(calculateDistance < 100){
+              endPoint.y, endPoint.x, points.y, points.x) *
+          1000;
+      if (calculateDistance < 100) {
         isEndPatrolling = true;
         _eventComplete(emit);
       } else {
@@ -166,81 +197,94 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       }
     }
 
-    if(taskData.taskStatus == TaskStatus.started){
+    if (taskData.taskStatus == TaskStatus.started) {
       await MapHelper.locationSave(
           context: context,
-          lastPoint: lastPoint, currentPoint: points,
-          speed: speed, verticalAccuracy: verticalAccuracy, taskData: taskData);
+          lastPoint: lastPoint,
+          currentPoint: points,
+          speed: speed,
+          verticalAccuracy: verticalAccuracy,
+          taskData: taskData);
     }
 
-    lastPoint =  PointsModel(
+    lastPoint = PointsModel(
       x: points.x,
       y: points.y,
     );
   }
 
   _updateTask(MapPageUpdateTaskEvent event, emit) async {
-    isLoader =  true;
+    isLoader = true;
     TaskStatus taskStatus = event.taskStatus;
     _eventComplete(emit);
 
-
     DateFormat formatter = DateFormat('yyyy-MM-dd');
-    DateTime currentDate =  formatter.parse(DateTime.now().toString());
+    DateTime currentDate = formatter.parse(DateTime.now().toString());
     DateTime dt1 = DateTime.parse(currentDate.toString());
     DateTime dt2 = DateTime.parse(taskData.assignedDate.toString().isNotEmpty
-        ? taskData.assignedDate.toString() :DateTime.now().toString());
+        ? taskData.assignedDate.toString()
+        : DateTime.now().toString());
 
-    List<TaskModel> tempList =  taskList.where((data) =>
-      (data.taskStatus == TaskStatus.started)
-          && taskData.subTaskId !=  data.subTaskId).toList();
-    if(dt1.compareTo(dt2) < 0){
-      SnackBarErrorWidget(event.context).show(message: "This task are future date");
-      isLoader =  false;
+    final List<TaskModel> tempList =  taskList.where((data) {
+             return data.taskStatus == TaskStatus.started &&
+                 taskData.subTaskId != data.subTaskId;
+    }).toList();
+
+    if (dt1.compareTo(dt2) < 0) {
+      SnackBarErrorWidget(event.context)
+          .show(message: "This task are future date");
+      isLoader = false;
       _eventComplete(emit);
       return;
-    }
-    else if(dt1.compareTo(dt2) > 0){
-      SnackBarErrorWidget(event.context).show(message: "This task are Back date");
-      isLoader =  false;
+    } else if (dt1.compareTo(dt2) > 0) {
+      SnackBarErrorWidget(event.context)
+          .show(message: "This task are Back date");
+      isLoader = false;
       _eventComplete(emit);
       return;
-    }
-    else if(tempList.isNotEmpty){
-      SnackBarErrorWidget(event.context).show(message: "Your already start another task.So please complete first old task then start.");
-      isLoader =  false;
+    } else if (tempList.isNotEmpty) {
+      SnackBarErrorWidget(event.context).show(
+          message:
+              "Your already start another task.So please complete first old task then start.");
+      isLoader = false;
       _eventComplete(emit);
       return;
     }
 
-    var res =  await TaskHelper.updateTask(
+    var res = await TaskHelper.updateTask(
         taskData: taskData,
-        taskStatus: taskStatus == TaskStatus.started ? 1
-            : taskStatus == TaskStatus.pause ? 2
-            : taskStatus == TaskStatus.completed ? 3 : 0,
+        taskStatus: taskStatus == TaskStatus.started
+            ? 1
+            : taskStatus == TaskStatus.pause
+                ? 2
+                : taskStatus == TaskStatus.completed
+                    ? 3
+                    : 0,
         context: event.context);
-    if(res != null){
-      taskData.taskStatus =  taskStatus;
-      isTaskStatusChange =  true;
-      BlocProvider.of<TaskBloc>(!event.context.mounted ? event.context : event.context)
-          .add(TaskPagRefreshDataEvent(context: !event.context.mounted ? event.context : event.context));
+    if (res != null) {
+      taskData.taskStatus = taskStatus;
+      isTaskStatusChange = true;
+      BlocProvider.of<TaskBloc>(
+              !event.context.mounted ? event.context : event.context)
+          .add(TaskPagRefreshDataEvent(
+              context: !event.context.mounted ? event.context : event.context));
     }
-    isLoader =  false;
+    isLoader = false;
     _eventComplete(emit);
   }
 
   _eventComplete(Emitter<MapState> emit) {
     emit(FetchMapPageDataState(
-        isLoader: isLoader,
-        isNavigationBool: isNavigationBool,
-        isEndPatrolling: isEndPatrolling,
-        isTaskStatusChange: isTaskStatusChange,
-        mapList: mapList,
-        directionList: directionList,
-        taskData: taskData,
-        isStartPatrolling: isStartPatrolling,
-        markerList: markerList,
+      isLoader: isLoader,
+      isNavigationBool: isNavigationBool,
+      isEndPatrolling: isEndPatrolling,
+      isTaskStatusChange: isTaskStatusChange,
+      mapList: mapList,
+      directionList: directionList,
+      taskData: taskData,
+      isStartPatrolling: isStartPatrolling,
+      markerList: markerList,
+      routes: routes,
     ));
   }
-
 }

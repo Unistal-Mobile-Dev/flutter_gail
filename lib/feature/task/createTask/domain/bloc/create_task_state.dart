@@ -44,16 +44,20 @@ final class FetchCreateTaskDataState extends CreateTaskInitial {
   final List<SectionModel> sectionList;
   final SectionModel sectionData;
   final List<RepeatFrequencyModel> repeatFrequencyList;
-  final List<RepeatFrequencyModel> repeatFrequencyData;
+  final RepeatFrequencyModel repeatFrequencyData;
   final List<UserNameModel> userNameList;
   final List<UserNameModel> userNameData;
   final bool isMaintenanceLoader;
   final bool isPipelineNameLoader;
   final bool isSectionNameLoader;
   final bool isPatrolRouteNameLoader;
+  final bool isVendorLoader;
+  final bool isUserNameLoader;
 
   FetchCreateTaskDataState({
     required this.isLoader,
+    required this.isVendorLoader,
+    required this.isUserNameLoader,
     required this.endPatrollingDateController,
     required this.endPatrollingTimeController,
     required this.lineData,
@@ -95,6 +99,9 @@ final class FetchCreateTaskDataState extends CreateTaskInitial {
 
   @override
   List<Object> get props => [
+    isLoader,
+    isVendorLoader,
+    isUserNameLoader,
     isLoader,
     endPatrollingDateController,
     endPatrollingTimeController,

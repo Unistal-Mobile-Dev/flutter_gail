@@ -18,8 +18,8 @@ class MaintenanceTypeModel {
   factory MaintenanceTypeModel.fromJson(Map<String, dynamic> json) {
     return MaintenanceTypeModel(
       id: json[''] ?? "",
-      name: json['maint_base_name'] ?? "",
-      code: json['maint_base_code'] ?? "",
+      name: json['maintenance_base_name'] ?? "",
+      code: json['maintenance_base_code'] ?? "",
     );
   }
 }

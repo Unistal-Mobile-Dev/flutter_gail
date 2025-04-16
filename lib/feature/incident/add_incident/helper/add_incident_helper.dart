@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/file_model.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/model/incident_type_model.dart';
+import 'package:flutter_gail/feature/login/helper/login_helper.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
@@ -48,7 +49,7 @@ class AddIncidentHelper {
     required File videoFile,
   }) async {
        try{
-         String url = APIs.addIncidentDataApi;
+         String url = APIs.addRouteObserveApi;
          List<FileModel> fileList = [];
          if (imageFile.path.isNotEmpty) {
            fileList.add(FileModel(
@@ -80,14 +81,23 @@ class AddIncidentHelper {
          if (locationRes != null) {
            locationData = locationRes;
          }
+         final DateFormat formatter = DateFormat('dd-MM-yyyy');
+         final String currentDate = formatter.format(DateTime.now());
+         var deviceId = await LoginHelper.getUniqueDeviceId();
          var json = {
-           "task_id": taskData.subTaskId.toString().isEmpty ? taskData.taskId.toString() : taskData.subTaskId.toString(),
-           "incident_report": incidentReport.toString(),
-           "incident_type": incidentTypeData.id != null ? incidentTypeData.id.toString() : "",
-           "latitude": locationData.lat != null ? locationData.lat.toString() : "0.0",
-           "longitude": locationData.long != null
-               ? locationData.long.toString()
-               : "0.0"
+           "task_id" : taskData.taskId.toString(),
+           "patrollroute_id" : taskData.patrollRouteId.toString(),
+           "observation_type" : "Incident",
+           "description" : incidentReport.toString(),
+           "condition" : "",
+           "crossing_marker": "",
+           "bank_condition": "",
+           "inspection_date" : currentDate.toString(),
+           "gpsx": locationData.lat != null ? locationData.lat.toString() : "0.0",
+           "gpsy": locationData.long != null ? locationData.long.toString(): "0.0",
+           "gps_accuracy" : locationData.accuracy.toString(),
+           "observation_subtype" : incidentTypeData.name != null ? incidentTypeData.name.toString() : "",
+           "device_id" : deviceId.toString(),
          };
          var res = await ServerRequest.postDataWithFile(urlEndPoint: url,
              body: json,

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/file_model.dart';
+import 'package:flutter_gail/feature/login/helper/login_helper.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/model/crossing_type_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
@@ -60,7 +61,7 @@ class AddCrossingHelper {
     required File videoFile,
   }) async {
     try {
-      String url = APIs.addCrossingPointApi;
+      String url = APIs.addRouteObserveApi;
       List<FileModel> fileList = [];
       if (cameraFile.path.isNotEmpty) {
         fileList.add(FileModel(
@@ -87,6 +88,8 @@ class AddCrossingHelper {
             keyName: "video_link"));
       }
 
+      var deviceId = await LoginHelper.getUniqueDeviceId();
+
       var locationRes = await LocationHelper.getLocationOfflineMode(
           context: context);
       LocationModel locationData = LocationModel();
@@ -96,18 +99,19 @@ class AddCrossingHelper {
       final DateFormat formatter = DateFormat('dd-MM-yyyy');
       final String currentDate = formatter.format(DateTime.now());
       var json = {
-        "task_id": taskData.taskId.toString(),
-        "inspectiondate": currentDate.toString(),
-        "featuretype": crossingTypeData.name.toString(),
-        "featuresubtype": "",
-        "comments": remark.toString(),
-        "marker_condition": markerCondition.toString(),
-        "vent_drain": drainCondition.toString(),
+        "task_id" : taskData.taskId.toString(),
+        "patrollroute_id" : taskData.patrollRouteId.toString(),
+        "observation_type" : "Crossing",
+        "description" : remark.toString(),
+        "condition" : drainCondition.toString(),
+        "crossing_marker": markerCondition.toString(),
         "bank_condition": bankCondition.toString(),
-        "latitude": locationData.lat != null ? locationData.lat.toString() : "0.0",
-        "longitude": locationData.long != null
-            ? locationData.long.toString()
-            : "0.0"
+        "inspection_date" : currentDate.toString(),
+        "gpsx": locationData.lat != null ? locationData.lat.toString() : "0.0",
+        "gpsy": locationData.long != null ? locationData.long.toString(): "0.0",
+        "gps_accuracy" : locationData.accuracy.toString(),
+        "observation_subtype" : crossingTypeData.name.toString(),
+        "device_id" : deviceId.toString(),
       };
       var res = await ServerRequest.postDataWithFile(urlEndPoint: url,
           body: json,

@@ -110,7 +110,7 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),
 
-        IconButton(
+/*        IconButton(
           onPressed: () async {
             double size =  MediaQuery.of(!context.mounted ? context : context).size.height
                 - MediaQuery.of(!context.mounted ? context : context).size.width;
@@ -138,9 +138,9 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
             }
           }, icon: Icon(Icons.mic, color: dataState.audioRecordFile.path.isNotEmpty ? AppColor.themeColor :AppColor.grey,),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
-        ),
+        ),*/
 
-        IconButton(
+/*        IconButton(
           onPressed: () {
             mediaType(context: context,
                 onPressedCamera: () {
@@ -157,7 +157,7 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
           }, icon: Icon(Icons.video_camera_back,
           color: dataState.videoFile.path.isNotEmpty ? AppColor.themeColor : AppColor.grey,),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
-        ),
+        ),*/
       ],
     );
   }

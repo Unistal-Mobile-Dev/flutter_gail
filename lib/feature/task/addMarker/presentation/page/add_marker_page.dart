@@ -113,7 +113,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
         TextWidget("Condition",color: AppColor.black,),
         Row(
           children: [
-            Radio(value: "1",
+            Radio(value: "Good",
                 groupValue: dataState.condition,
                 onChanged: (value) {
                 BlocProvider.of<AddMarkerBloc>(context)
@@ -129,7 +129,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
                 }),
             TextWidget("Damaged", fontSize: AppFont.font_12,),
 
-            Radio(value: "3",
+            Radio(value: "Missing",
                 groupValue: dataState.condition,
                 onChanged: (value) {
                   BlocProvider.of<AddMarkerBloc>(context)
@@ -151,7 +151,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
         TextWidget("Painting",color: AppColor.black,),
         Row(
           children: [
-            Radio(value: "1",
+            Radio(value: "Good",
                 groupValue: dataState.painting,
                 onChanged: (value) {
                   BlocProvider.of<AddMarkerBloc>(context)
@@ -159,7 +159,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
                 }),
             TextWidget("Good", fontSize: AppFont.font_12,),
 
-            Radio(value: "2",
+            Radio(value: "Required",
                 groupValue: dataState.painting,
                 onChanged: (value) {
                   BlocProvider.of<AddMarkerBloc>(context)
@@ -210,6 +210,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),
 
+/*
         IconButton(
           onPressed: () async {
             double size =  MediaQuery.of(!context.mounted ? context : context).size.height
@@ -241,8 +242,9 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
           AppColor.grey : AppColor.themeColor),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),
+*/
 
-        IconButton(
+/*        IconButton(
           onPressed: () {
           mediaType(context: context,
               onPressedCamera: () {
@@ -260,7 +262,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
           color: dataState.voiceRecordFile.path.isEmpty ?
           AppColor.grey : AppColor.themeColor,),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
-        ),
+        ),*/
       ],
     );
   }

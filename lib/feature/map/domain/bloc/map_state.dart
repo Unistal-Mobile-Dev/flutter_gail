@@ -21,6 +21,7 @@ final class FetchMapPageDataState extends MapInitial {
   final List<ArcGISPoint> directionList;
   final TaskModel taskData;
   final List<MarkerModel> markerList;
+  final List<List<PointsModel>> routes;
 
   FetchMapPageDataState({
    required this.isLoader,
@@ -32,6 +33,7 @@ final class FetchMapPageDataState extends MapInitial {
    required this.directionList,
    required this.taskData,
    required this.markerList,
+   required this.routes,
   });
 
   @override
@@ -45,6 +47,7 @@ final class FetchMapPageDataState extends MapInitial {
     directionList,
     taskData,
     markerList,
+    routes,
   ];
 
 }

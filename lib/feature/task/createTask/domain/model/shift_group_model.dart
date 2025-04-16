@@ -6,11 +6,13 @@ class ShiftGroupModel {
   List<ShiftTypeModel>? shiftList;
   UserNameModel? userNameData;
   String? selectedValue;
+  bool? isSelected;
 
   ShiftGroupModel({
     this.shiftList,
     this.userNameData,
     this.selectedValue,
+    this.isSelected,
  });
 
 }

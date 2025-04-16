@@ -4,10 +4,33 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 class LoginHelper {
+
+  static const platform = MethodChannel('com.gail.app/channel');
+
+  static Future<void> openDevSettings() async {
+    try {
+      await platform.invokeMethod('openDevSettings');
+    } on PlatformException catch (e) {
+      print("Failed to open developer settings: ${e.message}");
+    }
+  }
+
+  static Future<bool> isDeveloperModeEnabled() async {
+    try {
+      final bool result = await platform.invokeMethod('isDevMode');
+      return result;
+    } on PlatformException catch (e) {
+      print("Failed to check dev mode: ${e.message}");
+      return false;
+    }
+  }
+
   static Future<dynamic> textFieldValidation(
       {required String emilId,
       required String password,
@@ -81,6 +104,37 @@ class LoginHelper {
       SnackBarErrorWidget(context).show(message: "Internal server error");
       return null;
     }
+  }
+
+  static Future<dynamic> addDevice({required String userId, required BuildContext context}) async {
+    try{
+      final deviceInfo = DeviceInfoPlugin();
+      var deviceId = await getUniqueDeviceId();
+      String brand = "";
+      String model = "";
+      String deviceVersion = "";
+      String deviceType = "";
+      if (Platform.isAndroid) {
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        brand = androidInfo.brand.toString();
+        model = androidInfo.model.toString();
+        deviceVersion = androidInfo.version.release;
+        deviceType = "Android";
+      }
+      String url =  APIs.addDeviceApi;
+      var json = {
+        "user_id": userId,
+        "device_id": deviceId.toString(),
+        "device_name": model,
+        "device_platform": deviceType,
+        "device_brand": brand,
+        "device_version": deviceVersion,
+        "device_status": "Active"
+      };
+      await ServerRequest.postData(
+          urlEndPoint: url, body: jsonEncode(json),
+          context: !context.mounted ? context : context);
+    }catch(_){}
   }
 
   static Future<bool> isInternetConnected() async {

@@ -96,6 +96,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (pageList.isNotEmpty) {
       _childWidget = pageList[bottomTabIndex];
     }
+    
+    await LoginHelper.addDevice(userId: userData.users!.id.toString(),
+        context: !event.context.mounted ? event.context : event.context);
+    
     _eventCompleted(emit);
 
   }

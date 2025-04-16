@@ -64,9 +64,9 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
             _verticalSpace(),
             _patrolRouteLength(dataState: dataState),
             _verticalSpace(),
-            _shiftNameDropdown(dataState: dataState),
-            _shiftList(dataState: dataState),
-            Divider(color:  AppColor.lightGrey,),
+            // _shiftNameDropdown(dataState: dataState),
+            // _shiftList(dataState: dataState),
+            // Divider(color:  AppColor.lightGrey,),
             Align(
               alignment: Alignment.topLeft,
               child: TextWidget(AppString.walkerDetails+"*",
@@ -74,12 +74,12 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
                 color: AppColor.themeColor,),
             ),
             _verticalSpace(),
-            _startPatrollingDateController(dataState: dataState),
-            _verticalSpace(),
-            _endPatrollingDateController(dataState: dataState),
-            _verticalSpace(),
             _repeatFrequencyDropdown(dataState: dataState),
             _verticalSpace(),
+            // _startPatrollingDateController(dataState: dataState),
+            // _verticalSpace(),
+            // _endPatrollingDateController(dataState: dataState),
+            // _verticalSpace(),
             _userTypeDropdown(dataState: dataState),
             _verticalSpace(),
             _vendorDropdown(dataState: dataState),
@@ -195,116 +195,19 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
     );
   }
 
-
-  Widget _shiftNameDropdown({required FetchCreateTaskDataState dataState}) {
-    var seen = <String>{};
-    List<ShiftTypeModel> shiftList = dataState.shiftList.where((shiftData) => seen.add(shiftData.sgCode.toString())).toList();
+  Widget _repeatFrequencyDropdown({required FetchCreateTaskDataState dataState}) {
     return DropDownSearchWidget(
       isRequired: true,
-      selectedItem: dataState.shiftData.name != null ? dataState.shiftData : null,
-      hint: AppString.shiftGroup,
-      items: shiftList,
-      itemAsString: (shiftData) => shiftData.sgCode.toString(),
-      onChanged: (value) {
-        BlocProvider.of<CreateTaskBloc>(context)
-            .add(CreateTaskSelectShitDataEvent(shiftData: value));
-      },
-    );
-  }
-
-  Widget _shiftList({required FetchCreateTaskDataState dataState }) {
-    List<ShiftTypeModel> shiftList = [];
-    for(var shiftData in dataState.shiftList){
-      print(shiftData.sgCode.toString());
-      if(dataState.shiftData.sgCode.toString() == shiftData.sgCode.toString()){
-        shiftList.add(shiftData);
-      }
-    }
-    return dataState.shiftData.sgCode != null ?
-    Card(
-      shadowColor: AppColor.themeColor,
-      child: ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: shiftList.length,
-          itemBuilder: (context, index) {
-             return Padding(
-               padding: const EdgeInsets.all(10.0),
-               child: Row(
-                 children: [
-                   TextWidget(dataState.shiftList[index].name.toString(), fontSize: AppFont.font_12,),
-                   Expanded(child: TextWidget(" : ${dataState.shiftList[index].startTime.toString()} "
-                       "- ${dataState.shiftList[index].endTime.toString()}", fontSize: AppFont.font_12,)),
-                 ],
-               ),
-             );
-      }),
-    ) : const SizedBox.shrink();
-  }
-
-  Widget _repeatFrequencyDropdown({required FetchCreateTaskDataState dataState}) {
-    return DropDownSearchMultiSelectWidget(
-      selectedItem: dataState.repeatFrequencyData,
+      selectedItem: dataState.repeatFrequencyData.name != null ? dataState.repeatFrequencyData : null,
       hint: AppString.repeatFrequency,
       items: dataState.repeatFrequencyList,
-      compareFn: (item, selectedItem) =>
-      item.name == selectedItem.name,
-      itemAsString: (repeatFrequencyData) => repeatFrequencyData.name.toString(),
+      itemAsString: (regionTypeData) => regionTypeData.name.toString(),
       onChanged: (value) {
-        List<RepeatFrequencyModel> list = [];
-        for(var data in value){
-          list.add(data);
-        }
-
-        List<RepeatFrequencyModel> tempList =   list.where((element) =>  element.id == "0").toList();
         BlocProvider.of<CreateTaskBloc>(context)
-            .add(CreateTaskRepeatFrequencyEvent(
-            repeatFrequencyData: tempList.isNotEmpty ? dataState.repeatFrequencyList : list));
+            .add(CreateTaskRepeatFrequencyEvent(repeatFrequencyData: value));
       },
     );
   }
-
-
-  Widget _startPatrollingDateController({required FetchCreateTaskDataState dataState}) {
-    return TextFieldWidget(
-      enabled: false,
-      isRequired: true,
-      controller: dataState.startPatrollingDateController,
-      labelText: AppString.patrollingStartDate,
-      onTap: () => showCupertinoDatePickerWidgetDialog(
-        context: context,
-        child : CupertinoDatePickerWidget(
-          initialDateTime: DateTime.now(),
-          onDateTimeChanged: (DateTime newDate) async {
-            BlocProvider.of<CreateTaskBloc>(context)
-                .add(CreateTaskStartPatrollingDateEvent(context: context, dateTime: newDate));
-          },
-        ),
-      ),
-    );
-  }
-
-
-
-  Widget _endPatrollingDateController({required FetchCreateTaskDataState dataState}) {
-    return TextFieldWidget(
-      enabled: false,
-      isRequired: true,
-      controller: dataState.endPatrollingDateController,
-      labelText: AppString.patrollingEndDate,
-      onTap: () => showCupertinoDatePickerWidgetDialog(
-        context: context,
-        child : CupertinoDatePickerWidget(
-          initialDateTime: DateTime.now(),
-          onDateTimeChanged: (DateTime newDate) async {
-            BlocProvider.of<CreateTaskBloc>(context)
-                .add(CreateTaskEndPatrollingDateEvent(context: context, dateTime: newDate));
-          },
-        ),
-      ),
-    );
-  }
-
   Widget _userTypeDropdown({required FetchCreateTaskDataState dataState}) {
     return DropDownSearchWidget(
       isRequired: true,
@@ -314,13 +217,15 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
       itemAsString: (userTypeData) => userTypeData.name.toString(),
       onChanged: (value) {
         BlocProvider.of<CreateTaskBloc>(context)
-            .add(CreateTaskUserTypeEvent(userTypeData: value));
+            .add(CreateTaskUserTypeEvent(userTypeData: value, context: context));
       },
     );
   }
 
   Widget _vendorDropdown({required FetchCreateTaskDataState dataState}) {
-    return DropDownSearchWidget(
+    return dataState.isVendorLoader == false ?
+    dataState.vendorList.isNotEmpty ?
+    DropDownSearchWidget(
       isRequired: true,
       selectedItem: dataState.vendorData.name != null ? dataState.vendorData : null,
       hint: AppString.vendor,
@@ -330,11 +235,12 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         BlocProvider.of<CreateTaskBloc>(context)
             .add(CreateTaskVendorEvent(vendorData: value));
       },
-    );
+    ): const SizedBox.shrink() : const DottedLoaderWidget();
   }
 
   Widget _userNameDropdown({required FetchCreateTaskDataState dataState}) {
-    return DropDownSearchMultiSelectWidget(
+    return dataState.isUserNameLoader == false ?
+    DropDownSearchMultiSelectWidget(
       selectedItem: dataState.userNameData,
       hint: AppString.userName,
       items: dataState.userNameList,
@@ -350,7 +256,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         BlocProvider.of<CreateTaskBloc>(context)
             .add(CreateTaskUserNameEvent(userNameData: list));
       },
-    );
+    ) : const DottedLoaderWidget();
   }
 
   Widget _shiftTimeSetWidget({required FetchCreateTaskDataState dataState}) {
@@ -370,7 +276,6 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
                 TextWidget(dataState.shiftGroupList[index].userNameData!.name.toString(),
                   fontWeight: FontWeight.w700,),
                 _list(shiftList: dataState.shiftGroupList[index].shiftList!,
-                    selectedValue: dataState.shiftGroupList[index].selectedValue.toString(),
                     listIndex: index),
             ],
           ),
@@ -379,8 +284,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
     );
   }
 
-  Widget _list({required List<ShiftTypeModel> shiftList,
-    required String selectedValue, required int listIndex }) {
+  Widget _list({required List<ShiftTypeModel> shiftList, required int listIndex }) {
     return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -390,14 +294,16 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
             padding: const EdgeInsets.all(10.0),
             child: Row(
               children: [
-                Radio(
-                    value: shiftList[index].name.toString(),
-                    groupValue: selectedValue,
-                    onChanged: (value) {
-                      BlocProvider.of<CreateTaskBloc>(context).add(
-                          CreateTaskShiftGroupEvent(selectedValue: value.toString(), index: listIndex));
-                      }
-                    ),
+                Checkbox(
+                    value: shiftList[index].isSelected,
+                     onChanged: (value) {
+                      print(shiftList[index].id);
+                     BlocProvider.of<CreateTaskBloc>(context).add(
+                      CreateTaskShiftGroupEvent(selectedValue: value!,
+                          id:  int.parse(shiftList[index].id.toString()),
+                          lastIndex: listIndex,
+                          value : shiftList[index].name.toString()));
+                  }),
                 TextWidget(shiftList[index].name.toString(), fontSize: AppFont.font_12,),
                 Expanded(child: TextWidget(" : ${shiftList[index].startTime.toString()} "
                     "- ${shiftList[index].endTime.toString()}", fontSize: AppFont.font_12,)),

@@ -26,7 +26,6 @@ part 'create_task_state.dart';
 class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
 
   bool isLoader =  false;
-  List<ShiftTypeModel> shiftList = [];
   ShiftTypeModel shiftData = ShiftTypeModel();
   List<LineModel> lineList = [];
   LineModel lineData =  LineModel();
@@ -67,7 +66,7 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
   SectionModel sectionData =  SectionModel();
 
   List<RepeatFrequencyModel> repeatFrequencyList = [];
-  List<RepeatFrequencyModel> repeatFrequencyData = [];
+  RepeatFrequencyModel repeatFrequencyData = RepeatFrequencyModel();
 
   List<UserNameModel> userNameList = [];
   List<UserNameModel> userNameData =  [];
@@ -75,12 +74,16 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
   List<TaskFromModel> taskFromList  = [];
 
   List<ShiftTypeModel> allShiftList = [];
+  List<ShiftTypeModel>  get shiftList => allShiftList;
 
   bool isMaintenanceLoader = false;
   bool isPipelineNameLoader =  false;
   bool isSectionNameLoader =  false;
   bool isPatrolRouteNameLoader =  false;
 
+  bool isVendorLoader =  false;
+  bool isUserNameLoader =  false;
+  int id = 0;
 
   CreateTaskBloc() : super(CreateTaskInitial()) {
     on<CreateTaskPageLoadEvent>(_pageLoad);
@@ -116,11 +119,10 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     endPatrollingTimeController.text = "";
     taskDateController.text = "";
     lineList = [];
-    shiftList = [];
     taskFromList = [];
     routeData = RouteModel();
     shiftData =  ShiftTypeModel();
-    repeatFrequencyData =  [];
+    repeatFrequencyData =   RepeatFrequencyModel();
     userTypeData =  UserTypeModel();
     vendorData =  VendorModel();
     userNameData =  [];
@@ -134,6 +136,8 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     isPipelineNameLoader =  false;
     isSectionNameLoader =  false;
     isPatrolRouteNameLoader =  false;
+    isVendorLoader =  false;
+    isUserNameLoader =  false;
 
 
     var resRegion =  await CreateTaskHelper.fetchArea();
@@ -147,7 +151,9 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     routeList =  taskFromListRes.routeList;
     vendorList =  taskFromListRes.vendorList;
     userTypeList =  taskFromListRes.userTypeList;
-    shiftList =  allShiftList;
+    if(shiftList.isNotEmpty){
+      shiftData =  shiftList[0];
+    }
 
     repeatFrequencyList =  await CreateTaskHelper.fetchRepeatFrequency();
 
@@ -281,42 +287,41 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     _eventComplete(emit);
   }
 
-  _selectShiftGroup(CreateTaskShiftGroupEvent event, emit) {
-    int index =  event.index;
-    String selectedValue =  event.selectedValue;
-    isLoader =  true;
-    _eventComplete(emit);
-    shiftGroupList[index].selectedValue = selectedValue;
-
-    isLoader =  false;
-    _eventComplete(emit);
-  }
-
   _selectUserType(CreateTaskUserTypeEvent event, emit) async{
+
+    if(sectionData.id == null){
+      SnackBarErrorWidget(event.context).show(message: "Please select section name");
+    }
     userTypeData =  event.userTypeData;
     vendorList = [];
+    vendorData =  VendorModel();
+    userNameList = [];
+    userNameData =  [];
+    shiftGroupList = [];
+    isVendorLoader = true;
     _eventComplete(emit);
-
-    var resVendor =  await CreateTaskHelper.fetchVendor(userTypeData: userTypeData);
+    var resVendor =  await CreateTaskHelper.fetchVendor(
+        userTypeData: userTypeData, sectionData: sectionData);
     if(resVendor != null){
       vendorList = resVendor;
     }
+    isVendorLoader = false;
     _eventComplete(emit);
   }
 
   _selectVendor(CreateTaskVendorEvent event, emit) async {
     vendorData =  event.vendorData;
     userNameList = [];
+    isUserNameLoader =  true;
     _eventComplete(emit);
     var resUserName =  await CreateTaskHelper.fetchUserName(
         userTypeData: userTypeData, vendorData: vendorData);
     if(resUserName != null){
       userNameList = resUserName;
     }
+    isUserNameLoader =  false;
     _eventComplete(emit);
   }
-
-
 
   _selectRepeatFrequency(CreateTaskRepeatFrequencyEvent event, emit) {
     repeatFrequencyData = event.repeatFrequencyData;
@@ -326,19 +331,56 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
   _selectUserName(CreateTaskUserNameEvent event, emit) {
     userNameData = event.userNameData;
     shiftGroupList = [];
+    id = 0;
 
-    for(var userData in userNameData){
+// Filter once, outside the loop
+    List<ShiftTypeModel> filteredShiftList = shiftList
+        .where((element) => element.sgCode.toString() == shiftData.sgCode.toString())
+        .toList();
+
+    for (var userData in userNameData) {
+
+      List<ShiftTypeModel> copiedList = filteredShiftList.map((shift) {
+        return ShiftTypeModel(
+          id: id++, // assign a unique ID
+          sgCode: shift.sgCode,
+          name: shift.name,
+          startTime: shift.startTime,
+          endTime: shift.endTime,
+          isSelected: false,
+        );
+      }).toList();
+
       shiftGroupList.add(
         ShiftGroupModel(
-           userNameData: userData,
-           selectedValue: "",
-           shiftList: shiftList.where((element)
-           =>  element.sgCode.toString() == shiftData.sgCode.toString()).toList(),
-        )
+          userNameData: userData,
+          selectedValue: "",
+          shiftList: copiedList,
+        ),
       );
     }
     _eventComplete(emit);
   }
+
+  _selectShiftGroup(CreateTaskShiftGroupEvent event, emit) {
+    int id = event.id;
+    int lastIndex = event.lastIndex;
+    bool selectedValue = event.selectedValue;
+    isLoader = true;
+    _eventComplete(emit);
+    for (int i = 0; i < shiftGroupList.length; i++) {
+      if (i == lastIndex) {
+        for (int j = 0; j < shiftGroupList[i].shiftList!.length; j++) {
+          if (shiftGroupList[i].shiftList![j].id == id) {
+            shiftGroupList[i].shiftList![j].isSelected = selectedValue;
+          }
+        }
+      }
+    }
+    isLoader = false;
+    _eventComplete(emit);
+  }
+
 
   _submit(CreateTaskSubmitEvent event, emit) async {
     isLoader =  true;
@@ -357,7 +399,7 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
         userTypeModel: userTypeData,
         assignedStartDate: startPatrollingDateController.text.toString(),
         assignedEndDate: endPatrollingDateController.text.toString(),
-        repeatFrequencyList: repeatFrequencyData,
+        repeatFrequencyData: repeatFrequencyData,
         vendorData: vendorData);
     if(textFiledValidation == false){
       isLoader =  false;
@@ -380,7 +422,7 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
         userTypeModel: userTypeData,
         assignedStartDate: startPatrollingDateController.text.toString(),
         assignedEndDate: endPatrollingDateController.text.toString(),
-        repeatFrequencyList: repeatFrequencyData,
+        repeatFrequencyData: repeatFrequencyData,
         vendorData: vendorData);
     if(res != null){
       isLoader =  false;
@@ -393,7 +435,7 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
       taskDateController.text = "";
       routeData = RouteModel();
       shiftData =  ShiftTypeModel();
-      repeatFrequencyData =  [];
+      repeatFrequencyData =  RepeatFrequencyModel();
       userTypeData =  UserTypeModel();
       vendorData =  VendorModel();
       userNameData =  [];
@@ -449,6 +491,8 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
       isPatrolRouteNameLoader: isPatrolRouteNameLoader,
       isPipelineNameLoader: isPipelineNameLoader,
       isSectionNameLoader: isSectionNameLoader,
+      isUserNameLoader: isUserNameLoader,
+      isVendorLoader: isVendorLoader
     ));
   }
 }

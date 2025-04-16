@@ -29,7 +29,7 @@ class TaskHelper {
       {required String startDate, required String endDate}) async {
     try {
       LoginDataModel userData =  UserInfo.instance!.userData!;
-      String url = APIs.getDailyTaskTrackingApi+"?user_id=${userData.users!.securityId.toString()}&startDate=$startDate&endDate=$endDate";
+      String url = APIs.getDailyTaskTrackingApi;
       var res = await ServerRequest.getData(urlEndPoint: url);
       if (res != null && res['data'] != null) {
         return taskListResponse(res['data']);

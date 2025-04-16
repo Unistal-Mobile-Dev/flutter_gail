@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/file_model.dart';
+import 'package:flutter_gail/feature/login/helper/login_helper.dart';
 import 'package:flutter_gail/feature/task/addMarker/domain/model/marker_type_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
@@ -74,7 +75,7 @@ class AddMarkerHelper {
      required File videoFile,
  }) async {
       try{
-        String url =  APIs.addMarkerPointApi;
+        String url =  APIs.addRouteObserveApi;
         List<FileModel> fileList = [];
         if(cameraFile.path.isNotEmpty){
           fileList.add(FileModel(
@@ -94,6 +95,7 @@ class AddMarkerHelper {
               file: videoFile,
               keyName: "video_link"));
         }
+        var deviceId = await LoginHelper.getUniqueDeviceId();
 
         var locationRes =  await LocationHelper.getLocationOfflineMode(context: context);
         LocationModel locationData =  LocationModel();
@@ -104,16 +106,17 @@ class AddMarkerHelper {
         final String currentDate = formatter.format(DateTime.now());
         var json = {
           "task_id" : taskData.taskId.toString(),
-          "inspectiondate" : currentDate.toString(),
-          "featuretype" : markerTypeData.name.toString(),
-          "featuresubtype" : "",
-          "comments" : remark.toString(),
-          "marker_condition" : condition.toString(),
-          "marker_paint" : painting.toString(),
-          "latitude": locationData.lat != null ? locationData.lat.toString() : "0.0",
-          "longitude": locationData.long != null
-              ? locationData.long.toString()
-              : "0.0",
+          "patrollroute_id" : taskData.patrollRouteId.toString(),
+          "observation_type" : "Marker",
+          "paint_condition" : painting.toString(),
+          "description" : remark.toString(),
+          "condition" : condition.toString(),
+          "inspection_date" : currentDate.toString(),
+          "gpsx": locationData.lat != null ? locationData.lat.toString() : "0.0",
+          "gpsy": locationData.long != null ? locationData.long.toString(): "0.0",
+          "gps_accuracy" : locationData.accuracy.toString(),
+          "observation_subtype" : markerTypeData.name.toString(),
+          "device_id" : deviceId.toString(),
         };
         var res =  await ServerRequest.postDataWithFile(urlEndPoint: url,
             body: json, context: !context.mounted ? context :context, fileList: fileList);

@@ -118,12 +118,14 @@ class CreateTaskRouteEvent extends CreateTaskEvent {
 }
 
 class CreateTaskShiftGroupEvent extends CreateTaskEvent {
-  final String selectedValue;
-  final int index;
+  final bool selectedValue;
+  final String value;
+  final int id;
+  final int lastIndex;
   const CreateTaskShiftGroupEvent({
-    required this.selectedValue, required this.index});
+    required this.selectedValue, required this.id, required this.lastIndex, required this.value});
   @override
-  List<Object?> get props => [selectedValue, index];
+  List<Object?> get props => [selectedValue, id, value, lastIndex];
 }
 
 class CreateTaskVendorEvent extends CreateTaskEvent {
@@ -135,13 +137,14 @@ class CreateTaskVendorEvent extends CreateTaskEvent {
 
 class CreateTaskUserTypeEvent extends CreateTaskEvent {
   final UserTypeModel userTypeData;
-  const CreateTaskUserTypeEvent({required this.userTypeData});
+  final BuildContext context;
+  const CreateTaskUserTypeEvent({required this.userTypeData, required this.context});
   @override
-  List<Object?> get props => [userTypeData];
+  List<Object?> get props => [userTypeData, context];
 }
 
 class CreateTaskRepeatFrequencyEvent extends CreateTaskEvent {
-  final List<RepeatFrequencyModel> repeatFrequencyData;
+  final RepeatFrequencyModel repeatFrequencyData;
   const CreateTaskRepeatFrequencyEvent({required this.repeatFrequencyData});
   @override
   List<Object?> get props => [repeatFrequencyData];

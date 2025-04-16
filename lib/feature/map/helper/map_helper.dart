@@ -4,14 +4,36 @@ import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
+import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:battery_plus/battery_plus.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'dart:math' show cos, sqrt, asin;
 import 'dart:math' as math;
 
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 class MapHelper {
+
+  static Future<dynamic> fetchRoutes({required String routeId}) async {
+
+    try{
+      String url =  APIs.getRouteApi+routeId;
+      var res =  await ServerRequest.getData(urlEndPoint: url);
+      if(res != null){
+        return MapModel.fromJson(res);
+      }
+    }catch(_){}
+    return null;
+  }
+
+  static List<LatLng> decodeEncodedPolyline(String encoded) {
+    PolylinePoints polylinePoints = PolylinePoints();
+    List<PointLatLng> result = polylinePoints.decodePolyline(encoded);
+    return result.map((point) => LatLng(point.latitude, point.longitude)).toList();
+  }
 
   static Future<dynamic> fetchMarkerList({required String sectionCode}) async {
 

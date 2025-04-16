@@ -9,6 +9,7 @@ class ShiftTypeModel {
   String? sgCode;
   dynamic startTime;
   dynamic endTime;
+  bool? isSelected;
 
   ShiftTypeModel({
    this.name,
@@ -16,6 +17,7 @@ class ShiftTypeModel {
    this.endTime,
    this.startTime,
    this.sgCode,
+   this.isSelected,
  });
 
   static int tempId = 0;
@@ -27,6 +29,7 @@ class ShiftTypeModel {
       endTime: json['end_time'] ?? "",
       startTime:  json['start_time'] ?? "",
       sgCode:  json['sg_code'] ?? "",
+      isSelected:  false,
     );
 
   }

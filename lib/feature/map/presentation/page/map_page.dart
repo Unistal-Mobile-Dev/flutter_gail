@@ -39,6 +39,7 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
 
   final _stopsGraphicsOverlay = GraphicsOverlay();
   final _routeGraphicsOverlay = GraphicsOverlay();
+  final _routePathGraphicsOverlay = GraphicsOverlay();
   final _locationHistoryLineOverlay = GraphicsOverlay();
   final _locationHistoryPointOverlay = GraphicsOverlay();
 
@@ -86,6 +87,9 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
  }
 
   void onTap(Offset localPosition) async {
+    print("Get data ================= ${localPosition.dy}");
+    print("Get data ================= ${localPosition.dx}");
+    navigation(localPosition: localPosition);
     final identifyGraphicsOverlayResult =
     await _mapViewController.identifyGraphicsOverlay(
       _stopsGraphicsOverlay,
@@ -157,10 +161,10 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
             height: MediaQuery.of(context).size.width * 0.03,
           ) : const SizedBox.shrink(),
 
-          dataState.isStartPatrolling == false &&
-              dataState.isEndPatrolling == false ?
-         _navigationButton(dataState: dataState)
-              : const SizedBox.shrink(),
+         //  dataState.isStartPatrolling == false &&
+         //      dataState.isEndPatrolling == false ?
+         // _navigationButton(dataState: dataState)
+         //      : const SizedBox.shrink(),
 
           SizedBox(
             height: MediaQuery.of(context).size.width * 0.03,
@@ -192,7 +196,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
   }
 
   Widget _navigationButton({required FetchMapPageDataState dataState}) {
-    return SizedBox(
+    return  SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
         label: TextWidget(
@@ -232,6 +236,91 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
         ),
       ),
     );
+  }
+
+  void navigation({required Offset localPosition}) async {
+    final controller = await _mapViewController; // Your ArcGISMapViewController
+    final ArcGISPoint? mapPoint = await controller.screenToLocation(screen: localPosition);
+
+    if (mapPoint != null) {
+      // Project to WGS84 (lat/lng) if needed
+      final Geometry projected = GeometryEngine.project(
+        mapPoint,
+        outputSpatialReference: SpatialReference.wgs84,
+      );
+      if (projected is ArcGISPoint) {
+        double latitude = projected.y;
+        double longitude = projected.x;
+
+        print("Latitude: $latitude");
+        print("Longitude: $longitude");
+
+        _mapViewController.locationDisplay.autoPanMode =
+            LocationDisplayAutoPanMode.navigation;
+        _autoPanModeSubscription = _mapViewController.locationDisplay.onAutoPanModeChanged.listen((mode) {
+          // setState(() => _autoPanMode = mode);
+        });
+        ArcGISPoint point = _mapViewController.locationDisplay.location!.position;
+        BlocProvider.of<MapBloc>(context).add(MapRouteDirection(context: context,
+            startPoint:  ArcGISPoint(
+                x: point.x,
+                y: point.y
+            ),
+            endPoint: ArcGISPoint(
+              x: longitude,
+              y: latitude,
+            ),
+            currentPoint: point)
+        );
+      } else {
+        print("Projection failed. Not a MapPoint.");
+      }
+    } else {
+      print("Tap location could not be converted.");
+    }
+  }
+
+  Future<void> getLatLngFromOffset(Offset localPosition) async {
+    final controller = await _mapViewController; // Your ArcGISMapViewController
+    final ArcGISPoint? mapPoint = await controller.screenToLocation(screen: localPosition);
+
+    if (mapPoint != null) {
+      // Project to WGS84 (lat/lng) if needed
+      final Geometry projected = GeometryEngine.project(
+        mapPoint,
+        outputSpatialReference: SpatialReference.wgs84,
+      );
+      if (projected is ArcGISPoint) {
+        double latitude = projected.y;
+        double longitude = projected.x;
+
+        print("Latitude: $latitude");
+        print("Longitude: $longitude");
+
+        _mapViewController.locationDisplay.autoPanMode =
+            LocationDisplayAutoPanMode.navigation;
+        _autoPanModeSubscription = _mapViewController.locationDisplay.onAutoPanModeChanged.listen((mode) {
+          // setState(() => _autoPanMode = mode);
+        });
+        ArcGISPoint point = _mapViewController.locationDisplay.location!.position;
+        BlocProvider.of<MapBloc>(context).add(MapRouteDirection(context: context,
+            startPoint:  ArcGISPoint(
+                x: point.x,
+                y: point.y
+            ),
+            endPoint: ArcGISPoint(
+              x: mapPoint.x,
+              y: mapPoint.y,
+            ),
+            currentPoint: point)
+        );
+
+      } else {
+        print("Projection failed. Not a MapPoint.");
+      }
+    } else {
+      print("Tap location could not be converted.");
+    }
   }
 
   Widget _recentButton() {
@@ -404,9 +493,10 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
 
   void onMapViewReady() async{
     _mapViewController.arcGISMap =
-        ArcGISMap.withBasemapStyle(BasemapStyle.arcGISStreets);
+        ArcGISMap.withBasemapStyle(BasemapStyle.arcGISImagery); // BasemapStyle.arcGISStreets
     _mapViewController.graphicsOverlays.add(_routeGraphicsOverlay);
     _mapViewController.graphicsOverlays.add(_stopsGraphicsOverlay);
+    _mapViewController.graphicsOverlays.add(_routePathGraphicsOverlay);
     final imageStart = await ArcGISImage.fromAsset(AppIcon.pointerIcon);
     final routeStartPointMarker = PictureMarkerSymbol.withImage(imageStart)
       ..width = 20
@@ -417,7 +507,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       ..width = 20
       ..height = 20;
 
-    List<PointsModel> pointsList =  BlocProvider.of<TaskBloc>(!context.mounted ? context : context).taskData.shapeData!.pointsList!;
+/*    List<PointsModel> pointsList =  BlocProvider.of<MapBloc>(!context.mounted ? context : context).pointsList;
     final startPoint1 = Viewpoint.withLatLongScale(
       latitude: pointsList[0].y,
       longitude: pointsList[0].x,
@@ -436,7 +526,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     _stopsGraphicsOverlay.graphics.addAll([
       Graphic(geometry: startPoint1.targetGeometry, symbol: routeStartPointMarker, attributes: attributes1),
       Graphic(geometry: endPoint1.targetGeometry, symbol: routeEndPointMarker, attributes: attributes2),
-    ]);
+    ]);*/
 
 
     final bpIcon = await ArcGISImage.fromAsset(AppIcon.bpIcon);
@@ -524,15 +614,16 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       speed: onData.speed,
       ));
     });
-    _startLocationDataSource();
+    List<List<PointsModel>> routes =  BlocProvider.of<MapBloc>(context).routes;
+    for(var routeData in routes){
+      _startLocationDataSource(pointsLists: routeData);
+    }
     setState(() {});
   }
 
-  Future<void> _startLocationDataSource() async {
-    // final routeLineJson =
-    // await rootBundle.loadString('assets/SimulatedRoute.json');
+  Future<void> _startLocationDataSource({required List<PointsModel> pointsLists}) async {
 
-    List<PointsModel> pointsList =  BlocProvider.of<TaskBloc>(context).taskData.shapeData!.pointsList!;
+    List<PointsModel> pointsList =  pointsLists;
     List<List<dynamic>> addPath = [];
 
     final imageStart = await ArcGISImage.fromAsset(AppIcon.arrowIcon);
@@ -546,13 +637,16 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           ..angle = bearing
           ..angleAlignment =  SymbolAngleAlignment.arcGISMap
           ..height = 10;
-       _stopsGraphicsOverlay.graphics.addAll([
-        Graphic(geometry: ArcGISPoint(
-          x: pointsList[1+i].x,
-          y: pointsList[1+i].y,
-          spatialReference: SpatialReference.wgs84,
-        ), symbol: routeStartPointMarker)
-       ]);
+
+        /* ------- Arrow Icon for route line ------ */
+       // _stopsGraphicsOverlay.graphics.addAll([
+       //  Graphic(geometry: ArcGISPoint(
+       //    x: pointsList[1+i].x,
+       //    y: pointsList[1+i].y,
+       //    spatialReference: SpatialReference.wgs84,
+       //  ), symbol: routeStartPointMarker)
+       // ]);
+
       }
     }
 
@@ -591,17 +685,14 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
   }
 
   void currentLocation() async {
-
     _mapViewController.locationDisplay.dataSource = _locationDataSource;
     _mapViewController.locationDisplay.autoPanMode = LocationDisplayAutoPanMode.recenter;
-
     final imageEnd = await ArcGISImage.fromAsset(AppIcon.personLocation);
     final routeEndPointMarker = PictureMarkerSymbol.withImage(imageEnd)
       ..width = 35
       ..height = 35;
 
     _mapViewController.locationDisplay.courseSymbol = routeEndPointMarker;
-
     _statusSubscription = _locationDataSource.onStatusChanged.listen((status) {
       setState(() => _status = status);
     });
@@ -624,11 +715,10 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
   }
 
   void direction({required FetchMapPageDataState datState}) async {
+    _routePathGraphicsOverlay.graphics.clear();
     if(datState.directionList.isNotEmpty){
       List<ArcGISPoint> pointsList =  datState.directionList;
-
       final imageStart = await ArcGISImage.fromAsset(AppIcon.arrowIcon);
-
       if( pointsList.length > 10 ){
         int j = 10;
         for(int i = 0; i < pointsList.length; i++){
@@ -641,7 +731,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
               ..angle = bearing
               ..angleAlignment =  SymbolAngleAlignment.arcGISMap
               ..height = 10;
-            _stopsGraphicsOverlay.graphics.addAll([
+            _routePathGraphicsOverlay.graphics.addAll([
               Graphic(geometry: ArcGISPoint(
                 x: pointsList[1+i].x,
                 y: pointsList[1+i].y,
@@ -665,7 +755,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
               ..angle = bearing
               ..angleAlignment =  SymbolAngleAlignment.arcGISMap
               ..height = 10;
-            _stopsGraphicsOverlay.graphics.addAll([
+            _routePathGraphicsOverlay.graphics.addAll([
               Graphic(geometry: ArcGISPoint(
                 x: pointsList[1+i].x,
                 y: pointsList[1+i].y,
@@ -694,7 +784,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       );
       final routeGraphic =
       Graphic(geometry: routeLine, symbol: routeLineSymbol);
-      _routeGraphicsOverlay.graphics.add(routeGraphic);
+      _routePathGraphicsOverlay.graphics.add(routeGraphic);
     }
   }
 
