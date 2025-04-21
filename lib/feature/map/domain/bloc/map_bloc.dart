@@ -6,6 +6,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/map/domain/model/coordinates_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
+import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
@@ -35,9 +36,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   List<TaskModel> taskList = [];
   List<MarkerModel> markerList = [];
   List<List<PointsModel>> routes = [];
+  List<RoutePointsModel> routePointsList = [];
+  bool isArcGISStreets =  false;
 
   MapBloc() : super(MapInitial()) {
     on<MapPageLoadEvent>(_pageLoadEvent);
+    on<SelectMapArcGISStreets>(_selectMapType);
     on<MapRouteDirection>(_routeDirection);
     on<MapRouteLocationCheck>(_locationCheck);
     on<MapPageUpdateTaskEvent>(_updateTask);
@@ -50,10 +54,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     isStartPatrolling = false;
     isEndPatrolling = false;
     isTaskStatusChange = false;
+    isArcGISStreets =  false;
     mapList = [];
     directionList = [];
     markerList = [];
     routes = [];
+    routePointsList = [];
     lastPoint = PointsModel();
     taskList = BlocProvider.of<TaskBloc>(event.context).searchTaskList;
     taskData = BlocProvider.of<TaskBloc>(event.context).taskData;
@@ -103,7 +109,21 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         markerList = markerRes;
       }
     }
+
+    if(mapData.data != null){
+      for(var sectionData in mapData.data!){
+        var routePointRes =  await MapHelper.fetchPointsDetails(sectionCode: sectionData.sectionCode);
+        if(routePointRes != null){
+          routePointsList.add(routePointRes);
+        }
+      }
+    }
     _eventComplete(emit);
+  }
+
+  _selectMapType(SelectMapArcGISStreets event, emit) {
+      isArcGISStreets =  event.isArcGISStreets;
+      _eventComplete(emit);
   }
 
   _routeDirection(MapRouteDirection event, emit) async {
@@ -285,6 +305,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       isStartPatrolling: isStartPatrolling,
       markerList: markerList,
       routes: routes,
+      isArcGISStreets: isArcGISStreets
     ));
   }
 }

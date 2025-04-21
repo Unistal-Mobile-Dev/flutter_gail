@@ -41,6 +41,16 @@ class MapRouteLocationCheck extends MapEvent {
   ];
 }
 
+class SelectMapArcGISStreets extends MapEvent {
+  final bool isArcGISStreets;
+  const SelectMapArcGISStreets({required this.isArcGISStreets});
+
+  @override
+  List<Object?> get props => [
+    isArcGISStreets
+  ];
+}
+
 class MapRouteDirection extends MapEvent {
   final BuildContext context;
   final ArcGISPoint startPoint;

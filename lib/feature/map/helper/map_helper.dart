@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
+import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
@@ -143,6 +144,20 @@ class MapHelper {
         return res;
       }
     }catch(_){}
+    return null;
+  }
+
+  static Future<dynamic> fetchPointsDetails({required String sectionCode}) async {
+
+    try{
+      String url =  APIs.getMarkerCrossingInidentTypePointsApi+"?sectionCode=$sectionCode";
+      var res =  await ServerRequest.getData(urlEndPoint: url);
+      if(res != null){
+        return RoutePointsModel.fromJson(res, sectionCode);
+      }
+    }catch(e){
+      print("Get Poinst Errpor ===== ${e.toString()}");
+    }
     return null;
   }
 

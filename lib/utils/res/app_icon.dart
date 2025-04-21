@@ -41,4 +41,8 @@ class AppIcon {
 
   static get mapIcon => "assets/map.png";
 
+  static get arcGISImageryIcon => "assets/ic_arcGISImagery.png";
+
+  static get arcGISStreetsIcon => "assets/ic_arcGISStreets.png";
+
 }

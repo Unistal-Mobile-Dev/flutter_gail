@@ -56,5 +56,7 @@ class APIs {
 
   static get addDeviceApi => "patrolling-surveillance/device/add-user-device";
 
+  static get getMarkerCrossingInidentTypePointsApi => "patrolling-surveillance/route-observer/point-details";
+
   static get forgotPasswordApi => "";
 }

@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/model/incident_type_model.dart';
 import 'package:flutter_gail/feature/incident/add_incident/helper/add_incident_helper.dart';
+import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
+import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 
@@ -40,10 +42,15 @@ class AddIncidentBloc extends Bloc<AddIncidentEvent, AddIncidentState> {
     taskData =  BlocProvider.of<TaskBloc>(!event.context.mounted?  event.context : event.context).taskData;
 
      if(incidentTypeList.isEmpty){
-       var res =  await AddIncidentHelper.fetchIncidentTypeData();
-       if(res != null){
-         incidentTypeList =  res;
+       List<RoutePointsModel> routePointsList =
+            BlocProvider.of<MapBloc>(!event.context.mounted ? event.context: event.context).routePointsList;
+       if(routePointsList.isNotEmpty){
+         incidentTypeList = routePointsList.first.incidentTypeList;
        }
+       // var res =  await AddIncidentHelper.fetchIncidentTypeData();
+       // if(res != null){
+       //   incidentTypeList =  res;
+       // }
      }
     _eventComplete(emit);
   }

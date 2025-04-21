@@ -6,6 +6,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
 import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
+import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/map/presentation/widget/sample_state_support.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
@@ -75,6 +76,7 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
               onMapViewReady: onMapViewReady,
               onTap: onTap,
             ),
+            _mapViewType(dataState: state),
             _actionButtons(dataState: state),
           ],
         ),
@@ -126,6 +128,43 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
       }
     }
   }
+
+Widget _mapViewType({required FetchMapPageDataState dataState})   {
+  return Positioned(
+    top: 50,
+    right: 10,
+    child: Card(
+      shape: const CircleBorder(), // <-- Makes it circular
+      elevation: 2,
+      clipBehavior: Clip.antiAlias, // Ensures content is clipped to the circle
+      child: GestureDetector(
+        onTap: () {
+          BlocProvider.of<MapBloc>(context).add(
+            SelectMapArcGISStreets(
+              isArcGISStreets: dataState.isArcGISStreets ? false : true,
+            ),
+          );
+          _mapViewController.arcGISMap = ArcGISMap.withBasemapStyle(
+            dataState.isArcGISStreets
+                ? BasemapStyle.arcGISStreets
+                : BasemapStyle.arcGISImagery,
+          );
+        },
+        child: SizedBox(
+          height: 50,
+          width: 50,
+          child: Image.asset(
+            dataState.isArcGISStreets
+                ? AppIcon.arcGISStreetsIcon
+                : AppIcon.arcGISImageryIcon,
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    ),
+  );
+
+}
 
 Widget _actionButtons({required FetchMapPageDataState dataState}){
     return Positioned(
@@ -493,7 +532,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
 
   void onMapViewReady() async{
     _mapViewController.arcGISMap =
-        ArcGISMap.withBasemapStyle(BasemapStyle.arcGISImagery); // BasemapStyle.arcGISStreets
+        ArcGISMap.withBasemapStyle(BasemapStyle.arcGISStreets); // BasemapStyle.arcGISStreets //arcGISImagery
     _mapViewController.graphicsOverlays.add(_routeGraphicsOverlay);
     _mapViewController.graphicsOverlays.add(_stopsGraphicsOverlay);
     _mapViewController.graphicsOverlays.add(_routePathGraphicsOverlay);
@@ -555,29 +594,31 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       ..height = 15;
 
 
-    List<MarkerModel> markerList =  BlocProvider.of<MapBloc>(!context.mounted ? context : context).markerList;
-    for(var markerData in markerList){
-      final startPoint1 = Viewpoint.withLatLongScale(
-        latitude: markerData.gpsY!,
-        longitude: markerData.gpsX!,
-        scale: 2e4,
-      );
+    List<RoutePointsModel> routePointsList =  BlocProvider.of<MapBloc>(!context.mounted ? context : context).routePointsList;
+    for(var routePointsData in routePointsList){
+      for(var markerData in routePointsData.markerList){
+        final startPoint1 = Viewpoint.withLatLongScale(
+          latitude: markerData.gpsy!,
+          longitude: markerData.gpsx!,
+          scale: 2e4,
+        );
 
-      _stopsGraphicsOverlay.graphics.addAll([
-        Graphic(geometry: startPoint1.targetGeometry,
-            symbol: markerData.markerType.toString() == "1"
-                ? bpIconMarker
-                : markerData.markerType.toString() == "2"
-                ? dmIconMarker
-                : markerData.markerType.toString() == "3"
-                ? kmIconMarker
-                : markerData.markerType.toString() == "4"
-                ? tlpIconMarker
-                : markerData.markerType.toString() == "5"
-                ? wmIconMarker
-                : bpIconMarker,
-            attributes: markerData.toJson()),
-      ]);
+        _stopsGraphicsOverlay.graphics.addAll([
+          Graphic(geometry: startPoint1.targetGeometry,
+              symbol: markerData.markerType.toString() == "1"
+                  ? bpIconMarker
+                  : markerData.markerType.toString() == "2"
+                  ? dmIconMarker
+                  : markerData.markerType.toString() == "3"
+                  ? kmIconMarker
+                  : markerData.markerType.toString() == "4"
+                  ? tlpIconMarker
+                  : markerData.markerType.toString() == "5"
+                  ? wmIconMarker
+                  : bpIconMarker,
+              attributes: markerData.markerName),
+        ]);
+      }
     }
 
     _initPolyline();
