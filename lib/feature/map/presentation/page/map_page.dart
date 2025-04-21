@@ -181,9 +181,11 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
             height: MediaQuery.of(context).size.width * 0.03,
           ) : const SizedBox.shrink(),
 
-         dataState.isStartPatrolling == true ?
-         _statusButton(dataSate: dataState)
-             : const SizedBox.shrink(),
+          _statusButton(dataSate: dataState),
+
+         // dataState.isStartPatrolling == true ?
+         // _statusButton(dataSate: dataState)
+         //     : const SizedBox.shrink(),
 
           dataState.isEndPatrolling == true ?
           SizedBox(
@@ -644,7 +646,8 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       _locationHistoryPointOverlay,
     ]);
 
-    _mapViewController.locationDisplay.onLocationChanged.listen((onData) {
+    _mapViewController.locationDisplay.onLocationChanged.listen((onData) async {
+      await Future.delayed(const Duration(seconds: 3));
       BlocProvider.of<MapBloc>(!context.mounted ? context : context).add(MapRouteLocationCheck(
           context: !context.mounted ? context : context,
           currentPoint: ArcGISPoint(

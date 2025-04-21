@@ -123,7 +123,7 @@ class MapHelper {
       var location =     {
         "gpsx": currentPoint.x.toString(),
         "gpsy": currentPoint.y.toString(),
-        "gpsdatetime": DateTime.now().toString(),
+        "inspected_datetime": DateTime.now().toString(),
         "gpsaccuracy": verticalAccuracy.toString(),
         "provider": "GPS1",
         "speed": speed.toString(),
