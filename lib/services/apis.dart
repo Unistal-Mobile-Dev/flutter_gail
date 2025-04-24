@@ -58,5 +58,7 @@ class APIs {
 
   static get getMarkerCrossingInidentTypePointsApi => "patrolling-surveillance/route-observer/point-details";
 
+  static get getEncroachmentTypeApi => "encroachment/types";
+
   static get forgotPasswordApi => "";
 }

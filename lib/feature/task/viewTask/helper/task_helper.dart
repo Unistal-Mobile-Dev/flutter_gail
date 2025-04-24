@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/services/firebase/notification_service.dart';
+import 'package:flutter_gail/services/location/location_helper.dart';
+import 'package:flutter_gail/services/location/location_model.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -40,11 +42,33 @@ class TaskHelper {
   static Future<dynamic> updateTask(
       {required TaskModel taskData,
       required int taskStatus,
-      required BuildContext context}) async {
+      required BuildContext context,
+      required int pointsCount,
+      }) async {
     try {
+      final DateFormat formatter = DateFormat('dd-MM-yyyy');
+      final String currentDate = formatter.format(DateTime.now());
+
+      var location =  await LocationHelper.getLocation(context: context);
+      LocationModel locationModel = LocationModel();
+      if(location != null){
+        locationModel =   location;
+      }
+      final String currentTime =  "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
       String url = APIs.updateTaskApi+"?task_id=${taskData.taskId.toString()}&subtask_id=${taskData.subTaskId.toString()}";
       var json = {
         "patrollman_status": taskStatus,
+        "timing_data": {
+          "start_time": taskStatus == 1 ? currentTime : "",
+          "end_time": taskStatus == 3 ? currentTime : "",
+          "inspected_datetime": "${DateTime.now()}",
+          "pause_time": taskStatus == 2 ? currentTime : "",
+          "gpsx": locationModel.long ?? "",
+          "gpsy": locationModel.lat ?? "",
+          "no_of_points": "",
+          "no_of_points_covered": "",
+          "event_type": taskStatus == 1 ? "start" : taskStatus == 2 ? "pause" : taskStatus == 3 ? "end" : "",
+        }
       };
       var res = await ServerRequest.putData(
           urlEndPoint: url, body: jsonEncode(json), context: context);

@@ -4,6 +4,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
+import 'package:flutter_gail/feature/task/addEncroachment/domain/bloc/encroachment_bloc.dart';
 import 'package:flutter_gail/feature/task/addMarker/domain/bloc/add_marker_bloc.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/bloc/create_task_bloc.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
@@ -24,6 +25,7 @@ MultiProvider blocMultiProvider({required Widget child}) {
        BlocProvider(create: (BuildContext context) => AddIncidentBloc()),
        BlocProvider(create: (BuildContext context) => ViewTaskBloc()),
        BlocProvider(create: (BuildContext context) => AddTaskBloc()),
+       BlocProvider(create: (BuildContext context) => EncroachmentBloc()),
 
     ],
     child: child,

@@ -276,11 +276,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
                 : taskStatus == TaskStatus.completed
                     ? 3
                     : 0,
-        context: event.context);
+        context: event.context, pointsCount: routes.expand((routeData) => routeData).length);
     if (res != null) {
       taskData.taskStatus = taskStatus;
       isTaskStatusChange = true;
-      isStartPatrolling =  false;
+      isStartPatrolling =  true;
+      isEndPatrolling =  (taskStatus == TaskStatus.pause || taskStatus == TaskStatus.started) ? true : false;
       BlocProvider.of<TaskBloc>(
               !event.context.mounted ? event.context : event.context)
           .add(TaskPagRefreshDataEvent(

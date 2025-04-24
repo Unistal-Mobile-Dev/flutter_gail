@@ -190,7 +190,8 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
             height: MediaQuery.of(context).size.width * 0.03,
           ) : const SizedBox.shrink(),
 
-          dataState.isEndPatrolling == true ?
+          dataState.isEndPatrolling == true
+              && dataState.taskData.taskStatus != TaskStatus.completed ?
           _endPatrollingButton(dataSate: dataState)
               : const SizedBox.shrink(),
 
@@ -466,7 +467,8 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
   }
 
   Widget _statusButton({required FetchMapPageDataState dataSate}) {
-    return SizedBox(
+    return dataSate.taskData.taskStatus  != TaskStatus.completed
+        ? SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
         label: TextWidget(
@@ -501,7 +503,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           shadowColor: WidgetStateProperty.all<Color>(Colors.black),
         ),
       ),
-    );
+    ) : const SizedBox.shrink();
   }
 
   Widget _endPatrollingButton({required FetchMapPageDataState dataSate}) {
