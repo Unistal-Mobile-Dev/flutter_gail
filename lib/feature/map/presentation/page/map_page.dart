@@ -181,11 +181,9 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
             height: MediaQuery.of(context).size.width * 0.03,
           ) : const SizedBox.shrink(),
 
-          _statusButton(dataSate: dataState),
-
-         // dataState.isStartPatrolling == true ?
-         // _statusButton(dataSate: dataState)
-         //     : const SizedBox.shrink(),
+         dataState.isStartPatrolling == true ?
+         _statusButton(dataSate: dataState)
+             : const SizedBox.shrink(),
 
           dataState.isEndPatrolling == true ?
           SizedBox(
@@ -510,7 +508,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     return SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
-        label: TextWidget(AppString.completed,
+        label: TextWidget(AppString.end,
           color: AppColor.black,
           fontSize: AppFont.font_11,),
         icon: Icon(Icons.task_outlined, color: AppColor.themeColor,
@@ -547,27 +545,6 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     final routeEndPointMarker = PictureMarkerSymbol.withImage(imageEnd)
       ..width = 20
       ..height = 20;
-
-/*    List<PointsModel> pointsList =  BlocProvider.of<MapBloc>(!context.mounted ? context : context).pointsList;
-    final startPoint1 = Viewpoint.withLatLongScale(
-      latitude: pointsList[0].y,
-      longitude: pointsList[0].x,
-      scale: 2e4,
-    );
-
-    final endPoint1 = Viewpoint.withLatLongScale(
-      latitude: pointsList[pointsList.length-1].y,
-      longitude: pointsList[pointsList.length-1].x,
-      scale: 2e4,
-    );
-
-    Map<String, dynamic> attributes1 = {"id" :1};
-    Map<String, dynamic> attributes2 = {"id" :2};
-
-    _stopsGraphicsOverlay.graphics.addAll([
-      Graphic(geometry: startPoint1.targetGeometry, symbol: routeStartPointMarker, attributes: attributes1),
-      Graphic(geometry: endPoint1.targetGeometry, symbol: routeEndPointMarker, attributes: attributes2),
-    ]);*/
 
 
     final bpIcon = await ArcGISImage.fromAsset(AppIcon.bpIcon);

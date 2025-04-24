@@ -187,39 +187,35 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (taskData.taskStatus == TaskStatus.started ||
         taskData.taskStatus == TaskStatus.pause) {
       isStartPatrolling = true;
+      isEndPatrolling =  true;
     } else {
       isStartPatrolling = false;
+      isEndPatrolling =  false;
     }
 
-    if (isStartPatrolling == false) {
-      double calculateDistance = MapHelper.calculateDistance(
-              startPoint.y, startPoint.x, points.y, points.x) *
-          1000;
-      if (calculateDistance < 100) {
-        isStartPatrolling = true;
-        _eventComplete(emit);
-      } else {
-        isStartPatrolling = false;
-        _eventComplete(emit);
-      }
+    if(isStartPatrolling == false){
+      bool isBufferZone =  await MapHelper.getNearestLocation(currentLocation: points, routes: routes);
+      isStartPatrolling =  isBufferZone;
+      isEndPatrolling =  isBufferZone;
+      _eventComplete(emit);
     }
 
-    if (isStartPatrolling == true && isEndPatrolling == false) {
-      double calculateDistance = MapHelper.calculateDistance(
-              endPoint.y, endPoint.x, points.y, points.x) *
-          1000;
-      if (calculateDistance < 100) {
-        isEndPatrolling = true;
-        _eventComplete(emit);
-      } else {
-        isEndPatrolling = false;
-        _eventComplete(emit);
-      }
-    }
+    // if (isStartPatrolling == false) {
+    //   double calculateDistance = MapHelper.calculateDistance(
+    //           startPoint.y, startPoint.x, points.y, points.x) *
+    //       1000;
+    //   if (calculateDistance < 100) {
+    //     isStartPatrolling = true;
+    //     _eventComplete(emit);
+    //   } else {
+    //     isStartPatrolling = false;
+    //     _eventComplete(emit);
+    //   }
+    // }
 
     if (taskData.taskStatus == TaskStatus.started) {
       await MapHelper.locationSave(
-          context: context,
+          context: !context.mounted ? context : context,
           lastPoint: lastPoint,
           currentPoint: points,
           speed: speed,
@@ -284,6 +280,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (res != null) {
       taskData.taskStatus = taskStatus;
       isTaskStatusChange = true;
+      isStartPatrolling =  false;
       BlocProvider.of<TaskBloc>(
               !event.context.mounted ? event.context : event.context)
           .add(TaskPagRefreshDataEvent(

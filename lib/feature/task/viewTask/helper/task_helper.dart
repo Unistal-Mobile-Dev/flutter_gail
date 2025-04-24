@@ -15,13 +15,9 @@ class TaskHelper {
     try {
 
       return fetchDailyTask(startDate: startDate, endDate: endDate);
-      String url = APIs.getTaskApi+"?startDate=$startDate&endDate=$endDate";
-      var res = await ServerRequest.getData(urlEndPoint: url);
-      if (res != null && res['data'] != null) {
-        return taskListResponse(res['data']);
-      }
-      return null;
-    } catch (_) {}
+    } catch (e) {
+      print("Error ===================== ${e.toString()}");
+    }
     return null;
   }
 
@@ -35,8 +31,8 @@ class TaskHelper {
         return taskListResponse(res['data']);
       }
       return null;
-    } catch (_) {
-      print(_.toString());
+    } catch (e) {
+      print("Error 1 ===================== ${e.toString()}");
     }
     return null;
   }

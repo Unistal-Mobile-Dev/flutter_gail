@@ -13,6 +13,7 @@ class LoginDataModel {
   List<dynamic>? groups;
   List<dynamic>? verificationDetails;
   Tokens? tokens;
+  String? name;
 
 
   LoginDataModel(
@@ -21,9 +22,11 @@ class LoginDataModel {
       this.roles,
       this.groups,
       this.verificationDetails,
+      this.name,
       this.tokens});
 
   LoginDataModel.fromJson(Map<String, dynamic> json) {
+    name =  json['user_name'] ?? "";
     users = json['users'] != null ? Users.fromJson(json['users']) : null;
     if (json['modules'] != null) {
       modules = <Modules>[];

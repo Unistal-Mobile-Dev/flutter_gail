@@ -119,6 +119,8 @@ class AppString {
 
   static get completed => "Completed";
 
+  static get end => "End";
+
   static get type => "Type";
 
   static get reportIncident => "Report Incident";
