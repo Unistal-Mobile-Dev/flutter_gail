@@ -4,10 +4,10 @@ List<MarkerModel> markerListResponse(var json) {
 
 
 class MarkerModel {
-  int? markerNumber;
+  dynamic markerNumber;
   double? gpsX;
   double? gpsY;
-  int? markerType;
+  dynamic markerType;
   String? engRouteName;
   String? markerName;
 

@@ -200,19 +200,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       _eventComplete(emit);
     }
 
-    // if (isStartPatrolling == false) {
-    //   double calculateDistance = MapHelper.calculateDistance(
-    //           startPoint.y, startPoint.x, points.y, points.x) *
-    //       1000;
-    //   if (calculateDistance < 100) {
-    //     isStartPatrolling = true;
-    //     _eventComplete(emit);
-    //   } else {
-    //     isStartPatrolling = false;
-    //     _eventComplete(emit);
-    //   }
-    // }
-
     if (taskData.taskStatus == TaskStatus.started) {
       await MapHelper.locationSave(
           context: !context.mounted ? context : context,

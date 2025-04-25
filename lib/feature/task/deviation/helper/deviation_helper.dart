@@ -2,52 +2,40 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/file_model.dart';
 import 'package:flutter_gail/feature/login/helper/login_helper.dart';
-import 'package:flutter_gail/feature/task/addEncroachment/domain/model/encroachment_model.dart';
+import 'package:flutter_gail/feature/task/deviation/domain/model/deviation_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
 
-class EncroachmentHelper {
-
-  static Future<dynamic> fetchEncroachmentTypes() async {
-
-      try {
-        String url =  APIs.getEncroachmentTypeApi;
-        var res =  await ServerRequest.getData(urlEndPoint: url);
-        if(res != null && res['data'] != null){
-          return encroachmentListResponse(res['data']);
-        }
-      }catch(_){}
-      return null;
-  }
+class DeviationHelper {
 
   static Future<dynamic> textFiledValidation(
-         {required BuildContext context, required String chainage,
-            required EncroachmentModel encroachmentData,
-            required LocationModel locationData, required File file}) async {
-       try{
-            if(chainage.isEmpty){
-              SnackBarErrorWidget(context).show(message: "Please enter chainage");
-              return false;
-            }
-            else if(encroachmentData.value == null){
-              SnackBarErrorWidget(context).show(message: "Please select encroachment");
-              return false;
-            }
-            else if(file.path.isEmpty){
-              SnackBarErrorWidget(context).show(message: "Upload photo");
-              return false;
-            }
-            return true;
-       }catch(_){}
-      return false;
+      {required BuildContext context, required String other,
+        required DeviationModel deviationData,
+        required File file}) async {
+    try{
+      if(deviationData.id == null){
+        SnackBarErrorWidget(context).show(message: "Please select deviation");
+        return false;
+      }
+      else  if(deviationData.id == "5" && other.isEmpty){
+        SnackBarErrorWidget(context).show(message: "Please enter other reason");
+        return false;
+      }
+      else if(file.path.isEmpty){
+        SnackBarErrorWidget(context).show(message: "Upload photo");
+        return false;
+      }
+      return true;
+    }catch(_){}
+    return false;
   }
 
   static Future<dynamic> submit(
-      { required BuildContext context, required String chainage,
-        required EncroachmentModel encroachmentData,
+      {required BuildContext context, required String other,
+        required DeviationModel deviationData,
         required TaskModel taskData,
-        required LocationModel locationData, required File file}) async {
+        required File file}) async {
     try{
 
       String url = APIs.addRouteObserveApi;
@@ -63,11 +51,16 @@ class EncroachmentHelper {
       final DateFormat formatter = DateFormat('dd-MM-yyyy');
       final String currentDate = formatter.format(DateTime.now());
       var deviceId = await LoginHelper.getUniqueDeviceId();
+      var locationRes =  await LocationHelper.getLocationOfflineMode(context: !context.mounted ? context : context);
+      LocationModel locationData =  LocationModel();
+      if(locationRes != null){
+        locationData =  locationRes;
+      }
       var json = {
         "task_id" : taskData.taskId.toString(),
         "patrollroute_id" : taskData.patrollRouteId.toString(),
-        "observation_type" : "Encroachment",
-        "description" : chainage,
+        "observation_type" : "Deviation",
+        "description" : other,
         "condition" : "",
         "crossing_marker": "",
         "bank_condition": "",
@@ -75,7 +68,7 @@ class EncroachmentHelper {
         "gpsx": locationData.lat != null ? locationData.lat.toString() : "0.0",
         "gpsy": locationData.long != null ? locationData.long.toString(): "0.0",
         "gps_accuracy" : locationData.accuracy.toString(),
-        "observation_subtype" : encroachmentData.value != null ? encroachmentData.value.toString() : "",
+        "observation_subtype" : deviationData.name != null ? deviationData.name.toString() : "",
         "device_id" : deviceId.toString(),
       };
       var res = await ServerRequest.postDataWithFile(urlEndPoint: url,
@@ -90,5 +83,4 @@ class EncroachmentHelper {
     }catch(_){}
     return null;
   }
-
 }

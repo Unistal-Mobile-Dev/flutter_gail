@@ -5,13 +5,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/addEncroachment/domain/model/encroachment_model.dart';
 import 'package:flutter_gail/feature/task/addEncroachment/helper/encroachment_helper.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
+import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
+import 'package:flutter_gail/services/location/location_helper.dart';
+import 'package:flutter_gail/services/location/location_model.dart';
 
 part 'encroachment_event.dart';
 
 part 'encroachment_state.dart';
 
 class EncroachmentBloc extends Bloc<EncroachmentEvent, EncroachmentState> {
-
   String location = "";
   List<EncroachmentModel> encroachmentList = [];
   EncroachmentModel encroachmentData = EncroachmentModel();
@@ -19,7 +22,8 @@ class EncroachmentBloc extends Bloc<EncroachmentEvent, EncroachmentState> {
   bool isLoader = false;
   bool isFileLoader = false;
   TextEditingController chainageController = TextEditingController();
-  ArcGISPoint arcGISPoint =  ArcGISPoint(x: 0.0, y: 0.0);
+  TaskModel taskData =  TaskModel();
+  LocationModel locationModel = LocationModel();
 
   EncroachmentBloc() : super(EncroachmentInitial()) {
     on<PageLoadEvent>(_pageLoad);
@@ -30,44 +34,75 @@ class EncroachmentBloc extends Bloc<EncroachmentEvent, EncroachmentState> {
 
   _pageLoad(PageLoadEvent event, emit) async {
     emit(EncroachmentPageLoadState());
-    arcGISPoint = event.arcGISPoint;
-    location = "";
+
     encroachmentList = [];
     encroachmentData = EncroachmentModel();
     file = File("");
     isLoader = false;
     isFileLoader = false;
     chainageController = TextEditingController();
-    var res =  await EncroachmentHelper.fetchEncroachmentTypes();
-    if(res != null){
-      encroachmentList =  res;
+    taskData =  BlocProvider.of<TaskBloc>(!event.context.mounted?  event.context : event.context).taskData;
+    var res = await EncroachmentHelper.fetchEncroachmentTypes();
+    if (res != null) {
+      encroachmentList = res;
     }
+    var locationRes = await LocationHelper.getLocation(
+        context: !event.context.mounted ? event.context : event.context);
+    locationModel = LocationModel();
+    if (locationRes != null) {
+      locationModel = locationRes;
+    }
+    location = locationModel.address.toString();
     _eventCompleted(emit);
   }
 
   _selectFile(SelectFileEvent event, emit) async {
-    isFileLoader =  true;
+    isFileLoader = true;
     _eventCompleted(emit);
-    var res =  await DashboardHelper.cameraPiker(context: event.context);
-    if(res != null){
-      file =  res;
+    var res = await DashboardHelper.cameraPiker(context: event.context);
+    if (res != null) {
+      file = res;
     }
-    isFileLoader =  false;
+    isFileLoader = false;
     _eventCompleted(emit);
   }
 
   _selectEncroachmentType(SelectEncroachmentTypeEvent event, emit) {
-      encroachmentData =  event.encroachmentData;
-      _eventCompleted(emit);
+    encroachmentData = event.encroachmentData;
+    _eventCompleted(emit);
   }
 
   _submit(SubmitEvent event, emit) async {
+    BuildContext context =  event.context;
+    var textFiledValidation =  await EncroachmentHelper.textFiledValidation(context: context,
+        chainage: chainageController.text.toString(),
+        encroachmentData: encroachmentData, locationData: locationModel, file: file);
 
+    if(textFiledValidation == false){
+      return;
+    }
+
+    isLoader =  true;
+    _eventCompleted(emit);
+    var res =  await EncroachmentHelper.submit(context: !context.mounted ? context : context,
+        chainage: chainageController.text.toString(),
+         taskData: taskData,
+        encroachmentData: encroachmentData, locationData: locationModel, file: file);
+    if(res != null){
+      encroachmentData = EncroachmentModel();
+      file = File("");
+      isLoader = false;
+      isFileLoader = false;
+      chainageController = TextEditingController();
+    }
+    isLoader =  false;
+    _eventCompleted(emit);
 
   }
 
   _eventCompleted(Emitter<EncroachmentState> emit) {
-    emit(FetchEncroachmentDataState(location: location,
+    emit(FetchEncroachmentDataState(
+        location: location,
         isLoader: isLoader,
         chainageController: chainageController,
         encroachmentData: encroachmentData,
@@ -75,5 +110,4 @@ class EncroachmentBloc extends Bloc<EncroachmentEvent, EncroachmentState> {
         file: file,
         isFileLoader: isFileLoader));
   }
-
 }

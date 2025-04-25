@@ -6,9 +6,8 @@ sealed class EncroachmentEvent extends Equatable {
 
 class PageLoadEvent extends EncroachmentEvent {
   final BuildContext context;
-  final ArcGISPoint arcGISPoint;
 
-  const PageLoadEvent({required this.context, required this.arcGISPoint});
+  const PageLoadEvent({required this.context,});
 
   @override
   List<Object?> get props => [context];

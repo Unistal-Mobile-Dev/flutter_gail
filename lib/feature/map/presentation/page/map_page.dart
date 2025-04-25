@@ -11,8 +11,12 @@ import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/map/presentation/widget/sample_state_support.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
 import 'package:flutter_gail/feature/task/addCrossing/presentation/page/add_crossing_page.dart';
+import 'package:flutter_gail/feature/task/addEncroachment/domain/bloc/encroachment_bloc.dart';
+import 'package:flutter_gail/feature/task/addEncroachment/presentation/page/encroachment_page.dart';
 import 'package:flutter_gail/feature/task/addMarker/domain/bloc/add_marker_bloc.dart';
 import 'package:flutter_gail/feature/task/addMarker/presentation/page/add_marker_page.dart';
+import 'package:flutter_gail/feature/task/deviation/domain/bloc/deviation_bloc.dart';
+import 'package:flutter_gail/feature/task/deviation/presentation/page/deviation_page.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
@@ -89,9 +93,6 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
  }
 
   void onTap(Offset localPosition) async {
-    print("Get data ================= ${localPosition.dy}");
-    print("Get data ================= ${localPosition.dx}");
-    navigation(localPosition: localPosition);
     final identifyGraphicsOverlayResult =
     await _mapViewController.identifyGraphicsOverlay(
       _stopsGraphicsOverlay,
@@ -99,18 +100,21 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
       tolerance: 22,
     );
 
-    if (identifyGraphicsOverlayResult.graphics.isEmpty) return;
-    if (mounted) {
-      final graphic = identifyGraphicsOverlayResult.graphics.first;
+    if(identifyGraphicsOverlayResult.graphics.isEmpty) {
+      navigation(localPosition: localPosition);
+      return;
+    }
+
+    final graphic = identifyGraphicsOverlayResult.graphics.first;
       Map<String, dynamic> jsonValue = graphic.attributes;
-      if(jsonValue['type'] != null && jsonValue['type'] == "marker")
+      if(jsonValue['markername'] != null)
       {
 
        var res =  await showDialog(
-          context: context,
+          context: !context.mounted ? context : context,
           builder: (context) {
             return MessageBoxTwoButtonPopWidget(
-              message: "${jsonValue['markername']}\n${jsonValue['engroutename']}",
+              message: "You want update the ${jsonValue['markerName']}?",
               okButtonText: "Update",
               onPressed: () => Navigator.pop(context, true),
             );
@@ -126,7 +130,6 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
          );
        }
       }
-    }
   }
 
 Widget _mapViewType({required FetchMapPageDataState dataState})   {
@@ -222,6 +225,16 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
             height: MediaQuery.of(context).size.width * 0.03,
           ),
           _addIncidentButton(),
+
+          SizedBox(
+            height: MediaQuery.of(context).size.width * 0.03,
+          ),
+          _addEncroachmentButton(),
+
+          SizedBox(
+            height: MediaQuery.of(context).size.width * 0.03,
+          ),
+          _addDeviationButton(),
         ],
       ) : const DottedLoaderWidget(),
     );
@@ -466,6 +479,60 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     );
   }
 
+  Widget _addEncroachmentButton() {
+    return SizedBox(
+      height: MediaQuery.of(context).size.width * 0.10,
+      child: TextButton.icon(
+        label: TextWidget('Add Encroachment',
+          color: AppColor.black,
+          fontSize: AppFont.font_11,),
+        icon: Icon(Icons.fence_rounded, color: AppColor.themeColor,
+          size: MediaQuery.of(context).size.width * 0.05,),
+        onPressed: () async {
+          BlocProvider.of<EncroachmentBloc>(context).add(PageLoadEvent(context: context));
+          Navigator.push(
+            !context.mounted ? context : context,
+            FadeRoute(
+                page: const EncroachmentPage()),
+          );
+        },
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
+          foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+          elevation: WidgetStateProperty.all<double>(3.0),
+          shadowColor: WidgetStateProperty.all<Color>(Colors.black),
+        ),
+      ),
+    );
+  }
+
+  Widget _addDeviationButton() {
+    return SizedBox(
+      height: MediaQuery.of(context).size.width * 0.10,
+      child: TextButton.icon(
+        label: TextWidget('Add Deviation',
+          color: AppColor.black,
+          fontSize: AppFont.font_11,),
+        icon: Icon(Icons.developer_board, color: AppColor.themeColor,
+          size: MediaQuery.of(context).size.width * 0.05,),
+        onPressed: () async {
+          BlocProvider.of<DeviationBloc>(context).add(DeviationPageLoadEvent(context: context));
+          Navigator.push(
+            !context.mounted ? context : context,
+            FadeRoute(
+                page: const DeviationPage()),
+          );
+        },
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
+          foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+          elevation: WidgetStateProperty.all<double>(3.0),
+          shadowColor: WidgetStateProperty.all<Color>(Colors.black),
+        ),
+      ),
+    );
+  }
+
   Widget _statusButton({required FetchMapPageDataState dataSate}) {
     return dataSate.taskData.taskStatus  != TaskStatus.completed
         ? SizedBox(
@@ -554,6 +621,11 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       ..width = 15
       ..height = 15;
 
+    final pipelineMarkerIcon = await ArcGISImage.fromAsset(AppIcon.bpIcon);
+    final pipelineMarker = PictureMarkerSymbol.withImage(pipelineMarkerIcon)
+      ..width = 15
+      ..height = 15;
+
     final dmIcon = await ArcGISImage.fromAsset(AppIcon.dmIcon);
     final dmIconMarker = PictureMarkerSymbol.withImage(dmIcon)
       ..width = 15
@@ -578,26 +650,78 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     List<RoutePointsModel> routePointsList =  BlocProvider.of<MapBloc>(!context.mounted ? context : context).routePointsList;
     for(var routePointsData in routePointsList){
       for(var markerData in routePointsData.markerList){
-        final startPoint1 = Viewpoint.withLatLongScale(
+        final markerPoints = Viewpoint.withLatLongScale(
           latitude: markerData.gpsy!,
           longitude: markerData.gpsx!,
           scale: 2e4,
         );
 
+        Map<String, dynamic> attributes =
+        {
+          "markername" : markerData.markerName,
+          "markernumber" : markerData.markerNumber.toString(),
+          "markertype" : markerData.markerType.toString(),
+          "gpsx" : markerData.gpsx,
+          "gpsy" : markerData.gpsx,
+          "engroutename" : "",
+        };
         _stopsGraphicsOverlay.graphics.addAll([
-          Graphic(geometry: startPoint1.targetGeometry,
+          Graphic(geometry: markerPoints.targetGeometry,
               symbol: markerData.markerType.toString() == "1"
-                  ? bpIconMarker
-                  : markerData.markerType.toString() == "2"
-                  ? dmIconMarker
+                  ? bpIconMarker // no
+                  // : markerData.markerType.toString() == "2"
+                  // ? dmIconMarker // no
                   : markerData.markerType.toString() == "3"
                   ? kmIconMarker
                   : markerData.markerType.toString() == "4"
-                  ? tlpIconMarker
+                  ? wmIconMarker
                   : markerData.markerType.toString() == "5"
                   ? wmIconMarker
+                  : markerData.markerType.toString() == "6"
+                  ? wmIconMarker
+                  : markerData.markerType.toString() == "7"
+                  ? wmIconMarker
+                  : markerData.markerType.toString() == "8"
+                  ? wmIconMarker
+                  : markerData.markerType.toString() == "9"
+                  ? wmIconMarker
+                  : markerData.markerType.toString() == "10"
+                  ? wmIconMarker
+                  : markerData.markerType.toString() == "11"
+                  ? wmIconMarker
+                  : markerData.markerType.toString() == "12"
+                  ? kmIconMarker
+                  : markerData.markerType.toString() == "13"
+                  ? wmIconMarker
+                  : markerData.markerType.toString() == "14"
+                  ? wmIconMarker
+                  : markerData.markerType.toString() == "15"
+                  ? wmIconMarker
                   : bpIconMarker,
-              attributes: markerData.markerName),
+              attributes: attributes),
+        ]);
+      }
+
+      for(var ltpData in routePointsData.tlpList){
+        final tlpPoints = Viewpoint.withLatLongScale(
+          latitude: ltpData.gpsy!,
+          longitude: ltpData.gpsx!,
+          scale: 2e4,
+        );
+
+        Map<String, dynamic> attributes =
+        {
+          "markername" : "TLP",
+          "markernumber" : ltpData.id.toString(),
+          "markertype" : "17",
+          "gpsx" : ltpData.gpsx,
+          "gpsy" : ltpData.gpsx,
+          "engroutename" : "",
+        };
+        _stopsGraphicsOverlay.graphics.addAll([
+          Graphic(geometry: tlpPoints.targetGeometry,
+              symbol: tlpIconMarker,
+              attributes: attributes),
         ]);
       }
     }
