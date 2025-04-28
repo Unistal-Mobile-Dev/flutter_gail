@@ -55,7 +55,7 @@ class TaskHelper {
         locationModel =   location;
       }
       final String currentTime =  "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
-      String url = APIs.updateTaskApi+"?task_id=${taskData.taskId.toString()}&subtask_id=${taskData.subTaskId.toString()}";
+      String url = APIs.updateTaskApi+"?task_id=${taskData.taskId.toString()}";
       var json = {
         "patrollman_status": taskStatus,
         "timing_data": {
@@ -65,7 +65,7 @@ class TaskHelper {
           "pause_time": taskStatus == 2 ? currentTime : "",
           "gpsx": locationModel.long ?? "",
           "gpsy": locationModel.lat ?? "",
-          "no_of_points": "",
+          "no_of_points": pointsCount.toString(),
           "no_of_points_covered": "",
           "event_type": taskStatus == 1 ? "start" : taskStatus == 2 ? "pause" : taskStatus == 3 ? "end" : "",
         }

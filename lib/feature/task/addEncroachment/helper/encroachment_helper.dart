@@ -67,6 +67,7 @@ class EncroachmentHelper {
         "task_id" : taskData.taskId.toString(),
         "patrollroute_id" : taskData.patrollRouteId.toString(),
         "observation_type" : "Encroachment",
+        "sectionCode " : taskData.sectionCode.toString(),
         "description" : chainage,
         "condition" : "",
         "crossing_marker": "",

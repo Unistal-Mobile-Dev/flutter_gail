@@ -114,7 +114,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
         TextWidget("Warning Marker",color: AppColor.black,),
         Row(
           children: [
-            Radio(value: "1",
+            Radio(value: "Good",
                 groupValue: dataState.warningMarker,
                 onChanged: (value) {
                   BlocProvider.of<AddCrossingBloc>(context)
@@ -122,7 +122,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
                 }),
             TextWidget("Good", fontSize: AppFont.font_12,),
 
-            Radio(value: "2",
+            Radio(value: "Damaged",
                 groupValue: dataState.warningMarker,
                 onChanged: (value) {
                   BlocProvider.of<AddCrossingBloc>(context)
@@ -130,7 +130,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
                 }),
             TextWidget("Damaged", fontSize: AppFont.font_12,),
 
-            Radio(value: "3",
+            Radio(value: "Missing",
                 groupValue: dataState.warningMarker,
                 onChanged: (value) {
                   BlocProvider.of<AddCrossingBloc>(context)
@@ -152,7 +152,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
         TextWidget("Vent And Drain Condition",color: AppColor.black,),
         Row(
           children: [
-            Radio(value: "1",
+            Radio(value: "Good",
                 groupValue: dataState.drainCondition,
                 onChanged: (value) {
                   BlocProvider.of<AddCrossingBloc>(context)
@@ -160,7 +160,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
                 }),
             TextWidget("Good", fontSize: AppFont.font_12,),
 
-            Radio(value: "2",
+            Radio(value: "Eroded",
                 groupValue: dataState.drainCondition,
                 onChanged: (value) {
                   BlocProvider.of<AddCrossingBloc>(context)
@@ -168,7 +168,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
                 }),
             TextWidget("Eroded", fontSize: AppFont.font_12,),
 
-            Radio(value: "3",
+            Radio(value: "N.A",
                 groupValue: dataState.drainCondition,
                 onChanged: (value) {
                   BlocProvider.of<AddCrossingBloc>(context)
@@ -190,7 +190,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
         TextWidget("Bank Condition",color: AppColor.black,),
         Row(
           children: [
-            Radio(value: "1",
+            Radio(value: "Good",
                 groupValue: dataState.bankCondition,
                 onChanged: (value) {
                   BlocProvider.of<AddCrossingBloc>(context)
@@ -198,7 +198,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
                 }),
             TextWidget("Good", fontSize: AppFont.font_12,),
 
-            Radio(value: "2",
+            Radio(value: "Eroded",
                 groupValue: dataState.bankCondition,
                 onChanged: (value) {
                   BlocProvider.of<AddCrossingBloc>(context)
@@ -206,7 +206,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
                 }),
             TextWidget("Eroded", fontSize: AppFont.font_12,),
 
-            Radio(value: "3",
+            Radio(value: "Pipe Exposed",
                 groupValue: dataState.bankCondition,
                 onChanged: (value) {
                   BlocProvider.of<AddCrossingBloc>(context)

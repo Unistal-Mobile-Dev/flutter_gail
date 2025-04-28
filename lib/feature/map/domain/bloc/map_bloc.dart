@@ -38,6 +38,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   List<List<PointsModel>> routes = [];
   List<RoutePointsModel> routePointsList = [];
   bool isArcGISStreets =  false;
+  int routeLength = 1;
 
   MapBloc() : super(MapInitial()) {
     on<MapPageLoadEvent>(_pageLoadEvent);
@@ -60,6 +61,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     markerList = [];
     routes = [];
     routePointsList = [];
+    routeLength = 1;
     lastPoint = PointsModel();
     taskList = BlocProvider.of<TaskBloc>(event.context).searchTaskList;
     taskData = BlocProvider.of<TaskBloc>(event.context).taskData;
@@ -82,6 +84,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
                  z: 0.0,
                )),
              );
+             routeLength++;
            }
            routes.add(list);
          }
@@ -263,7 +266,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
                 : taskStatus == TaskStatus.completed
                     ? 3
                     : 0,
-        context: event.context, pointsCount: routes.expand((routeData) => routeData).length);
+        context: event.context, pointsCount: routeLength);
     if (res != null) {
       taskData.taskStatus = taskStatus;
       isTaskStatusChange = true;

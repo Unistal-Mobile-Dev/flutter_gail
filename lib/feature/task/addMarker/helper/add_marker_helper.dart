@@ -107,6 +107,7 @@ class AddMarkerHelper {
         var json = {
           "task_id" : taskData.taskId.toString(),
           "patrollroute_id" : taskData.patrollRouteId.toString(),
+          "sectionCode " : taskData.sectionCode.toString(),
           "observation_type" : "Marker",
           "paint_condition" : painting.toString(),
           "description" : remark.toString(),

@@ -53,6 +53,7 @@ class ServerRequest {
       addToken();
       String url = APIs.baseUrl + urlEndPoint;
       log(url);
+      log(body);
       final response =
           await put(Uri.parse(url), headers: header, body: body)
               .timeout(const Duration(minutes: 1));

@@ -60,6 +60,7 @@ class DeviationHelper {
         "task_id" : taskData.taskId.toString(),
         "patrollroute_id" : taskData.patrollRouteId.toString(),
         "observation_type" : "Deviation",
+        "sectionCode " : taskData.sectionCode.toString(),
         "description" : other,
         "condition" : "",
         "crossing_marker": "",

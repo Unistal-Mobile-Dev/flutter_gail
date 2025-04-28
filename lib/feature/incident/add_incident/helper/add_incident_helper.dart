@@ -88,6 +88,7 @@ class AddIncidentHelper {
            "task_id" : taskData.taskId.toString(),
            "patrollroute_id" : taskData.patrollRouteId.toString(),
            "observation_type" : "Incident",
+           "sectionCode " : taskData.sectionCode.toString(),
            "description" : incidentReport.toString(),
            "condition" : "",
            "crossing_marker": "",
