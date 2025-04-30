@@ -6,6 +6,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
 import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
+import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/map/presentation/widget/sample_state_support.dart';
@@ -100,10 +101,10 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
       tolerance: 22,
     );
 
-    if(identifyGraphicsOverlayResult.graphics.isEmpty) {
-      navigation(localPosition: localPosition);
-      return;
-    }
+    // if(identifyGraphicsOverlayResult.graphics.isEmpty) {
+    //   navigation(localPosition: localPosition);
+    //   return;
+    // }
 
     final graphic = identifyGraphicsOverlayResult.graphics.first;
       Map<String, dynamic> jsonValue = graphic.attributes;
@@ -762,13 +763,15 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       ));
     });
     List<List<PointsModel>> routes =  BlocProvider.of<MapBloc>(context).routes;
+    MapModel mapData =  BlocProvider.of<MapBloc>(context).mapData;
+    double buffer =  double.parse(mapData.buffer.toString());
     for(var routeData in routes){
-      _startLocationDataSource(pointsLists: routeData);
+      _startLocationDataSource(pointsLists: routeData, buffer: buffer);
     }
     setState(() {});
   }
 
-  Future<void> _startLocationDataSource({required List<PointsModel> pointsLists}) async {
+  Future<void> _startLocationDataSource({required List<PointsModel> pointsLists, required double buffer}) async {
 
     List<PointsModel> pointsList =  pointsLists;
     List<List<dynamic>> addPath = [];
@@ -816,7 +819,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     final routeLineSymbol1 = SimpleLineSymbol(
       style: SimpleLineSymbolStyle.solid,
       color: Colors.red.withOpacity(0.2),
-      width: 20.0,
+      width: buffer/2,
 
     );
 
