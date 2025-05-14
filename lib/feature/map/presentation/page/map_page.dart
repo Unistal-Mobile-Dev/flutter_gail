@@ -49,6 +49,8 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
   final _locationHistoryLineOverlay = GraphicsOverlay();
   final _locationHistoryPointOverlay = GraphicsOverlay();
 
+  bool isFirstLocation =  false;
+
 
   @override
   void initState() {
@@ -551,12 +553,15 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
 
           TaskStatus taskStatus =  TaskStatus.notStarted;
           if(dataSate.taskData.taskStatus == TaskStatus.notStarted){
+            _mapViewController.locationDisplay.start();
             taskStatus =  TaskStatus.started;
           }
           else if(dataSate.taskData.taskStatus == TaskStatus.started) {
+            _mapViewController.locationDisplay.stop();
             taskStatus =  TaskStatus.pause;
           }
           else if(dataSate.taskData.taskStatus == TaskStatus.pause) {
+            _mapViewController.locationDisplay.start();
             taskStatus =  TaskStatus.started;
           }
           BlocProvider.of<MapBloc>(context).add(MapPageUpdateTaskEvent(
@@ -584,6 +589,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
         icon: Icon(Icons.task_outlined, color: AppColor.themeColor,
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () {
+          _mapViewController.locationDisplay.stop();
           BlocProvider.of<MapBloc>(context).add(MapPageUpdateTaskEvent(
               context: context,
               taskStatus: TaskStatus.completed
@@ -750,18 +756,23 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       _locationHistoryPointOverlay,
     ]);
 
-    _mapViewController.locationDisplay.onLocationChanged.listen((onData) async {
-      await Future.delayed(const Duration(seconds: 3));
-      BlocProvider.of<MapBloc>(!context.mounted ? context : context).add(MapRouteLocationCheck(
-          context: !context.mounted ? context : context,
+    DateTime _lastLocationUpdate = DateTime.now().subtract(Duration(seconds: 30));
+    _mapViewController.locationDisplay.onLocationChanged.listen((onData) {
+      final now = DateTime.now();
+      if (now.difference(_lastLocationUpdate).inSeconds >= 30) {
+        _lastLocationUpdate = now;
+        BlocProvider.of<MapBloc>(context).add(MapRouteLocationCheck(
+          context: context,
           currentPoint: ArcGISPoint(
-          x: onData.position.x,
-          y: onData.position.y,
-      ),
-      verticalAccuracy: onData.verticalAccuracy,
-      speed: onData.speed,
-      ));
+            x: onData.position.x,
+            y: onData.position.y,
+          ),
+          verticalAccuracy: onData.verticalAccuracy,
+          speed: onData.speed,
+        ));
+      }
     });
+
     List<List<PointsModel>> routes =  BlocProvider.of<MapBloc>(context).routes;
     MapModel mapData =  BlocProvider.of<MapBloc>(context).mapData;
     double buffer =  double.parse(mapData.buffer.toString());
