@@ -10,11 +10,15 @@ import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dar
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:battery_plus/battery_plus.dart';
+import 'package:flutter_gail/services/location/location_helper.dart';
+import 'package:flutter_gail/services/location/location_model.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
 import 'dart:math' show cos, sqrt, asin;
 import 'dart:math' as math;
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MapHelper {
   static Future<dynamic> fetchRoutes({required String routeId}) async {
@@ -107,23 +111,31 @@ class MapHelper {
     try {
       String distance = "0.0";
       double bearing = 0.0;
+
+      var locationRes = await LocationHelper.getLocationOfflineMode(
+          context: !context.mounted ? context : context);
+      LocationModel locationData = LocationModel();
+      if (locationRes != null) {
+        locationData = locationRes;
+      }
+
       if (lastPoint.y != null) {
         double calculateDistance = MapHelper.calculateDistance(
-                lastPoint.y, lastPoint.x, currentPoint.y, currentPoint.x) *
+                lastPoint.y, lastPoint.x, locationData.lat, locationData.long) *
             1000;
         distance = calculateDistance.toStringAsFixed(2);
       }
       bearing = calculateBearing(
-          currentPoint.y, currentPoint.x, lastPoint.y, lastPoint.x);
+          locationData.lat, locationData.long, lastPoint.y, lastPoint.x);
 
       var battery = Battery();
       int batteryPercentage = await battery.batteryLevel;
 
       var location = {
-        "gpsx": currentPoint.x.toString(),
-        "gpsy": currentPoint.y.toString(),
+        "gpsx": locationData.long.toString(),
+        "gpsy": locationData.lat.toString(),
         "inspected_datetime": DateTime.now().toString(),
-        "gpsaccuracy": verticalAccuracy.toString(),
+        "gpsaccuracy": locationData.accuracy.toString(),
         "provider": "GPS1",
         "speed": speed.toString(),
         "bearing": bearing.toString(),
@@ -249,4 +261,5 @@ class MapHelper {
     }
     return false;
   }
+
 }

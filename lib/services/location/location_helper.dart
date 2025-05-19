@@ -82,7 +82,7 @@ class LocationHelper {
         LocationPermission permission = await Geolocator.checkPermission();
         if (permission != LocationPermission.denied) {
           LocationSettings locationSettings = const LocationSettings(
-            accuracy: LocationAccuracy.high, //accuracy of the location data
+            accuracy: LocationAccuracy.bestForNavigation, //accuracy of the location data
             distanceFilter: 0, //minimum distance (measured in meters) a
           );
           Position position = await Geolocator.getCurrentPosition(

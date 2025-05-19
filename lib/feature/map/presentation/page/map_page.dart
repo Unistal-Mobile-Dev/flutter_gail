@@ -96,17 +96,30 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
  }
 
   void onTap(Offset localPosition) async {
+
+    TaskStatus taskStatus =  BlocProvider.of<MapBloc>(!context.mounted ? context : context).taskData.taskStatus!;
+    if(taskStatus != TaskStatus.started){
+      var res =  await showDialog(
+        context: !context.mounted ? context : context,
+        builder: (context) {
+          return MessageBoxPopButtonWidget(
+            title: "Alert",
+            message: "You task not started",
+            onPressed: () => Navigator.pop(context, false),
+          );
+        },
+      );
+      if(res == false){
+        return;
+      }
+    }
+
     final identifyGraphicsOverlayResult =
     await _mapViewController.identifyGraphicsOverlay(
       _stopsGraphicsOverlay,
       screenPoint: localPosition,
       tolerance: 22,
     );
-
-    // if(identifyGraphicsOverlayResult.graphics.isEmpty) {
-    //   navigation(localPosition: localPosition);
-    //   return;
-    // }
 
     final graphic = identifyGraphicsOverlayResult.graphics.first;
       Map<String, dynamic> jsonValue = graphic.attributes;
@@ -219,25 +232,38 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           SizedBox(
             height: MediaQuery.of(context).size.width * 0.03,
           ),
-          _addMarkerButton(),
+          dataState.taskData.taskStatus == TaskStatus.started ?
+          _addMarkerButton()
+              : const SizedBox.shrink(),
+          dataState.taskData.taskStatus == TaskStatus.started ?
           SizedBox(
             height: MediaQuery.of(context).size.width * 0.03,
-          ),
-          _addCrossingButton(),
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ),
-          _addIncidentButton(),
+          ): const SizedBox.shrink(),
 
+          dataState.taskData.taskStatus == TaskStatus.started ?
+          _addCrossingButton() : const SizedBox.shrink(),
+          dataState.taskData.taskStatus == TaskStatus.started ?
           SizedBox(
             height: MediaQuery.of(context).size.width * 0.03,
-          ),
-          _addEncroachmentButton(),
+          ): const SizedBox.shrink(),
 
+          dataState.taskData.taskStatus == TaskStatus.started ?
+          _addIncidentButton() : const SizedBox.shrink(),
+          dataState.taskData.taskStatus == TaskStatus.started ?
           SizedBox(
             height: MediaQuery.of(context).size.width * 0.03,
-          ),
-          _addDeviationButton(),
+          ): const SizedBox.shrink(),
+
+          dataState.taskData.taskStatus == TaskStatus.started ?
+          _addEncroachmentButton(): const SizedBox.shrink(),
+
+          dataState.taskData.taskStatus == TaskStatus.started ?
+          SizedBox(
+            height: MediaQuery.of(context).size.width * 0.03,
+          ): const SizedBox.shrink(),
+
+          dataState.taskData.taskStatus == TaskStatus.started
+              ? _addDeviationButton() : const SizedBox.shrink(),
         ],
       ) : const DottedLoaderWidget(),
     );
@@ -756,13 +782,13 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       _locationHistoryPointOverlay,
     ]);
 
-    DateTime _lastLocationUpdate = DateTime.now().subtract(Duration(seconds: 30));
+    DateTime _lastLocationUpdate = DateTime.now().subtract(const Duration(seconds: 30));
     _mapViewController.locationDisplay.onLocationChanged.listen((onData) {
       final now = DateTime.now();
       if (now.difference(_lastLocationUpdate).inSeconds >= 30) {
         _lastLocationUpdate = now;
-        BlocProvider.of<MapBloc>(context).add(MapRouteLocationCheck(
-          context: context,
+        BlocProvider.of<MapBloc>(!context.mounted ? context : context).add(MapRouteLocationCheck(
+          context: !context.mounted ? context : context,
           currentPoint: ArcGISPoint(
             x: onData.position.x,
             y: onData.position.y,
