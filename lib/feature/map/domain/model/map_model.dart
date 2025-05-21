@@ -2,9 +2,10 @@ import 'package:flutter_gail/feature/map/domain/model/coordinates_model.dart';
 
 class MapModel {
   dynamic buffer;
+  dynamic timeInterval;
   List<Data>? data;
 
-  MapModel({this.buffer, this.data});
+  MapModel({this.buffer, this.data, this.timeInterval =  30});
 
   MapModel.fromJson(Map<String, dynamic> json) {
     buffer = json['buffer'] ?? "50";

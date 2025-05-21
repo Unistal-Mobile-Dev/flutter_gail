@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/map/domain/model/configuration_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/coordinates_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
@@ -37,8 +38,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   List<MarkerModel> markerList = [];
   List<List<PointsModel>> routes = [];
   List<RoutePointsModel> routePointsList = [];
-  bool isArcGISStreets =  false;
+  bool isArcGISStreets = false;
   int routeLength = 1;
+  ConfigurationModel configurationData = ConfigurationModel();
 
   MapBloc() : super(MapInitial()) {
     on<MapPageLoadEvent>(_pageLoadEvent);
@@ -55,7 +57,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     isStartPatrolling = false;
     isEndPatrolling = false;
     isTaskStatusChange = false;
-    isArcGISStreets =  false;
+    isArcGISStreets = false;
     mapList = [];
     directionList = [];
     markerList = [];
@@ -63,42 +65,57 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     routePointsList = [];
     routeLength = 1;
     lastPoint = PointsModel();
+    configurationData = ConfigurationModel();
     taskList = BlocProvider.of<TaskBloc>(event.context).searchTaskList;
     taskData = BlocProvider.of<TaskBloc>(event.context).taskData;
+
+    var resConfiguration = await MapHelper.fetchConfiguration();
+    if (resConfiguration != null) {
+      configurationData = resConfiguration;
+    }
 
     var routeRes = await MapHelper.fetchRoutes(
         routeId: taskData.patrollRouteId.toString());
     if (routeRes != null) {
-       mapData =  routeRes;
-       mapData = routeRes;
-       if (mapData.data != null) {
-         for (var data in mapData.data!) {
-           List<PointsModel> list  = [];
-           final geometryData = data.geometry;
-           if (geometryData != null) {
-             list.addAll(
-               geometryData.coordinates.map((coord) => PointsModel(
-                 y: coord.latitude,
-                 x: coord.longitude,
-                 m: 0.0,
-                 z: 0.0,
-               )),
-             );
-             routeLength++;
-           }
-           routes.add(list);
-         }
-       }
+      mapData = routeRes;
+      mapData = routeRes;
+      mapData.buffer = configurationData.buffer != null
+          ? double.parse(configurationData.buffer.toString())
+          : mapData.buffer;
+      mapData.timeInterval = configurationData.timeInterval != null
+          ? int.parse(configurationData.timeInterval.toString())
+          : mapData.timeInterval;
+      if (mapData.data != null) {
+        for (var data in mapData.data!) {
+          List<PointsModel> list = [];
+          final geometryData = data.geometry;
+          if (geometryData != null) {
+            list.addAll(
+              geometryData.coordinates.map((coord) => PointsModel(
+                    y: coord.latitude,
+                    x: coord.longitude,
+                    m: 0.0,
+                    z: 0.0,
+                  )),
+            );
+            routeLength++;
+          }
+          routes.add(list);
+        }
+      }
     }
     //  pointsList =  taskData.shapeData!.pointsList!;
-    if(pointsList.isNotEmpty){
+    if (pointsList.isNotEmpty) {
       startPoint = ArcGISPoint(x: pointsList[0].x, y: pointsList[0].y);
-      endPoint = ArcGISPoint(x: pointsList[pointsList.length-1].x, y: pointsList[pointsList.length-1].y);
+      endPoint = ArcGISPoint(
+          x: pointsList[pointsList.length - 1].x,
+          y: pointsList[pointsList.length - 1].y);
     } else {
       startPoint = ArcGISPoint(x: 0.0, y: 0.0);
     }
 
     if (taskData.taskStatus == TaskStatus.started ||
+        taskData.taskStatus == TaskStatus.resume ||
         taskData.taskStatus == TaskStatus.pause) {
       isStartPatrolling = true;
     } else {
@@ -113,10 +130,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       }
     }
 
-    if(mapData.data != null){
-      for(var sectionData in mapData.data!){
-        var routePointRes =  await MapHelper.fetchPointsDetails(sectionCode: sectionData.sectionCode);
-        if(routePointRes != null){
+    if (mapData.data != null) {
+      for (var sectionData in mapData.data!) {
+        var routePointRes = await MapHelper.fetchPointsDetails(
+            sectionCode: sectionData.sectionCode);
+        if (routePointRes != null) {
           routePointsList.add(routePointRes);
         }
       }
@@ -125,8 +143,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
   _selectMapType(SelectMapArcGISStreets event, emit) {
-      isArcGISStreets =  event.isArcGISStreets;
-      _eventComplete(emit);
+    isArcGISStreets = event.isArcGISStreets;
+    _eventComplete(emit);
   }
 
   _routeDirection(MapRouteDirection event, emit) async {
@@ -137,11 +155,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         ? taskData.assignedDate.toString()
         : DateTime.now().toString());
 
-    final List<TaskModel> tempList =  taskList.where((data) {
-        return data.taskStatus == TaskStatus.started &&
-            taskData.subTaskId != data.subTaskId;
+    final List<TaskModel> tempList = taskList.where((data) {
+      return data.taskStatus == TaskStatus.started &&
+          taskData.subTaskId != data.subTaskId;
     }).toList();
-
 
     if (dt1.compareTo(dt2) < 0) {
       SnackBarErrorWidget(event.context)
@@ -164,8 +181,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     _eventComplete(emit);
 
     var res = await MapHelper.fetchRoute(
-        startPoint: event.startPoint,
-        endPoint: event.endPoint);
+        startPoint: event.startPoint, endPoint: event.endPoint);
     if (res != null) {
       directionList = res;
     }
@@ -188,18 +204,20 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
 
     if (taskData.taskStatus == TaskStatus.started ||
+        taskData.taskStatus == TaskStatus.resume ||
         taskData.taskStatus == TaskStatus.pause) {
       isStartPatrolling = true;
-      isEndPatrolling =  true;
+      isEndPatrolling = true;
     } else {
       isStartPatrolling = false;
-      isEndPatrolling =  false;
+      isEndPatrolling = false;
     }
 
-    if(isStartPatrolling == false){
-      bool isBufferZone =  await MapHelper.getNearestLocation(currentLocation: points, routes: routes);
-      isStartPatrolling =  isBufferZone;
-      isEndPatrolling =  isBufferZone;
+    if (isStartPatrolling == false) {
+      bool isBufferZone = await MapHelper.getNearestLocation(
+          currentLocation: points, routes: routes);
+      isStartPatrolling = isBufferZone;
+      isEndPatrolling = isBufferZone;
       _eventComplete(emit);
     }
 
@@ -231,9 +249,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         ? taskData.assignedDate.toString()
         : DateTime.now().toString());
 
-    final List<TaskModel> tempList =  taskList.where((data) {
-             return data.taskStatus == TaskStatus.started &&
-                 taskData.subTaskId != data.subTaskId;
+    final List<TaskModel> tempList = taskList.where((data) {
+      return data.taskStatus == TaskStatus.started &&
+          taskData.subTaskId != data.subTaskId;
     }).toList();
 
     if (dt1.compareTo(dt2) < 0) {
@@ -263,15 +281,22 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             ? 1
             : taskStatus == TaskStatus.pause
                 ? 2
-                : taskStatus == TaskStatus.completed
-                    ? 3
-                    : 0,
-        context: event.context, pointsCount: routeLength);
+                : taskStatus == TaskStatus.resume
+                    ? 5
+                    : taskStatus == TaskStatus.completed
+                        ? 3
+                        : 0,
+        context: event.context,
+        pointsCount: routeLength);
     if (res != null) {
       taskData.taskStatus = taskStatus;
       isTaskStatusChange = true;
-      isStartPatrolling =  true;
-      isEndPatrolling =  (taskStatus == TaskStatus.pause || taskStatus == TaskStatus.started) ? true : false;
+      isStartPatrolling = true;
+      isEndPatrolling = (taskStatus == TaskStatus.pause ||
+              taskStatus == TaskStatus.started ||
+              taskStatus == TaskStatus.resume)
+          ? true
+          : false;
       BlocProvider.of<TaskBloc>(
               !event.context.mounted ? event.context : event.context)
           .add(TaskPagRefreshDataEvent(
@@ -283,17 +308,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   _eventComplete(Emitter<MapState> emit) {
     emit(FetchMapPageDataState(
-      isLoader: isLoader,
-      isNavigationBool: isNavigationBool,
-      isEndPatrolling: isEndPatrolling,
-      isTaskStatusChange: isTaskStatusChange,
-      mapList: mapList,
-      directionList: directionList,
-      taskData: taskData,
-      isStartPatrolling: isStartPatrolling,
-      markerList: markerList,
-      routes: routes,
-      isArcGISStreets: isArcGISStreets
-    ));
+        isLoader: isLoader,
+        isNavigationBool: isNavigationBool,
+        isEndPatrolling: isEndPatrolling,
+        isTaskStatusChange: isTaskStatusChange,
+        mapList: mapList,
+        directionList: directionList,
+        taskData: taskData,
+        isStartPatrolling: isStartPatrolling,
+        markerList: markerList,
+        routes: routes,
+        isArcGISStreets: isArcGISStreets));
   }
 }

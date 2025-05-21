@@ -60,5 +60,7 @@ class APIs {
 
   static get getEncroachmentTypeApi => "encroachment/types";
 
+  static get getConfigurationApi => "patrolling-surveillance/mis/configuration";
+
   static get forgotPasswordApi => "";
 }

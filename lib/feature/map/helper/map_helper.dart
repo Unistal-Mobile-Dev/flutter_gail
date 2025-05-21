@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/map/domain/model/configuration_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
@@ -29,6 +30,20 @@ class MapHelper {
         return MapModel.fromJson(res);
       }
     } catch (_) {}
+    return null;
+  }
+
+  static Future<dynamic> fetchConfiguration() async {
+    try {
+      String url = APIs.getConfigurationApi;
+      var res = await ServerRequest.getData(urlEndPoint: url);
+      if (res != null &&
+          res['success'] != null &&
+          res['success'] == true &&
+          res['config'] != null) {
+          return ConfigurationModel.fromJson(res['config']);
+      }
+    } catch (e) {}
     return null;
   }
 
@@ -245,15 +260,14 @@ class MapHelper {
   static Future<bool> getNearestLocation(
       {required ArcGISPoint currentLocation,
       required List<List<PointsModel>> routes}) async {
-
     double shortestDistance = 100;
 
-    for(var routeData in routes){
-      List<PointsModel> pointsList =  routeData;
-      for(var points in pointsList){
+    for (var routeData in routes) {
+      List<PointsModel> pointsList = routeData;
+      for (var points in pointsList) {
         double distance = calculateBearing(
             currentLocation.y, currentLocation.x, points.y, points.x);
-        if(distance < shortestDistance){
+        if (distance < shortestDistance) {
           print("Get Distance ===== $distance");
           return true;
         }
@@ -261,5 +275,4 @@ class MapHelper {
     }
     return false;
   }
-
 }

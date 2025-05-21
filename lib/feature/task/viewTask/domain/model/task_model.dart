@@ -35,6 +35,7 @@ class TaskModel {
   String? region;
   TaskStatus? taskStatus;
   ShapeModel? shapeData;
+  dynamic noOfPoints;
 
   TaskModel(
       {this.objectId,
@@ -54,7 +55,8 @@ class TaskModel {
         this.taskStatus,
         this.shapeData,
         this.sectionCode,
-        this.section
+        this.section,
+        this.noOfPoints,
       });
 
   TaskModel.fromJson(Map<String, dynamic> json) {
@@ -82,6 +84,7 @@ class TaskModel {
     updatedAt = json['updated_at'] ?? "";
     vendorName = json['vendor_name'] ?? "";
     region = json['region'] ?? "";
+    noOfPoints = json['noOfPoints'] ?? "";
     shapeData =  json['shape'] != null ? ShapeModel.fromJson(json['shape']) :  ShapeModel();
     taskStatus =  json['patrollman_status'] != null ? getTaskStatus(json['patrollman_status'].toString())
         :  json['status'] != null ? getTaskStatus(json['status'].toString())
@@ -98,6 +101,8 @@ class TaskModel {
         return TaskStatus.pause;
       case "3" :
         return TaskStatus.completed;
+      case "5" :
+        return TaskStatus.resume;
       default:
         return TaskStatus.notStarted;
     }

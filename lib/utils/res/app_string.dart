@@ -161,6 +161,8 @@ class AppString {
 
   static get start => "Start";
 
+  static get resume => "Resume";
+
 
 
   static get logoutMessage =>

@@ -570,7 +570,8 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
         label: TextWidget(
           dataSate.taskData.taskStatus == TaskStatus.notStarted ? AppString.start
           : dataSate.taskData.taskStatus == TaskStatus.started ? AppString.pause
-          : dataSate.taskData.taskStatus == TaskStatus.pause ? AppString.start : AppString.completed,
+              : dataSate.taskData.taskStatus == TaskStatus.pause ? AppString.resume
+              : dataSate.taskData.taskStatus == TaskStatus.resume ? AppString.pause : AppString.completed,
           color: AppColor.black,
           fontSize: AppFont.font_11,),
         icon: Icon(Icons.task_outlined, color: AppColor.themeColor,
@@ -588,7 +589,11 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           }
           else if(dataSate.taskData.taskStatus == TaskStatus.pause) {
             _mapViewController.locationDisplay.start();
-            taskStatus =  TaskStatus.started;
+            taskStatus =  TaskStatus.resume;
+          }
+          else if(dataSate.taskData.taskStatus == TaskStatus.resume) {
+            _mapViewController.locationDisplay.stop();
+            taskStatus =  TaskStatus.pause;
           }
           BlocProvider.of<MapBloc>(context).add(MapPageUpdateTaskEvent(
             context: context,
@@ -782,10 +787,15 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       _locationHistoryPointOverlay,
     ]);
 
-    DateTime _lastLocationUpdate = DateTime.now().subtract(const Duration(seconds: 30));
+    List<List<PointsModel>> routes =  BlocProvider.of<MapBloc>(context).routes;
+    MapModel mapData =  BlocProvider.of<MapBloc>(context).mapData;
+    double buffer =  double.parse(mapData.buffer.toString());
+    int timeInterval =  int.parse(mapData.timeInterval.toString());
+
+    DateTime _lastLocationUpdate = DateTime.now().subtract( Duration(seconds: timeInterval));
     _mapViewController.locationDisplay.onLocationChanged.listen((onData) {
       final now = DateTime.now();
-      if (now.difference(_lastLocationUpdate).inSeconds >= 30) {
+      if (now.difference(_lastLocationUpdate).inSeconds >= timeInterval) {
         _lastLocationUpdate = now;
         BlocProvider.of<MapBloc>(!context.mounted ? context : context).add(MapRouteLocationCheck(
           context: !context.mounted ? context : context,
@@ -799,9 +809,6 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       }
     });
 
-    List<List<PointsModel>> routes =  BlocProvider.of<MapBloc>(context).routes;
-    MapModel mapData =  BlocProvider.of<MapBloc>(context).mapData;
-    double buffer =  double.parse(mapData.buffer.toString());
     for(var routeData in routes){
       _startLocationDataSource(pointsLists: routeData, buffer: buffer);
     }
@@ -824,16 +831,6 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           ..angle = bearing
           ..angleAlignment =  SymbolAngleAlignment.arcGISMap
           ..height = 10;
-
-        /* ------- Arrow Icon for route line ------ */
-       // _stopsGraphicsOverlay.graphics.addAll([
-       //  Graphic(geometry: ArcGISPoint(
-       //    x: pointsList[1+i].x,
-       //    y: pointsList[1+i].y,
-       //    spatialReference: SpatialReference.wgs84,
-       //  ), symbol: routeStartPointMarker)
-       // ]);
-
       }
     }
 
@@ -856,7 +853,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     final routeLineSymbol1 = SimpleLineSymbol(
       style: SimpleLineSymbolStyle.solid,
       color: Colors.red.withOpacity(0.2),
-      width: buffer/2,
+      width: buffer,
 
     );
 

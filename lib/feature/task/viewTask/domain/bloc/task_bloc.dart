@@ -90,7 +90,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         }
         else if(tabIndex== 1){
           taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.started
-              || taskData.taskStatus == TaskStatus.pause ).toList();
+              || taskData.taskStatus == TaskStatus.pause  || taskData.taskStatus == TaskStatus.resume).toList();
         }
         else if(tabIndex == 2){
           taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed  ).toList();
@@ -109,7 +109,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     }
     else if(tabIndex== 1){
       taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.started
-          || taskData.taskStatus == TaskStatus.pause ).toList();
+          || taskData.taskStatus == TaskStatus.pause  || taskData.taskStatus == TaskStatus.resume).toList();
     }
     else if(tabIndex == 2){
       taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed  ).toList();
@@ -131,7 +131,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     }
     else if(tabIndex== 1){
       taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.started
-          || taskData.taskStatus == TaskStatus.pause ).toList();
+          || taskData.taskStatus == TaskStatus.pause  || taskData.taskStatus == TaskStatus.resume).toList();
     }
     else if(tabIndex == 2){
       taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed  ).toList();
