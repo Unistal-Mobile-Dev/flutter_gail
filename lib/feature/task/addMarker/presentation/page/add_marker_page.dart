@@ -121,7 +121,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
             }),
             TextWidget("Good", fontSize: AppFont.font_12,),
 
-            Radio(value: "2",
+            Radio(value: "Damaged",
                 groupValue: dataState.condition,
                 onChanged: (value) {
                   BlocProvider.of<AddMarkerBloc>(context)

@@ -13,9 +13,9 @@ class AddCrossingBloc extends Bloc<AddCrossingEvent, AddCrossingState> {
   bool isLoader =  false;
   List<CrossingTypeModel> crossingTypeList = [];
   CrossingTypeModel crossingTypeData =  CrossingTypeModel();
-  String warningMarker = "1";
-  String drainCondition = "1";
-  String bankCondition = "1";
+  String warningMarker = "Good";
+  String drainCondition = "Good";
+  String bankCondition = "Good";
   TextEditingController remarkController  =  TextEditingController();
   TaskModel taskData =  TaskModel();
   File cameraFile = File("");
@@ -38,9 +38,9 @@ class AddCrossingBloc extends Bloc<AddCrossingEvent, AddCrossingState> {
     isLoader =  false;
     crossingTypeList = [];
     crossingTypeData =  CrossingTypeModel();
-    warningMarker = "1";
-    drainCondition = "1";
-    bankCondition = "1";
+    warningMarker = "Good";
+    drainCondition = "Good";
+    bankCondition = "Good";
     remarkController.text = "";
     cameraFile = File("");
     videoFile = File("");

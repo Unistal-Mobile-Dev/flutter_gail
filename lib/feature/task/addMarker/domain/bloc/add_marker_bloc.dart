@@ -39,8 +39,8 @@ class AddMarkerBloc extends Bloc<AddMarkerEvent, AddMarkerState> {
     isLoader =  false;
     markerTypeList = [];
     markerTypeData =  MarkerTypeModel();
-    condition = "1";
-    painting = "1";
+    condition = "Good";
+    painting = "Good";
     remarkController.text = "";
     cameraFile = File("");
     videoFile = File("");
