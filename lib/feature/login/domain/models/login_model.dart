@@ -28,9 +28,9 @@ class LoginDataModel {
   LoginDataModel.fromJson(Map<String, dynamic> json) {
     name =  json['user_name'] ?? "";
     users = json['users'] != null ? Users.fromJson(json['users']) : null;
-    if (json['modules'] != null) {
+    if (json['group_roles'] != null) {
       modules = <Modules>[];
-      json['modules'].forEach((v) {
+      json['group_roles'].forEach((v) {
         modules!.add(Modules.fromJson(v));
       });
     }

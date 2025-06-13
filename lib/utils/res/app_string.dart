@@ -127,11 +127,19 @@ class AppString {
 
   static get incident => "Incident";
 
+  static get imageSharing => "Image Sharing";
+
   static get assigned => "Assigned";
 
   static get pipelineName => "Pipeline Name";
 
+  static get pipeline => "Pipeline";
+
   static get sectionName => "Section Name";
+
+  static get stationName => "Station Name";
+
+  static get sections => "Sections";
 
   static get patrolRouteName => "Patrol Route Name";
 
@@ -163,6 +171,15 @@ class AppString {
 
   static get resume => "Resume";
 
+  static get categoryName => "Category Name";
+
+  static get subCategoryName => "Sub Category Name";
+
+  static get title => "Title";
+
+  static get fromChainagem=> "From Chainage(m)";
+
+  static get toChainagem=> "To Chainage(m)";
 
 
   static get logoutMessage =>

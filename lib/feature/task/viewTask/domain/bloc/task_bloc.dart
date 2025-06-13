@@ -44,14 +44,16 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     startDate = DateTime.now().subtract(const Duration(days: 7));
     endDate =  DateTime.now();
     userData =  UserInfo.instance!.userData!;
-    for(var moduleData in userData.modules!) {
-       if(moduleData.permissionList != null){
-         for(var permissionData in moduleData.permissionList!){
-           if(permissionData.name.toString().toLowerCase() == "write"){
-             isAssignTask =  permissionData.value ?? false;
-           }
-         }
-       }
+    if(userData.modules != null){
+      for(var moduleData in userData.modules!) {
+        if(moduleData.permissionList != null){
+          for(var permissionData in moduleData.permissionList!){
+            if(permissionData.name.toString().toLowerCase() == "write"){
+              isAssignTask =  permissionData.value ?? false;
+            }
+          }
+        }
+      }
     }
 
     var res = await TaskHelper.fetchTask(startDate: startDate.toString(), endDate: endDate.toString());

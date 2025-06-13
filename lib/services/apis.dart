@@ -62,5 +62,13 @@ class APIs {
 
   static get getConfigurationApi => "patrolling-surveillance/mis/configuration";
 
+  static get getCategoryApi => "image-sharing/category";
+
+  static get getSubCategoryApi => "image-sharing/sub-category";
+
+  static get getPipelineApi => "common-apis/area-structure-sections-stations";
+
+  static get saveImageSharingApi => "image-sharing/summary";
+
   static get forgotPasswordApi => "";
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/imageShare/domain/bloc/image_share_bloc.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
@@ -28,6 +29,7 @@ MultiProvider blocMultiProvider({required Widget child}) {
        BlocProvider(create: (BuildContext context) => AddTaskBloc()),
        BlocProvider(create: (BuildContext context) => EncroachmentBloc()),
        BlocProvider(create: (BuildContext context) => DeviationBloc()),
+       BlocProvider(create: (BuildContext context) => ImageShareBloc()),
 
     ],
     child: child,

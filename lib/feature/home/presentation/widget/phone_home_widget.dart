@@ -24,15 +24,18 @@ class _PhoneHomeWidgetState extends State<PhoneHomeWidget> {
   @override
   Widget build(BuildContext context) {
     LoginDataModel userData = UserInfo.instanceInit()!.userData!;
-    for(var moduleData in userData.modules!) {
-      if(moduleData.permissionList != null && moduleData.moduleName.toString() == "pipeline_patrolling_suervielliance"){
-        for(var permissionData in moduleData.permissionList!){
-          if(permissionData.name.toString().toLowerCase() == "write"){
-            isAssignTask =  permissionData.value ?? false;
+    if(userData.modules != null){
+      for(var moduleData in userData.modules!) {
+        if(moduleData.permissionList != null && moduleData.moduleName.toString() == "pipeline_patrolling_suervielliance"){
+          for(var permissionData in moduleData.permissionList!){
+            if(permissionData.name.toString().toLowerCase() == "write"){
+              isAssignTask =  permissionData.value ?? false;
+            }
           }
         }
       }
     }
+
     return Scaffold(
         extendBodyBehindAppBar: true,
         key: scaffoldKey,
