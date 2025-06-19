@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/file_model.dart';
@@ -131,14 +133,14 @@ class ImageShareHelper extends ImageShareInterface {
 
       if (fromChainage.isEmpty) {
         SnackBarErrorWidget(context)
-            .show(message: "Please enter From Chainage");
+            .show(message: "Please enter Chainage");
         return false;
       }
 
-      if (toChainage.isEmpty) {
-        SnackBarErrorWidget(context).show(message: "Please enter To Chainage");
-        return false;
-      }
+      // if (toChainage.isEmpty) {
+      //   SnackBarErrorWidget(context).show(message: "Please enter To Chainage");
+      //   return false;
+      // }
 
       if (title.isEmpty) {
         SnackBarErrorWidget(context).show(message: "Please enter Title");
@@ -196,8 +198,8 @@ class ImageShareHelper extends ImageShareInterface {
          'stationName': stationData.name.toString(),
          'sectionCode': sectionData.sectionCode.toString(),
          'sectionName': sectionData.sectionName.toString(),
-         'fromChainage': fromChainage.toString(),
-         'toChainage': toChainage.toString(),
+         'sectionLength': sectionData.sectionLength.toString(),
+         'chainage': fromChainage.toString(),
          'imageStatus': 'Under Review',
          'categoryName': categoryData.name.toString(),
          'categoryCode': categoryData.code.toString(),
@@ -208,11 +210,8 @@ class ImageShareHelper extends ImageShareInterface {
          'uploadedDate': currentDate.toString()
        };
 
-       var body  =  {
-         "imageSummary" : json.toString(),
-       };
        var res =  await ServerRequest.postDataWithFile(urlEndPoint: url,
-           body: body, context: !context.mounted ? context :context, fileList: imageList);
+           body: json, context: !context.mounted ? context :context, fileList: imageList);
        if(res != null &&  res['message'] != null){
          SnackBarSuccessWidget(!context.mounted ? context :context).show(message: res['message'].toString());
          return res;

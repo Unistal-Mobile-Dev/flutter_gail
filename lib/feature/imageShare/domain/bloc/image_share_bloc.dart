@@ -160,7 +160,7 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
 
   _selectSection(SelectSectionEvent event, emit) async {
     sectionData = event.sectionData;
-    fromChainageController.text = sectionData.fromChainage.toString();
+    fromChainageController.text = "";
     toChainageController.text = sectionData.toChainage.toString();
     _eventCompleted(emit);
   }

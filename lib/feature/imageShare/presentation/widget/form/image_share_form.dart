@@ -27,9 +27,9 @@ class ImageShareForm extends StatelessWidget {
         _verticalSpace(context: context),
         _sectionDropDown(context: context),
         _verticalSpace(context: context),
-        _fromChainageController(),
+        _sectionNameController(),
         _verticalSpace(context: context),
-        _toChainageController(),
+        _fromChainageController(),
         _verticalSpace(context: context),
         _categoryDropDown(context: context),
         _verticalSpace(context: context),
@@ -54,7 +54,7 @@ class ImageShareForm extends StatelessWidget {
     return DropDownSearchWidget(
       isRequired: true,
       selectedItem:
-          dataState.regionData.name != null ? dataState.regionData : null,
+      dataState.regionData.name != null ? dataState.regionData : null,
       hint: AppString.region,
       items: dataState.regionList,
       itemAsString: (regionData) => regionData.name.toString(),
@@ -68,38 +68,40 @@ class ImageShareForm extends StatelessWidget {
   Widget _maintenanceBaseDropDown({required BuildContext context}) {
     return dataState.isMaintenanceLoader == false
         ? DropDownSearchWidget(
-            isRequired: true,
-            selectedItem: dataState.maintenanceBaseData.name != null
-                ? dataState.maintenanceBaseData
-                : null,
-            hint: AppString.maintenanceBase,
-            items: dataState.maintenanceBaseList,
-            itemAsString: (maintenanceBaseData) =>
-                maintenanceBaseData.name.toString(),
-            onChanged: (value) {
-              BlocProvider.of<ImageShareBloc>(context)
-                  .add(SelectMaintenanceBaseEvent(maintenanceBaseData: value));
-            },
-          )
+      isRequired: true,
+      selectedItem: dataState.maintenanceBaseData.name != null
+          ? dataState.maintenanceBaseData
+          : null,
+      hint: AppString.maintenanceBase,
+      items: dataState.maintenanceBaseList,
+      itemAsString: (maintenanceBaseData) =>
+          maintenanceBaseData.name.toString(),
+      onChanged: (value) {
+        BlocProvider.of<ImageShareBloc>(context)
+            .add(SelectMaintenanceBaseEvent(maintenanceBaseData: value));
+      },
+    )
         : const DottedLoaderWidget();
   }
 
   Widget _pipelineDropDown({required BuildContext context}) {
     return dataState.isPipelineLoader == false
         ? DropDownSearchWidget(
-            isRequired: true,
-            selectedItem: dataState.pipelineData.pipelineCode != null
-                ? dataState.pipelineData
-                : null,
-            hint: AppString.pipeline,
-            items: dataState.pipelineList,
-            itemAsString: (pipelineData) =>
-                "${pipelineData.pipelineCode.toString()}-${pipelineData.pipelineName.toString()}",
-            onChanged: (value) {
-              BlocProvider.of<ImageShareBloc>(context)
-                  .add(SelectPipelineEvent(pipelineImageShareData: value)); // pipelineName
-            },
-          )
+      isRequired: true,
+      selectedItem: dataState.pipelineData.pipelineCode != null
+          ? dataState.pipelineData
+          : null,
+      hint: AppString.pipeline,
+      items: dataState.pipelineList,
+      itemAsString: (pipelineData) =>
+      "${pipelineData.pipelineCode.toString()}-${pipelineData.pipelineName
+          .toString()}",
+      onChanged: (value) {
+        BlocProvider.of<ImageShareBloc>(context)
+            .add(
+            SelectPipelineEvent(pipelineImageShareData: value)); // pipelineName
+      },
+    )
         : const DottedLoaderWidget();
   }
 
@@ -107,7 +109,7 @@ class ImageShareForm extends StatelessWidget {
     return DropDownSearchWidget(
       isRequired: true,
       selectedItem:
-          dataState.stationData.name != null ? dataState.stationData : null,
+      dataState.stationData.name != null ? dataState.stationData : null,
       hint: AppString.stationName,
       items: dataState.stationList,
       itemAsString: (stationData) => stationData.name.toString(),
@@ -134,12 +136,23 @@ class ImageShareForm extends StatelessWidget {
     );
   }
 
+  Widget _sectionNameController() {
+    TextEditingController controller = TextEditingController(
+        text: dataState.sectionData.sectionName != null ? dataState.sectionData.sectionLength.
+        toString() : "");
+    return TextFieldWidget(
+    labelText: AppString.sectionLength,
+    controller: controller,
+    isRequired: true,
+    enabled: false );
+    }
+
   Widget _fromChainageController() {
     return TextFieldWidget(
-      labelText: AppString.fromChainagem,
+      labelText: AppString.chainage,
       controller: dataState.fromChainageController,
       isRequired: true,
-      enabled: false,
+      textInputType: TextInputType.number,
     );
   }
 
@@ -156,7 +169,7 @@ class ImageShareForm extends StatelessWidget {
     return DropDownSearchWidget(
       isRequired: true,
       selectedItem:
-          dataState.categoryData.name != null ? dataState.categoryData : null,
+      dataState.categoryData.name != null ? dataState.categoryData : null,
       hint: AppString.categoryName,
       items: dataState.categoryList,
       itemAsString: (categoryData) => categoryData.name.toString(),
@@ -201,17 +214,20 @@ class ImageShareForm extends StatelessWidget {
   Widget _buttonWidget({required BuildContext context}) {
     return dataState.isLoader == false
         ? ButtonWidget(
-            text: AppString.submit,
-            onPressed: () {
-              BlocProvider.of<ImageShareBloc>(context)
-                  .add(ImageShareSubmitEvent(context: context));
-            })
+        text: AppString.submit,
+        onPressed: () {
+          BlocProvider.of<ImageShareBloc>(context)
+              .add(ImageShareSubmitEvent(context: context));
+        })
         : const DottedLoaderWidget();
   }
 
   Widget _imageWidget({required BuildContext context}) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width / 4,
+      width: MediaQuery
+          .of(context)
+          .size
+          .width / 4,
       child: DottedBorder(
         child: Padding(
           padding: const EdgeInsets.all(10.0),
@@ -257,8 +273,14 @@ class ImageShareForm extends StatelessWidget {
         ),
         itemBuilder: (context, index) {
           return SizedBox(
-            width: MediaQuery.of(context).size.width / 4,
-            height: MediaQuery.of(context).size.width / 4,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width / 4,
+            height: MediaQuery
+                .of(context)
+                .size
+                .width / 4,
             child: Stack(
               children: [
                 ClipRRect(
@@ -301,6 +323,9 @@ class ImageShareForm extends StatelessWidget {
   }
 
   Widget _verticalSpace({required BuildContext context}) {
-    return SizedBox(height: MediaQuery.of(context).size.width * 0.05);
+    return SizedBox(height: MediaQuery
+        .of(context)
+        .size
+        .width * 0.05);
   }
 }

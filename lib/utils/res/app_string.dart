@@ -139,6 +139,8 @@ class AppString {
 
   static get stationName => "Station Name";
 
+  static get sectionLength => "Section Length";
+
   static get sections => "Sections";
 
   static get patrolRouteName => "Patrol Route Name";
@@ -180,6 +182,8 @@ class AppString {
   static get fromChainagem=> "From Chainage(m)";
 
   static get toChainagem=> "To Chainage(m)";
+
+  static get chainage => "Chainage";
 
 
   static get logoutMessage =>

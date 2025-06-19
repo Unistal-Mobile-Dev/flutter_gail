@@ -7,6 +7,7 @@ List<SectionImageShareModel> sectionImageShareListResponse(var json) {
 class SectionImageShareModel {
   String? sectionCode;
   String? sectionName;
+  dynamic sectionLength;
   dynamic fromChainage;
   dynamic toChainage;
   List<StationModel>? stationList;
@@ -15,6 +16,7 @@ class SectionImageShareModel {
   SectionImageShareModel({this.fromChainage,
     this.sectionCode,
     this.sectionName,
+    this.sectionLength,
     this.toChainage,
     this.stationList,
   });
@@ -24,6 +26,7 @@ class SectionImageShareModel {
     return SectionImageShareModel(
         sectionCode: json['sectionCode'] ?? "",
         sectionName: json['sectionName'] ?? "",
+        sectionLength: json['sectionLength'] ?? "",
         fromChainage: json['fromChainage'] ?? "",
         toChainage: json['toChainage'] ?? "",
         stationList: json['stations'] != null
