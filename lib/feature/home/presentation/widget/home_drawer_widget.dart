@@ -14,8 +14,25 @@ class HomeDrawerWidget extends StatelessWidget {
 
   LoginDataModel get userData => _userData;
 
+  bool isImageSharing =  false;
+
   @override
   Widget build(BuildContext context) {
+
+    LoginDataModel userData = UserInfo.instanceInit()!.userData!;
+    if(userData.modules != null){
+      for(var moduleData in userData.modules!) {
+        if(moduleData.permissionList != null && moduleData.moduleName.toString() == "image_sharing"){
+           isImageSharing =  true;
+          // for(var permissionData in moduleData.permissionList!){
+          //   if(permissionData.name.toString().toLowerCase() == "write"){
+          //     isImageSharing =  permissionData.value ?? false;
+          //   }
+          // }
+        }
+      }
+    }
+
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, state) {
         if (state is FetchHomeDataState) {
@@ -44,7 +61,10 @@ class HomeDrawerWidget extends StatelessWidget {
                   ),
                   _listBuilder(dataState: state),
                   _incident(context: context),
-                  _imageSharing(context: context),
+
+                  isImageSharing == true
+                      ? _imageSharing(context: context)
+                      : const SizedBox.shrink(),
                   _logout(context: context),
                 ],
               ),
