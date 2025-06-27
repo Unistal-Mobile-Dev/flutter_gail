@@ -800,10 +800,10 @@ packages:
     dependency: "direct main"
     description:
       name: geolocator
-      sha256: "0ec58b731776bc43097fcf751f79681b6a8f6d3bc737c94779fe9f1ad73c1a81"
+      sha256: f62bcd90459e63210bbf9c35deb6a51c521f992a78de19a1fe5c11704f9530e2
       url: "https://pub.dev"
     source: hosted
-    version: "13.0.1"
+    version: "13.0.4"
   geolocator_android:
     dependency: transitive
     description:
@@ -816,10 +816,10 @@ packages:
     dependency: transitive
     description:
       name: geolocator_apple
-      sha256: bc2aca02423ad429cb0556121f56e60360a2b7d694c8570301d06ea0c00732fd
+      sha256: dbdd8789d5aaf14cf69f74d4925ad1336b4433a6efdf2fce91e8955dc921bf22
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.7"
+    version: "2.3.13"
   geolocator_platform_interface:
     dependency: transitive
     description:
@@ -832,18 +832,18 @@ packages:
     dependency: transitive
     description:
       name: geolocator_web
-      sha256: "2ed69328e05cd94e7eb48bb0535f5fc0c0c44d1c4fa1e9737267484d05c29b5e"
+      sha256: b1ae9bdfd90f861fde8fd4f209c37b953d65e92823cb73c7dee1fa021b06f172
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.1"
+    version: "4.1.3"
   geolocator_windows:
     dependency: transitive
     description:
       name: geolocator_windows
-      sha256: "53da08937d07c24b0d9952eb57a3b474e29aae2abf9dd717f7e1230995f13f0e"
+      sha256: "175435404d20278ffd220de83c2ca293b73db95eafbdc8131fe8609be1421eb6"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.3"
+    version: "0.2.5"
   get_it:
     dependency: "direct main"
     description:
@@ -1496,58 +1496,66 @@ packages:
     dependency: "direct main"
     description:
       name: record
-      sha256: "4a5cf4d083d1ee49e0878823c4397d073f8eb0a775f31215d388e2bc47a9e867"
+      sha256: daeb3f9b3fea9797094433fe6e49a879d8e4ca4207740bc6dc7e4a58764f0817
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.2"
+    version: "6.0.0"
   record_android:
     dependency: transitive
     description:
       name: record_android
-      sha256: d7af0b3119725a0f561817c72b5f5eca4d7a76d441deef519ae04e4824c0734c
+      sha256: "97d7122455f30de89a01c6c244c839085be6b12abca251fc0e78f67fed73628b"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.6"
-  record_darwin:
+    version: "1.3.3"
+  record_ios:
     dependency: transitive
     description:
-      name: record_darwin
-      sha256: fe90d302acb1f3cee1ade5df9c150ca5cee33b48d8cdf1cf433bf577d7f00134
+      name: record_ios
+      sha256: "73706ebbece6150654c9d6f57897cf9b622c581148304132ba85dba15df0fdfb"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.2"
+    version: "1.0.0"
   record_linux:
     dependency: transitive
     description:
       name: record_linux
-      sha256: "74d41a9ebb1eb498a38e9a813dd524e8f0b4fdd627270bda9756f437b110a3e3"
+      sha256: "0626678a092c75ce6af1e32fe7fd1dea709b92d308bc8e3b6d6348e2430beb95"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.2"
+    version: "1.1.1"
+  record_macos:
+    dependency: transitive
+    description:
+      name: record_macos
+      sha256: "02240833fde16c33fcf2c589f3e08d4394b704761b4a3bb609d872ff3043fbbd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   record_platform_interface:
     dependency: transitive
     description:
       name: record_platform_interface
-      sha256: "11f8b03ea8a0e279b0e306571dbe0db0202c0b8e866495c9fa1ad2281d5e4c15"
+      sha256: c1ad38f51e4af88a085b3e792a22c685cb3e7c23fc37aa7ce44c4cf18f25fe89
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.3.0"
   record_web:
     dependency: transitive
     description:
       name: record_web
-      sha256: "656b7a865f90651fab997c2a563364f5fd60a0b527d5dadbb915d62d84fc3867"
+      sha256: "024c81eb7f51468b1833a3eca8b461c7ca25c04899dba37abe580bb57afd32e4"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.3"
+    version: "1.1.8"
   record_windows:
     dependency: transitive
     description:
       name: record_windows
-      sha256: e653555aa3fda168aded7c34e11bd82baf0c6ac84e7624553def3c77ffefd36f
+      sha256: "85a22fc97f6d73ecd67c8ba5f2f472b74ef1d906f795b7970f771a0914167e99"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.3"
+    version: "1.0.6"
   sanitize_html:
     dependency: transitive
     description:

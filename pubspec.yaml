@@ -53,7 +53,7 @@ dependencies:
   video_compress: ^3.1.2
   google_maps_flutter: ^2.6.1
   google_maps_polyline: ^1.0.3
-  record: ^5.1.2
+  record: ^6.0.0
   pdf: ^3.11.1
   open_file: ^3.5.8
   battery_plus: ^6.2.0
