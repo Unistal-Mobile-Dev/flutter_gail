@@ -185,6 +185,8 @@ class AppString {
 
   static get chainage => "Chainage";
 
+  static get task => "Task";
+
 
   static get logoutMessage =>
       "Are you sure you want to logout? Once you logout, you will be return to login screen";

@@ -23,18 +23,14 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: TextWidget("Add Incident",
-        fontSize: AppFont.font_16, color: AppColor.white,),),
-      body: BlocBuilder<AddIncidentBloc, AddIncidentState>(
-        builder: (context, state) {
-          if(state is FetchAddIncidentDataState){
-            return _itemBuilder(dataState: state);
-          } else {
-            return const Center(child: CenterLoaderWidget());
-          }
-        },
-      ),
+    return BlocBuilder<AddIncidentBloc, AddIncidentState>(
+      builder: (context, state) {
+        if(state is FetchAddIncidentDataState){
+          return _itemBuilder(dataState: state);
+        } else {
+          return const Center(child: CenterLoaderWidget());
+        }
+      },
     );
   }
 

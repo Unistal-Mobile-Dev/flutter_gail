@@ -4,6 +4,7 @@ import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
 import 'package:flutter_gail/feature/map/presentation/page/map_page.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
 import 'package:flutter_gail/feature/task/addMarker/domain/bloc/add_marker_bloc.dart';
+import 'package:flutter_gail/feature/task/createTask/presentation/page/create_task_page.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/presentation/widget/tab_item.dart';
@@ -11,7 +12,8 @@ import 'package:flutter_gail/feature/task/viewTask/presentation/widget/task_item
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
 
 class TaskPage extends StatefulWidget {
-  const TaskPage({super.key});
+  final bool isAssignTask;
+  const TaskPage({super.key, required this.isAssignTask});
 
   @override
   State<TaskPage> createState() => _TaskPageState();
@@ -46,43 +48,52 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
   }
 
   Widget _tabView({required FetchTaskDataState dataState}) {
-    return Column(
+    return Stack(
       children: [
-        Container(
-          color: Colors.grey[200],
-          height: 40,
-          child: TabBar(
-            controller: _tabController,
-            indicatorSize: TabBarIndicatorSize.tab,
-            dividerColor: Colors.transparent,
-            indicator:  BoxDecoration(
-              color: AppColor.themeColor,
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
+        widget.isAssignTask == true ?
+        Positioned(
+            bottom: 20,
+            right: 20,
+            child: _addFloatingButton()) : const SizedBox.shrink(),
+        Column(
+          children: [
+            Container(
+              color: Colors.grey[200],
+              height: 40,
+              child: TabBar(
+                controller: _tabController,
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                indicator:  BoxDecoration(
+                  color: AppColor.themeColor,
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                ),
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.black54,
+                tabs:  [
+                  TabItem(title: AppString.assigned, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList().length),
+                  TabItem(title: AppString.onGoing, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.started
+                      || taskData.taskStatus == TaskStatus.pause).toList().length),
+                  TabItem(title: AppString.completed, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed).toList().length),
+                ],
+                onTap: (index) {
+                  BlocProvider.of<TaskBloc>(context)
+                      .add(TaskTabIndexEvent(tabIndex: index));
+                },
+              ),),
+            // tab bar view here
+            Expanded(
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: _tabController,
+                children:  [
+                  _itemWidget(dataState: dataState),
+                  _itemWidget(dataState: dataState),
+                  _itemWidget(dataState: dataState),
+                ],
+              ),
             ),
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.black54,
-            tabs:  [
-              TabItem(title: AppString.assigned, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList().length),
-              TabItem(title: AppString.onGoing, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.started
-                  || taskData.taskStatus == TaskStatus.pause).toList().length),
-              TabItem(title: AppString.completed, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed).toList().length),
-            ],
-            onTap: (index) {
-              BlocProvider.of<TaskBloc>(context)
-                  .add(TaskTabIndexEvent(tabIndex: index));
-            },
-          ),),
-        // tab bar view here
-        Expanded(
-          child: TabBarView(
-            physics: const NeverScrollableScrollPhysics(),
-            controller: _tabController,
-            children:  [
-              _itemWidget(dataState: dataState),
-              _itemWidget(dataState: dataState),
-              _itemWidget(dataState: dataState),
-            ],
-          ),
+          ],
         ),
       ],
     );
@@ -119,6 +130,18 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
     await Future.delayed(const Duration(seconds: 1));
     BlocProvider.of<TaskBloc>(!context.mounted ? context : context)
         .add(TaskPagRefreshDataEvent(context: !context.mounted ? context : context));
+  }
+
+  Widget _addFloatingButton() {
+    return FloatingActionButton(
+      onPressed: () {
+        Navigator.push(
+          !context.mounted ? context : context,
+          FadeRoute(page: const CreateTaskPage()),
+        );
+      },
+      child: const Icon(Icons.add),
+    );
   }
 
 }

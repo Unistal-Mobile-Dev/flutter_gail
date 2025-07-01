@@ -64,6 +64,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   HomeBloc() : super(HomeInitial()) {
     on<HomePageLoadEvent>(_pageLoad);
+    on<SelectWidgetHomeEvent>(_selectWidget);
     on<HomeDrawerItemSelectedEvent>(_drawerItemSelected);
     on<HomeDrawerItemSubListSelectedEvent>(_drawerSublistSelected);
     on<HomeChangeBottomNavigationItemEvent>(_changeBottomNavigationBarIndex);
@@ -79,6 +80,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _pageWidgetList = [];
     FirebaseService.instance.setupInteractedMessage();
     _childWidget = const DashboardPage();
+    _title = "Dashboard";
     _actionButtonWidget = const SizedBox.shrink();
 
     String notificationSilent = await SharedPreferencesUtils.getString(key: PreferencesName.notificationSilent);
@@ -88,20 +90,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       isNotificationSilent =  false;
     }
 
-    _drawerList = await HomeHelper.fetchDrawerList(
-        context: !event.context.mounted ? event.context : event.context);
-    _bottomNavigationBarItemList = await HomeHelper.fetchAppBottomBarItems(
-        context: !event.context.mounted ? event.context : event.context);
-    List<Widget> pageList = await HomeHelper.fetchPageList();
-    if (pageList.isNotEmpty) {
-      _childWidget = pageList[bottomTabIndex];
-    }
-    
     await LoginHelper.addDevice(userId: userData.users!.id.toString(),
         context: !event.context.mounted ? event.context : event.context);
     
     _eventCompleted(emit);
 
+  }
+
+  _selectWidget(SelectWidgetHomeEvent event, emit) {
+    _childWidget =  event.widget;
+    _title =  event.title;
+    _eventCompleted(emit);
   }
 
   _drawerItemSelected(HomeDrawerItemSelectedEvent event, emit) async {

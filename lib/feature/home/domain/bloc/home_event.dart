@@ -13,6 +13,15 @@ class HomePageLoadEvent extends HomeEvent {
   List<Object?> get props => [context];
 }
 
+class SelectWidgetHomeEvent extends HomeEvent {
+  final Widget widget;
+  final String title;
+  const SelectWidgetHomeEvent({required this.widget, required this.title});
+
+  @override
+  List<Object?> get props => [widget, title];
+}
+
 class HomePageRefreshEvent extends HomeEvent {
   final BuildContext context;
 

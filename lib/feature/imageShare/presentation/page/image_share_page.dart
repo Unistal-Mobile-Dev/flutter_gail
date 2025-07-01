@@ -23,18 +23,14 @@ class _ImageSharePageState extends State<ImageSharePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: TextWidget(AppString.imageSharing,
-        fontSize: AppFont.font_16, color: AppColor.white,),),
-      body: BlocBuilder<ImageShareBloc, ImageShareState>(
-        builder: (context, state) {
-          if(state is FetchImageShareDataState) {
-             return _itemBuilder(dataState: state);
-          } else {
-            return const Center(child: CenterLoaderWidget());
-          }
-        },
-      ),
+    return BlocBuilder<ImageShareBloc, ImageShareState>(
+      builder: (context, state) {
+        if(state is FetchImageShareDataState) {
+          return _itemBuilder(dataState: state);
+        } else {
+          return const Center(child: CenterLoaderWidget());
+        }
+      },
     );
   }
 

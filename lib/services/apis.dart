@@ -70,5 +70,7 @@ class APIs {
 
   static get saveImageSharingApi => "image-sharing/summary";
 
+  static get dashboardSummaryApi => "dashboard/summary";
+
   static get forgotPasswordApi => "";
 }

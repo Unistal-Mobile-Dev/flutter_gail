@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/dashboard/presentation/page/dashboard_page.dart';
 import 'package:flutter_gail/feature/home/domain/model/drawer_model.dart';
 import 'package:flutter_gail/feature/home/presentation/widget/logout_widget.dart';
 import 'package:flutter_gail/feature/imageShare/presentation/page/image_share_page.dart';
 import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
+import 'package:flutter_gail/feature/task/viewTask/presentation/page/task_page.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
 
@@ -14,21 +16,27 @@ class HomeDrawerWidget extends StatelessWidget {
 
   LoginDataModel get userData => _userData;
 
-  bool isImageSharing =  false;
+  bool isImageSharing = false;
+  bool isAssignTask = false;
 
   @override
   Widget build(BuildContext context) {
-
     LoginDataModel userData = UserInfo.instanceInit()!.userData!;
-    if(userData.modules != null){
-      for(var moduleData in userData.modules!) {
-        if(moduleData.permissionList != null && moduleData.moduleName.toString() == "image_sharing"){
-           isImageSharing =  true;
-          // for(var permissionData in moduleData.permissionList!){
-          //   if(permissionData.name.toString().toLowerCase() == "write"){
-          //     isImageSharing =  permissionData.value ?? false;
-          //   }
-          // }
+    if (userData.modules != null) {
+      for (var moduleData in userData.modules!) {
+        if (moduleData.permissionList != null &&
+            moduleData.moduleName.toString() == "image_sharing") {
+          isImageSharing = true;
+        }
+
+        if (moduleData.permissionList != null &&
+            moduleData.moduleName.toString() ==
+                "pipeline_patrolling_suervielliance") {
+          for (var permissionData in moduleData.permissionList!) {
+            if (permissionData.name.toString().toLowerCase() == "write") {
+              isAssignTask = permissionData.value ?? false;
+            }
+          }
         }
       }
     }
@@ -59,9 +67,9 @@ class HomeDrawerWidget extends StatelessWidget {
                   SizedBox(
                     height: MediaQuery.of(context).size.width * 0.10,
                   ),
-                  _listBuilder(dataState: state),
+                  _dashboard(context: context),
+                  _task(context: context),
                   _incident(context: context),
-
                   isImageSharing == true
                       ? _imageSharing(context: context)
                       : const SizedBox.shrink(),
@@ -259,6 +267,86 @@ class HomeDrawerWidget extends StatelessWidget {
     );
   }
 
+  Widget _dashboard({required BuildContext context}) {
+    return Padding(
+      padding: EdgeInsets.only(
+          top: MediaQuery.of(context).size.width * 0.02,
+          bottom: MediaQuery.of(context).size.width * 0.02),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+          BlocProvider.of<HomeBloc>(context)
+              .add(SelectWidgetHomeEvent(widget: const DashboardPage(), title: AppString.dashboard));
+        },
+        child: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                // color: Colors.white.withOpacity(.2),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(7.0),
+                child: Icon(
+                  Icons.home_outlined,
+                  color: AppColor.white,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.02,
+            ),
+            TextWidget(
+              AppString.dashboard,
+              fontSize: AppFont.font_14,
+              color: AppColor.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _task({required BuildContext context}) {
+    return Padding(
+      padding: EdgeInsets.only(
+          top: MediaQuery.of(context).size.width * 0.02,
+          bottom: MediaQuery.of(context).size.width * 0.02),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
+              widget: TaskPage(isAssignTask: isAssignTask), title: AppString.task));
+        },
+        child: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                // color: Colors.white.withOpacity(.2),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(7.0),
+                child: Icon(
+                  Icons.task_outlined,
+                  color: AppColor.white,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.02,
+            ),
+            TextWidget(
+              AppString.task,
+              fontSize: AppFont.font_14,
+              color: AppColor.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _incident({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
@@ -267,11 +355,8 @@ class HomeDrawerWidget extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          Navigator.push(
-            !context.mounted ? context : context,
-            FadeRoute(
-                page: const AddIncidentPage()),
-          );
+          BlocProvider.of<HomeBloc>(context).add( SelectWidgetHomeEvent(
+              widget: const AddIncidentPage(), title: AppString.incident));
         },
         child: Row(
           children: [
@@ -310,11 +395,8 @@ class HomeDrawerWidget extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          Navigator.push(
-            !context.mounted ? context : context,
-            FadeRoute(
-                page: const ImageSharePage()),
-          );
+          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
+              widget: const ImageSharePage(), title: AppString.imageSharing));
         },
         child: Row(
           children: [
@@ -344,7 +426,6 @@ class HomeDrawerWidget extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _logout({required BuildContext context}) {
     return Padding(

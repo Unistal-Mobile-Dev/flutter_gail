@@ -15,6 +15,10 @@ class DashboardPageLoadState extends DashboardInitial {
 }
 
 class FetchDashboardDataState extends DashboardInitial {
+  final bool isLoader;
+  final List<PipelineSection> listOfPipelineSection;
+
+  FetchDashboardDataState({required this.isLoader, required this.listOfPipelineSection});
   @override
-  List<Object> get props => [];
+  List<Object> get props => [isLoader, listOfPipelineSection];
 }

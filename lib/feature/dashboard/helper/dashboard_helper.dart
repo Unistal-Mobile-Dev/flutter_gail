@@ -1,7 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/dashboard/domain/model/PipelineSection.dart';
 
 class DashboardHelper {
+
+  static Future<dynamic> getSummaryApi() async {
+    try {
+       String url =  APIs.dashboardSummaryApi;
+       var res =  await ServerRequest.getData(urlEndPoint: url);
+       if(res != null){
+         return pipelineSectionListResponse(res);
+       }
+    } catch (_) {}
+    return null;
+  }
+
   static Future<dynamic> imagePiker({required BuildContext context}) async {
     try {
       final ImagePicker picker = ImagePicker();

@@ -11,7 +11,6 @@ export 'package:flutter_gail/ExportFile/app_export_file.dart';
 export 'package:flutter_gail/feature/dashboard/domain/bloc/dashboard_bloc.dart';
 export 'package:flutter_gail/feature/dashboard/helper/dashboard_helper.dart';
 export 'package:flutter_gail/feature/dashboard/presentation/widget/phone_dashboard_widget.dart';
-export 'package:flutter_gail/feature/dashboard/presentation/widget/tablet_dashboard_widget.dart';
 export 'package:flutter_gail/feature/home/domain/bloc/home_bloc.dart';
 export 'package:flutter_gail/feature/login/domain/bloc/login_bloc.dart';
 export 'package:flutter_gail/feature/login/domain/models/login_model.dart';
