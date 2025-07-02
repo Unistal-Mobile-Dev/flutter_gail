@@ -14,71 +14,58 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   List<PipelineSection> listOfPipelineSection = [];
   List<PipelineStatus> pipelineStatuses = [];
   List<CpSystemStatus> cpSystemStatuses = [];
+  Map<String, int> lengthPiggabilty = {};
   List<MapEntry<String, Map<String, double>>> pieChartList = [];
 
   DashboardBloc() : super(DashboardInitial()) {
     on<DashboardPageLoadEvent>(_pageLoad);
   }
 
-
-
   _pageLoad(DashboardPageLoadEvent event, emit) async {
-    isLoader =  false;
-    var resPipe = await DashboardHelper.getPipelineSummaryApi(context: event.context);
-    if(resPipe != null){
+    isLoader = false;
+    lengthPiggabilty = {};
+    var resPipe =
+        await DashboardHelper.getPipelineSummaryApi(context: event.context);
+    if (resPipe != null) {
       pipelineStatuses = resPipe.pipelineStatuses;
       cpSystemStatuses = resPipe.cpSystemStatuses;
       pieChartList = [
         MapEntry("Pipeline Status", {
-          for (var e in pipelineStatuses) e.pipelineStatus: e.statusCount.toDouble()
+          for (var e in pipelineStatuses)
+            e.pipelineStatus: e.statusCount.toDouble()
         }),
         MapEntry("CP System Status", {
-          for (var e in cpSystemStatuses) e.pipelineStatus: e.statusCount.toDouble()
+          for (var e in cpSystemStatuses)
+            e.pipelineStatus: e.statusCount.toDouble()
         }),
       ];
-
     }
-    await  _fetchSummary(context: event.context);
+
+    final result =
+        await DashboardHelper.getPipelineMasterApi(context: event.context);
+    if (result != null) {
+      lengthPiggabilty = result.length;
+      pieChartList.addAll([
+        MapEntry(
+          "Piggability",
+          result.piggabilityCountMap.map((k, v) => MapEntry(k, v.toDouble())),
+        ),
+      ]);
+    }
+
+    var res = await DashboardHelper.getSummaryApi();
+    if (res != null) {
+      listOfPipelineSection = res;
+    }
     _eventCompleted(emit);
   }
 
-
-  _fetchSummary({required BuildContext context}) async {
-    var res = await DashboardHelper.getSummaryApi();
-
-    if (res != null) {
-      listOfPipelineSection = res;
-
-      double piggable = 0;
-      double unpiggable = 0;
-
-      for (var data in listOfPipelineSection) {
-        final int pigTotal = data.piggingNd + data.piggingDue + data.piggingOverdue;
-
-        if (pigTotal > 0) {
-          piggable += pigTotal;
-        } else {
-          unpiggable += 1;
-        }
-      }
-
-      final Map<String, double> piggingMap = {
-        "Piggable": piggable,
-        "Unpiggable": unpiggable,
-      };
-      final total = piggable + unpiggable;
-      print("total--->${total.toString().length}");
-      pieChartList.add(MapEntry("Pigging Status (Total: $total)", piggingMap));
-
-    }
-  }
-
-
   _eventCompleted(Emitter<DashboardState> emit) {
     emit(FetchDashboardDataState(
-        isLoader: isLoader,
-        listOfPipelineSection: listOfPipelineSection,
-        pieChartList: pieChartList,
+      isLoader: isLoader,
+      listOfPipelineSection: listOfPipelineSection,
+      pieChartList: pieChartList,
+      lengthPiggabilty: lengthPiggabilty,
     ));
-}
+  }
 }

@@ -43,7 +43,8 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  _buildLayout({required FetchDashboardDataState dataState}) {
+  Widget _buildLayout({required FetchDashboardDataState dataState}) {
+
     int totalCpUnderProtection = 0;
     int totalShortedCasingElectrical = 0;
     int totalAcInterference = 0;
@@ -91,7 +92,6 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     return ListView(
-      padding: EdgeInsets.zero,
       children: [
         Padding(
           padding: const EdgeInsets.all(8),
@@ -124,7 +124,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                "$chartTitle (Total: ${total.toStringAsFixed(0)} km)",
+                                chartTitle,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   color: Colors.white,
@@ -163,15 +163,12 @@ class _DashboardPageState extends State<DashboardPage> {
                             ),
 
                             const SizedBox(height: 16),
-
-                            // Legends
                             Wrap(
                               alignment: WrapAlignment.start,
                               children: dataMap.entries.toList().asMap().entries.map((entry) {
                                 final i = entry.key;
                                 final label = entry.value.key;
                                 final value = entry.value.value;
-
                                 return Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -184,6 +181,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                       ),
                                     ),
                                     const SizedBox(width: 4),
+                                    chartTitle == "Piggability" ? Text('$label: ${value.toStringAsFixed(0)}, Length: ${dataState.lengthPiggabilty[label]} km'):
                                     Text('$label: ${value.toStringAsFixed(0)} km'),
                                   ],
                                 );

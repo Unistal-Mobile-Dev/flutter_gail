@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/dashboard/domain/model/PiggabilityDataModel.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineMasterModel.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineSection.dart';
 
@@ -40,6 +41,26 @@ class DashboardHelper {
     return null;
   }
 
+  static Future<PiggabilityDataModel?> getPipelineMasterApi({
+    required BuildContext context,
+  }) async {
+    try {
+      Map<String, String> para = {
+        "region": "",
+        "lifecycleStatuses": "8,256",
+      };
+      String url =  APIs.dashboardSummaryApi;
+      String query = Uri(queryParameters: para).query;
+      var res = await ServerRequest.getData(urlEndPoint: url+ query,);
+
+      if (res != null && res is Map<String, dynamic>) {
+        return PiggabilityDataModel.fromMap(res);
+      } else {
+        log("Unexpected response type: ${res.runtimeType}");
+      }
+    } catch (_) {}
+    return null;
+  }
 
   static Future<dynamic> imagePiker({required BuildContext context}) async {
     try {
