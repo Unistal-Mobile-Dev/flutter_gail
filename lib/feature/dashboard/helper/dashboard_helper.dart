@@ -49,7 +49,7 @@ class DashboardHelper {
         "region": "",
         "lifecycleStatuses": "8,256",
       };
-      String url =  APIs.dashboardSummaryApi;
+      String url =  APIs.pipelineMaster;
       String query = Uri(queryParameters: para).query;
       var res = await ServerRequest.getData(urlEndPoint: url+ query,);
 

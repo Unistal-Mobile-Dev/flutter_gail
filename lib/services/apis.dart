@@ -72,6 +72,7 @@ class APIs {
 
   static get dashboardSummaryApi => "dashboard/summary";
   static get pipelineSummary => "pipeline-master/summary/summary?";
+  static get pipelineMaster => "pipeline-master/master-data/assetManagementValues?";
 
   static get forgotPasswordApi => "";
 }
