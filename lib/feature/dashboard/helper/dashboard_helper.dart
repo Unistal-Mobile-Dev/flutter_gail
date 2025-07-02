@@ -24,7 +24,7 @@ class DashboardHelper {
         "region": "",
         "section": "",
         "pipeline": "",
-        "lifecycleStatuses": "8256",
+        "lifecycleStatuses": "8,256",
       };
       String url =  APIs.pipelineSummary;
       String query = Uri(queryParameters: para).query;

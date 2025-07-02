@@ -40,6 +40,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         }),
       ];
     }
+    _eventCompleted(emit);
 
     final result =
         await DashboardHelper.getPipelineMasterApi(context: event.context);
@@ -52,7 +53,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         ),
       ]);
     }
-
+    _eventCompleted(emit);
     var res = await DashboardHelper.getSummaryApi();
     if (res != null) {
       listOfPipelineSection = res;

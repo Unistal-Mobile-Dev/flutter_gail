@@ -2,6 +2,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/bloc/dashboard_bloc.dart';
 import 'package:flutter_gail/utils/commonWidgets/center_loader_widget.dart';
 
@@ -92,6 +93,7 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     return ListView(
+      padding: EdgeInsets.zero,
       children: [
         Padding(
           padding: const EdgeInsets.all(8),
@@ -107,7 +109,6 @@ class _DashboardPageState extends State<DashboardPage> {
                     final chartTitle = dataState.pieChartList[index].key;
                     final dataMap = dataState.pieChartList[index].value;
                     final total = dataMap.values.fold(0.0, (a, b) => a + b);
-
                     return Card(
                       elevation: 4,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -181,8 +182,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                       ),
                                     ),
                                     const SizedBox(width: 4),
-                                    chartTitle == "Piggability" ? Text('$label: ${value.toStringAsFixed(0)}, Length: ${dataState.lengthPiggabilty[label]} km'):
-                                    Text('$label: ${value.toStringAsFixed(0)} km'),
+                                    chartTitle == "Piggability" ? Flexible(child: TextWidget('$label: ${value.toStringAsFixed(0)}, Length: ${dataState.lengthPiggabilty[label]} km')):
+                                    Flexible(child: TextWidget('$label: ${value.toStringAsFixed(0)} km')),
                                   ],
                                 );
                               }).toList(),
