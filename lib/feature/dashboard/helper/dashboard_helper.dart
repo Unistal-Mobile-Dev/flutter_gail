@@ -8,7 +8,7 @@ class DashboardHelper {
 
   static Future<dynamic> getSummaryApi() async {
     try {
-       String url =  APIs.dashboardSummaryApi;
+       String url =  APIs.summary;
        var res =  await ServerRequest.getData(urlEndPoint: url);
        if(res != null){
          return pipelineSectionListResponse(res);
@@ -26,7 +26,7 @@ class DashboardHelper {
         "pipeline": "",
         "lifecycleStatuses": "8256",
       };
-      String url =  APIs.dashboardSummaryApi;
+      String url =  APIs.pipelineSummary;
       String query = Uri(queryParameters: para).query;
       var res = await ServerRequest.getData(urlEndPoint: url+ query,);
       log("getPipelineSummaryApi response → $res");

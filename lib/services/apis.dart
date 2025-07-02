@@ -70,7 +70,7 @@ class APIs {
 
   static get saveImageSharingApi => "image-sharing/summary";
 
-  static get dashboardSummaryApi => "dashboard/summary";
+  static get summary => "dashboard/summary";
   static get pipelineSummary => "pipeline-master/summary/summary?";
   static get pipelineMaster => "pipeline-master/master-data/assetManagementValues?";
 
