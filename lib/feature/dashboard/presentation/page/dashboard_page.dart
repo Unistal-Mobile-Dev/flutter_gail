@@ -91,6 +91,7 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     return ListView(
+      padding: EdgeInsets.zero,
       children: [
         Padding(
           padding: const EdgeInsets.all(8),
