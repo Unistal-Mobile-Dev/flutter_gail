@@ -49,7 +49,8 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       pieChartList.addAll([
         MapEntry(
           "Piggability",
-          result.piggabilityCountMap.map((k, v) => MapEntry(k, v.toDouble())),
+          result.piggabilityCountMap.map((k, v) => MapEntry(k, v.toDouble()))..remove("Under Conversion"),
+
         ),
       ]);
     }
