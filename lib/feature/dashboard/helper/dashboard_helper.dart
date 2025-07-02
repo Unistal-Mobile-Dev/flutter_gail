@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/dashboard/domain/model/PipelineMasterModel.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineSection.dart';
 
 class DashboardHelper {
@@ -14,6 +15,31 @@ class DashboardHelper {
     } catch (_) {}
     return null;
   }
+  static Future<DashboardStatusModel?> getPipelineSummaryApi({
+    required BuildContext context,
+  }) async {
+    try {
+      Map<String, String> para = {
+        "region": "",
+        "section": "",
+        "pipeline": "",
+        "lifecycleStatuses": "8256",
+      };
+      String url =  APIs.dashboardSummaryApi;
+      String query = Uri(queryParameters: para).query;
+      var res = await ServerRequest.getData(urlEndPoint: url+ query,);
+      log("getPipelineSummaryApi response → $res");
+      if (res != null && res is Map<String, dynamic>) {
+        DashboardStatusModel dashboardStatusModel =
+        DashboardStatusModel.fromJson(res);
+        return dashboardStatusModel;
+      } else {
+        log("Unexpected response type: ${res.runtimeType}");
+      }
+    } catch (_) {}
+    return null;
+  }
+
 
   static Future<dynamic> imagePiker({required BuildContext context}) async {
     try {
