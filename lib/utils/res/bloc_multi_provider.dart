@@ -12,6 +12,7 @@ import 'package:flutter_gail/feature/task/deviation/domain/bloc/deviation_bloc.d
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
 import 'package:flutter_gail/feature/taskManagement/addTask/domain/bloc/add_task_bloc.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/domain/bloc/view_task_bloc.dart';
+import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/domain/bloc/add_tlp_survey_bloc.dart';
 
 MultiProvider blocMultiProvider({required Widget child}) {
   return MultiProvider(
@@ -30,6 +31,7 @@ MultiProvider blocMultiProvider({required Widget child}) {
        BlocProvider(create: (BuildContext context) => EncroachmentBloc()),
        BlocProvider(create: (BuildContext context) => DeviationBloc()),
        BlocProvider(create: (BuildContext context) => ImageShareBloc()),
+       BlocProvider(create: (BuildContext context) => AddTlpSurveyBloc()),
 
     ],
     child: child,

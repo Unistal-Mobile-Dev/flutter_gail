@@ -74,5 +74,9 @@ class APIs {
   static get pipelineSummary => "pipeline-master/summary/summary?";
   static get pipelineMaster => "pipeline-master/master-data/assetManagementValues?";
 
+  static get getTlpTaskApi => "cp-system/short-interval/tasks";
+
+  static get addTlpApi => "cp-system/short-interval/soil/create-tlp";
+
   static get forgotPasswordApi => "";
 }

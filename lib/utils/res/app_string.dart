@@ -187,6 +187,8 @@ class AppString {
 
   static get task => "Task";
 
+  static get tlpSurvey => "TLP Survey";
+
 
   static get logoutMessage =>
       "Are you sure you want to logout? Once you logout, you will be return to login screen";

@@ -6,6 +6,7 @@ import 'package:flutter_gail/feature/home/presentation/widget/logout_widget.dart
 import 'package:flutter_gail/feature/imageShare/presentation/page/image_share_page.dart';
 import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
 import 'package:flutter_gail/feature/task/viewTask/presentation/page/task_page.dart';
+import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/presentation/page/add_tlp_survey_page.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
 
@@ -69,6 +70,7 @@ class HomeDrawerWidget extends StatelessWidget {
                   ),
                   _dashboard(context: context),
                   _task(context: context),
+                  _tlpSurvey(context: context),
                   _incident(context: context),
                   isImageSharing == true
                       ? _imageSharing(context: context)
@@ -338,6 +340,46 @@ class HomeDrawerWidget extends StatelessWidget {
             ),
             TextWidget(
               AppString.task,
+              fontSize: AppFont.font_14,
+              color: AppColor.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _tlpSurvey({required BuildContext context}) {
+    return Padding(
+      padding: EdgeInsets.only(
+          top: MediaQuery.of(context).size.width * 0.02,
+          bottom: MediaQuery.of(context).size.width * 0.02),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
+              widget: const AddTlpSurveyPage(), title: AppString.tlpSurvey));
+        },
+        child: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                // color: Colors.white.withOpacity(.2),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(7.0),
+                child: Icon(
+                  Icons.add_chart,
+                  color: AppColor.white,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.02,
+            ),
+            TextWidget(
+              AppString.tlpSurvey,
               fontSize: AppFont.font_14,
               color: AppColor.white,
             ),
