@@ -11,6 +11,8 @@ import 'package:flutter_gail/feature/imageShare/domain/model/section_imgae_share
 import 'package:flutter_gail/feature/imageShare/domain/model/station_model.dart';
 import 'package:flutter_gail/feature/imageShare/domain/model/sub_category_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/region_type_model.dart';
+import 'package:flutter_gail/services/location/location_helper.dart';
+import 'package:flutter_gail/services/location/location_model.dart';
 
 class ImageShareHelper extends ImageShareInterface {
   @override
@@ -92,7 +94,7 @@ class ImageShareHelper extends ImageShareInterface {
       required String toChainage,
       required String title,
       required String remark,
-      required List<File> fileList}) async {
+      required List<FileModel> fileList}) async {
     try {
       if (regionData.id == null) {
         SnackBarErrorWidget(context).show(message: "Please select a region");
@@ -110,15 +112,15 @@ class ImageShareHelper extends ImageShareInterface {
         return false;
       }
 
-      if (sectionData.sectionCode == null || sectionData.sectionCode!.isEmpty) {
-        SnackBarErrorWidget(context).show(message: "Please select a section");
-        return false;
-      }
-
-      if (stationData.name == null) {
-        SnackBarErrorWidget(context).show(message: "Please select station");
-        return false;
-      }
+      // if (sectionData.sectionCode == null || sectionData.sectionCode!.isEmpty) {
+      //   SnackBarErrorWidget(context).show(message: "Please select a section");
+      //   return false;
+      // }
+      //
+      // if (stationData.name == null) {
+      //   SnackBarErrorWidget(context).show(message: "Please select station");
+      //   return false;
+      // }
 
       if (categoryData.name == null) {
         SnackBarErrorWidget(context).show(message: "Please select a category");
@@ -131,11 +133,11 @@ class ImageShareHelper extends ImageShareInterface {
         return false;
       }
 
-      if (fromChainage.isEmpty) {
-        SnackBarErrorWidget(context)
-            .show(message: "Please enter Chainage");
-        return false;
-      }
+      // if (fromChainage.isEmpty) {
+      //   SnackBarErrorWidget(context)
+      //       .show(message: "Please enter Chainage");
+      //   return false;
+      // }
 
       // if (toChainage.isEmpty) {
       //   SnackBarErrorWidget(context).show(message: "Please enter To Chainage");
@@ -171,21 +173,38 @@ class ImageShareHelper extends ImageShareInterface {
       required String toChainage,
       required String title,
       required String remark,
-      required List<File> fileList}) async {
+      required List<FileModel> fileList}) async {
      try{
 
        String url = APIs.saveImageSharingApi;
        List<FileModel> imageList = [];
        int id = 1;
+       Map<String, String> list = {};
        if(fileList.isNotEmpty){
          for(var data in fileList){
            imageList.add(FileModel(
-               name: data.path.split('/').last,
-               file: data,
+               name: data.file.path.split('/').last,
+               file: data.file,
                keyName: "file-$id"));
+
+           var value = {
+             "file-$id-lat" : data.lat.toString(),
+             "file-$id-lng" : data.lat.toString(),
+             "file-$id-section" : sectionData.sectionName != null ? sectionData.sectionName.toString()  : "",
+             "file-$id-station" : stationData.name != null ? stationData.name.toString()  : "",
+           };
+           list.addAll(value);
            id++;
          }
        }
+
+       var locationRes = await LocationHelper.getLocationOfflineMode(
+           context: context);
+       LocationModel locationData = LocationModel();
+       if (locationRes != null) {
+         locationData = locationRes;
+       }
+
        final DateFormat formatter = DateFormat('dd-MM-yyyy');
        final String currentDate = formatter.format(DateTime.now());
        var json = {
@@ -207,8 +226,12 @@ class ImageShareHelper extends ImageShareInterface {
          'subCategoryCode': subCategoryData.code.toString(),
          'imageTitle': title.toString(),
          'remarks': remark.toString(),
-         'uploadedDate': currentDate.toString()
+         'uploadedDate': currentDate.toString(),
+         "latitude": locationData.lat != null ? locationData.lat.toString() : "0.0",
+         "longitude": locationData.long != null ? locationData.long.toString(): "0.0",
        };
+
+       json.addAll(list);
 
        var res =  await ServerRequest.postDataWithFile(urlEndPoint: url,
            body: json, context: !context.mounted ? context :context, fileList: imageList);

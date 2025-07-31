@@ -107,7 +107,7 @@ class ImageShareForm extends StatelessWidget {
 
   Widget _stationDropDown({required BuildContext context}) {
     return DropDownSearchWidget(
-      isRequired: true,
+      isRequired: false,
       selectedItem:
       dataState.stationData.name != null ? dataState.stationData : null,
       hint: AppString.stationName,
@@ -122,7 +122,7 @@ class ImageShareForm extends StatelessWidget {
 
   Widget _sectionDropDown({required BuildContext context}) {
     return DropDownSearchWidget(
-      isRequired: true,
+      isRequired: false,
       selectedItem: dataState.sectionData.sectionName != null
           ? dataState.sectionData
           : null,
@@ -143,7 +143,6 @@ class ImageShareForm extends StatelessWidget {
     return TextFieldWidget(
     labelText: AppString.sectionLength,
     controller: controller,
-    isRequired: true,
     enabled: false );
     }
 
@@ -151,7 +150,6 @@ class ImageShareForm extends StatelessWidget {
     return TextFieldWidget(
       labelText: AppString.chainage,
       controller: dataState.fromChainageController,
-      isRequired: true,
       textInputType: TextInputType.number,
     );
   }
@@ -181,7 +179,8 @@ class ImageShareForm extends StatelessWidget {
   }
 
   Widget _subCategoryDropDown({required BuildContext context}) {
-    return DropDownSearchWidget(
+    return dataState.isSubCategoryLoader == false ?
+    DropDownSearchWidget(
       isRequired: true,
       selectedItem: dataState.subCategoryData.name != null
           ? dataState.subCategoryData
@@ -193,7 +192,7 @@ class ImageShareForm extends StatelessWidget {
         BlocProvider.of<ImageShareBloc>(context)
             .add(SelectSubcategoryEvent(subCategoryData: value));
       },
-    );
+    ) : const DottedLoaderWidget();
   }
 
   Widget _titleController() {
@@ -232,27 +231,31 @@ class ImageShareForm extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Center(
-            child: IconButton(
+            child: dataState.isFileLoader == false ?
+            IconButton(
                 onPressed: () {
-                  mediaType(
-                      context: context,
-                      onPressedCamera: () {
-                        Navigator.pop(context);
-                        BlocProvider.of<ImageShareBloc>(context).add(
-                            ImageShareSelectFileEvent(
-                                context: context, mediaType: 1));
-                      },
-                      onPressedGallery: () {
-                        Navigator.pop(context);
-                        BlocProvider.of<ImageShareBloc>(context).add(
-                            ImageShareSelectFileEvent(
-                                context: context, mediaType: 2));
-                      });
+                  BlocProvider.of<ImageShareBloc>(context).add(
+                      ImageShareSelectFileEvent(
+                          context: context, mediaType: 1));
+                  // mediaType(
+                  //     context: context,
+                  //     onPressedCamera: () {
+                  //       Navigator.pop(context);
+                  //       BlocProvider.of<ImageShareBloc>(context).add(
+                  //           ImageShareSelectFileEvent(
+                  //               context: context, mediaType: 1));
+                  //     },
+                  //     onPressedGallery: () {
+                  //       Navigator.pop(context);
+                  //       BlocProvider.of<ImageShareBloc>(context).add(
+                  //           ImageShareSelectFileEvent(
+                  //               context: context, mediaType: 2));
+                  //     });
                 },
                 icon: Icon(
                   Icons.image_outlined,
                   color: AppColor.lightGrey,
-                )),
+                )) : const DottedLoaderWidget(),
           ),
         ),
       ),
@@ -286,7 +289,7 @@ class ImageShareForm extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.file(
-                    dataState.fileList[index],
+                    dataState.fileList[index].file,
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,

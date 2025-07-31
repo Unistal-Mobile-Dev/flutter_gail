@@ -39,7 +39,7 @@ final class FetchImageShareDataState extends ImageShareInitial {
   final TextEditingController toChainageController;
   final TextEditingController titleController;
   final TextEditingController remarkController;
-  final List<File> fileList;
+  final List<FileModel> fileList;
 
   FetchImageShareDataState({
     required this.regionData,

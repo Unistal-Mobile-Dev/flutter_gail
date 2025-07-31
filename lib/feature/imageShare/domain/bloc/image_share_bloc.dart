@@ -15,13 +15,16 @@ import 'package:flutter_gail/feature/task/createTask/domain/model/pipeline_model
 import 'package:flutter_gail/feature/task/createTask/domain/model/region_type_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/section_model.dart';
 import 'package:flutter_gail/feature/task/createTask/helper/create_task_helper.dart';
+import 'package:flutter_gail/services/location/location_helper.dart';
+import 'package:flutter_gail/services/location/location_model.dart';
+
+import '../../../dashboard/domain/model/file_model.dart';
 
 part 'image_share_event.dart';
 
 part 'image_share_state.dart';
 
 class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
-
   bool isLoader = false;
   bool isFileLoader = false;
   bool isMaintenanceLoader = false;
@@ -45,7 +48,7 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
   TextEditingController toChainageController = TextEditingController();
   TextEditingController titleController = TextEditingController();
   TextEditingController remarkController = TextEditingController();
-  List<File> fileList = [];
+  List<FileModel> fileList = [];
   final ImageShareHelper imageShareHelper = ImageShareHelper();
 
   ImageShareBloc() : super(ImageShareInitial()) {
@@ -110,8 +113,8 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
     toChainageController.text = "";
     isMaintenanceLoader = true;
     _eventCompleted(emit);
-    var res = await imageShareHelper.fetchMaintenanceBaseType(
-        regionData: regionData);
+    var res =
+        await imageShareHelper.fetchMaintenanceBaseType(regionData: regionData);
     if (res != null) {
       maintenanceBaseList = res;
     }
@@ -171,8 +174,8 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
     _eventCompleted(emit);
     subCategoryData = SubCategoryModel();
     subCategoryList = [];
-    var res = await imageShareHelper.fetchSubCategoryType(
-        categoryData: categoryData);
+    var res =
+        await imageShareHelper.fetchSubCategoryType(categoryData: categoryData);
     if (res != null) {
       subCategoryList = res;
     }
@@ -188,15 +191,25 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
   _selectFile(ImageShareSelectFileEvent event, emit) async {
     isFileLoader = true;
     _eventCompleted(emit);
+
+    var locationRes = await LocationHelper.getLocationOfflineMode(
+        context: event.context.mounted ? event.context : event.context);
+    LocationModel locationData = LocationModel();
+    if (locationRes != null) {
+      locationData = locationRes;
+    }
+
     if (event.mediaType == 1) {
-      var res = await DashboardHelper.cameraPiker(context: event.context);
+      var res = await DashboardHelper.cameraPiker(
+          context: event.context.mounted ? event.context : event.context);
       if (res != null) {
-        fileList.add(res);
+        fileList.add(FileModel(name: "", file: res, keyName: "", lat: locationData.lat ?? 0.0, long: locationData.long ?? 0.0));
       }
     } else {
-      var res = await DashboardHelper.imagePiker(context: event.context);
+      var res = await DashboardHelper.imagePiker(
+          context: event.context.mounted ? event.context : event.context);
       if (res != null) {
-        fileList.add(res);
+        fileList.add(FileModel(name: "", file: res, keyName: "", lat: locationData.lat ?? 0.0, long: locationData.long ?? 0.0));
       }
     }
     isFileLoader = false;
@@ -228,11 +241,11 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
         remark: remarkController.text.toString(),
         fileList: fileList);
 
-    if(textFiledValidation == false){
+    if (textFiledValidation == false) {
       return false;
     }
 
-    isLoader =  true;
+    isLoader = true;
     _eventCompleted(emit);
     var res = await imageShareHelper.submit(
         context: context,
@@ -248,7 +261,7 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
         title: titleController.text.toString(),
         remark: remarkController.text.toString(),
         fileList: fileList);
-    if(res != null){
+    if (res != null) {
       isLoader = false;
       isFileLoader = false;
       isMaintenanceLoader = false;
@@ -263,7 +276,6 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
       sectionData = SectionImageShareModel();
       stationList = [];
       stationData = StationModel();
-      categoryList = [];
       categoryData = CategoryModel();
       subCategoryList = [];
       subCategoryData = SubCategoryModel();
@@ -274,12 +286,13 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
       fileList = [];
     }
 
-    isLoader =  false;
+    isLoader = false;
     _eventCompleted(emit);
   }
 
   _eventCompleted(Emitter<ImageShareState> emit) {
-    emit(FetchImageShareDataState(regionData: regionData,
+    emit(FetchImageShareDataState(
+        regionData: regionData,
         stationList: stationList,
         titleController: titleController,
         isFileLoader: isFileLoader,
@@ -302,7 +315,6 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
         stationData: stationData,
         subCategoryData: subCategoryData,
         subCategoryList: subCategoryList,
-        toChainageController: toChainageController
-    ));
+        toChainageController: toChainageController));
   }
 }

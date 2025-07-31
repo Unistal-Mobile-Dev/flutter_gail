@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/dashboard/domain/model/file_model.dart';
 import 'package:flutter_gail/feature/imageShare/domain/model/category_model.dart';
 import 'package:flutter_gail/feature/imageShare/domain/model/maintenance_base_model.dart';
 import 'package:flutter_gail/feature/imageShare/domain/model/pipeline_image_share_model.dart';
@@ -27,7 +28,7 @@ abstract class ImageShareInterface {
     required String toChainage,
     required String title,
     required String remark,
-    required List<File> fileList,
+    required List<FileModel> fileList,
   });
 
   Future<dynamic> submit({required BuildContext context,
@@ -42,7 +43,7 @@ abstract class ImageShareInterface {
     required String toChainage,
     required String title,
     required String remark,
-    required List<File> fileList,
+    required List<FileModel> fileList,
   });
 
 }
