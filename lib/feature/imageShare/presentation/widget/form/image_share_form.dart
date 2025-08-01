@@ -130,10 +130,10 @@ class ImageShareForm extends StatelessWidget {
       enabled: dataState.isLoader == false ? true : false,
       selectedItem: dataState.sectionData.sectionName != null
           ? dataState.sectionData
-          : null,
+          : null,  // sectionCode
       hint: AppString.sections,
       items: dataState.sectionList,
-      itemAsString: (sectionData) => sectionData.sectionName.toString(),
+      itemAsString: (sectionData) => "${sectionData.sectionName.toString()}(${sectionData.sectionCode.toString()})",
       onChanged: (value) {
         BlocProvider.of<ImageShareBloc>(context)
             .add(SelectSectionEvent(sectionData: value));
