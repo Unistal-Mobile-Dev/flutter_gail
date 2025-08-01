@@ -17,6 +17,7 @@ import 'package:flutter_gail/feature/task/createTask/domain/model/section_model.
 import 'package:flutter_gail/feature/task/createTask/helper/create_task_helper.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
+import 'package:flutter_gail/utils/commonClass/connectivity_helper.dart';
 
 import '../../../dashboard/domain/model/file_model.dart';
 
@@ -226,6 +227,16 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
 
   _submit(ImageShareSubmitEvent event, emit) async {
     BuildContext context = event.context;
+    isLoader = true;
+    _eventCompleted(emit);
+
+    if (await ConnectivityHelper.allConnectivityCheck(context: event.context) ==
+        false) {
+      isLoader = false;
+      _eventCompleted(emit);
+      return;
+    }
+
     var textFiledValidation = await imageShareHelper.textFieldValidationCheck(
         context: context,
         regionData: regionData,
@@ -242,11 +253,12 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
         fileList: fileList);
 
     if (textFiledValidation == false) {
+      isLoader = false;
+      _eventCompleted(emit);
       return false;
     }
 
-    isLoader = true;
-    _eventCompleted(emit);
+
     var res = await imageShareHelper.submit(
         context: context,
         regionData: regionData,

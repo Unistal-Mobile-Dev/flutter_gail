@@ -71,7 +71,7 @@ class ImageShareHelper extends ImageShareInterface {
       {required CategoryModel categoryData}) async {
     try {
       String url =
-          APIs.getSubCategoryApi + "?CategoryCode=${categoryData.code}";
+          APIs.getSubCategoryApi + "?categoryCode=${categoryData.code}";
       var res = await ServerRequest.getData(urlEndPoint: url);
       if (res != null && res['data'] != null) {
         return subCategoryListResponse(res['data']);
@@ -110,6 +110,35 @@ class ImageShareHelper extends ImageShareInterface {
           pipelineData.pipelineCode!.isEmpty) {
         SnackBarErrorWidget(context).show(message: "Please select a pipeline");
         return false;
+      }
+
+      if (fromChainage.isNotEmpty && sectionData.sectionLength == null) {
+        SnackBarErrorWidget(context).show(message: "Please select section");
+
+        final double? from = double.tryParse(fromChainage);
+        final double? to = double.tryParse(sectionData.sectionLength);
+
+        if (from == null || to == null || from >= to) {
+          SnackBarErrorWidget(context).show(message: "Invalid chainage values");
+          return false;
+        }
+
+        return false;
+      }
+
+      if (fromChainage.isEmpty && sectionData.sectionLength != null) {
+        SnackBarErrorWidget(context).show(message: "Please enter chainage values");
+        return false;
+      }
+
+      if(fromChainage.isNotEmpty && sectionData.sectionLength != null){
+        final double from = double.parse(fromChainage.toString());
+        final double length = double.parse(sectionData.sectionLength.toString());
+
+        if (from > length) {
+          SnackBarErrorWidget(context).show(message: "Invalid chainage values");
+          return false;
+        }
       }
 
       // if (sectionData.sectionCode == null || sectionData.sectionCode!.isEmpty) {

@@ -139,7 +139,7 @@ class AppString {
 
   static get stationName => "Station Name";
 
-  static get sectionLength => "Section Length";
+  static get sectionLength => "Section Length(m)";
 
   static get sections => "Sections";
 
@@ -183,7 +183,7 @@ class AppString {
 
   static get toChainagem=> "To Chainage(m)";
 
-  static get chainage => "Chainage";
+  static get chainage => "Chainage(m)";
 
   static get task => "Task";
 

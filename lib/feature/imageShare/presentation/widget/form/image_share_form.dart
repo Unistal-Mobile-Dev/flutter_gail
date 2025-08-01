@@ -53,6 +53,7 @@ class ImageShareForm extends StatelessWidget {
   Widget _regionDropDown({required BuildContext context}) {
     return DropDownSearchWidget(
       isRequired: true,
+      enabled: dataState.isLoader == false ? true : false,
       selectedItem:
       dataState.regionData.name != null ? dataState.regionData : null,
       hint: AppString.region,
@@ -69,13 +70,14 @@ class ImageShareForm extends StatelessWidget {
     return dataState.isMaintenanceLoader == false
         ? DropDownSearchWidget(
       isRequired: true,
+      enabled: dataState.isLoader == false ? true : false,
       selectedItem: dataState.maintenanceBaseData.name != null
           ? dataState.maintenanceBaseData
           : null,
       hint: AppString.maintenanceBase,
       items: dataState.maintenanceBaseList,
       itemAsString: (maintenanceBaseData) =>
-          maintenanceBaseData.name.toString(),
+          "${maintenanceBaseData.name.toString()}(${maintenanceBaseData.code.toString()})",
       onChanged: (value) {
         BlocProvider.of<ImageShareBloc>(context)
             .add(SelectMaintenanceBaseEvent(maintenanceBaseData: value));
@@ -88,6 +90,7 @@ class ImageShareForm extends StatelessWidget {
     return dataState.isPipelineLoader == false
         ? DropDownSearchWidget(
       isRequired: true,
+      enabled: dataState.isLoader == false ? true : false,
       selectedItem: dataState.pipelineData.pipelineCode != null
           ? dataState.pipelineData
           : null,
@@ -108,6 +111,7 @@ class ImageShareForm extends StatelessWidget {
   Widget _stationDropDown({required BuildContext context}) {
     return DropDownSearchWidget(
       isRequired: false,
+      enabled: dataState.isLoader == false ? true : false,
       selectedItem:
       dataState.stationData.name != null ? dataState.stationData : null,
       hint: AppString.stationName,
@@ -123,6 +127,7 @@ class ImageShareForm extends StatelessWidget {
   Widget _sectionDropDown({required BuildContext context}) {
     return DropDownSearchWidget(
       isRequired: false,
+      enabled: dataState.isLoader == false ? true : false,
       selectedItem: dataState.sectionData.sectionName != null
           ? dataState.sectionData
           : null,
@@ -143,11 +148,13 @@ class ImageShareForm extends StatelessWidget {
     return TextFieldWidget(
     labelText: AppString.sectionLength,
     controller: controller,
-    enabled: false );
-    }
+      enabled: false,
+    );
+  }
 
   Widget _fromChainageController() {
     return TextFieldWidget(
+      enabled: dataState.isLoader ==  false ? true : false,
       labelText: AppString.chainage,
       controller: dataState.fromChainageController,
       textInputType: TextInputType.number,
@@ -166,6 +173,7 @@ class ImageShareForm extends StatelessWidget {
   Widget _categoryDropDown({required BuildContext context}) {
     return DropDownSearchWidget(
       isRequired: true,
+      enabled: dataState.isLoader ==  false ? true : false,
       selectedItem:
       dataState.categoryData.name != null ? dataState.categoryData : null,
       hint: AppString.categoryName,
@@ -182,6 +190,7 @@ class ImageShareForm extends StatelessWidget {
     return dataState.isSubCategoryLoader == false ?
     DropDownSearchWidget(
       isRequired: true,
+      enabled: dataState.isLoader ==  false ? true : false,
       selectedItem: dataState.subCategoryData.name != null
           ? dataState.subCategoryData
           : null,
@@ -197,6 +206,7 @@ class ImageShareForm extends StatelessWidget {
 
   Widget _titleController() {
     return TextFieldWidget(
+      enabled: dataState.isLoader ==  false ? true : false,
       labelText: AppString.title,
       controller: dataState.titleController,
       isRequired: true,
@@ -205,6 +215,7 @@ class ImageShareForm extends StatelessWidget {
 
   Widget _remarkController() {
     return TextFieldWidget(
+      enabled: dataState.isLoader ==  false ? true : false,
       labelText: AppString.remark,
       controller: dataState.remarkController,
     );
@@ -222,7 +233,8 @@ class ImageShareForm extends StatelessWidget {
   }
 
   Widget _imageWidget({required BuildContext context}) {
-    return SizedBox(
+    return dataState.isLoader == false ?
+    SizedBox(
       width: MediaQuery
           .of(context)
           .size
@@ -259,7 +271,7 @@ class ImageShareForm extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ) : const SizedBox.shrink();
   }
 
   Widget _fileListWidget({required BuildContext context}) {
@@ -295,6 +307,7 @@ class ImageShareForm extends StatelessWidget {
                     height: double.infinity,
                   ),
                 ),
+                dataState.isLoader == false ?
                 Positioned(
                   top: 4,
                   right: 4,
@@ -316,7 +329,7 @@ class ImageShareForm extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
+                ) : const SizedBox.shrink(),
               ],
             ),
           );

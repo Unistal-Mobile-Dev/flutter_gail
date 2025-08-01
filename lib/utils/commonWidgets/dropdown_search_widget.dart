@@ -9,6 +9,7 @@ class DropDownSearchWidget extends StatelessWidget {
   final String hint;
   final dynamic selectedItem;
   final bool? isRequired;
+  final bool? enabled;
 
   const DropDownSearchWidget({
     super.key,
@@ -18,6 +19,7 @@ class DropDownSearchWidget extends StatelessWidget {
     required this.hint,
     this.selectedItem,
     this.isRequired,
+    this.enabled,
   });
 
   @override
@@ -28,6 +30,7 @@ class DropDownSearchWidget extends StatelessWidget {
           : MediaQuery.of(context).size.height * 0.15,
       child: DropdownSearch<dynamic>(
         selectedItem: selectedItem,
+        enabled: enabled ?? true,
         compareFn: (i, s) => i.isEqual(s),
         decoratorProps: DropDownDecoratorProps(
           textAlign: TextAlign.start,

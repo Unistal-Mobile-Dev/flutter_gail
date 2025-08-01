@@ -53,7 +53,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   _setPassword(LoginSetPasswordEvent event, emit) {
-    password = event.password.replaceAll("", "");
+    password = event.password.replaceAll(" ", "");
   }
 
   _passwordHideShow(LoginPasswordHideShowEvent event, emit) {
