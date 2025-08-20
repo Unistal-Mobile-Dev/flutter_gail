@@ -87,7 +87,7 @@ class AddIncidentHelper {
          var json = {
            "task_id" : taskData.taskId.toString(),
            "patrollroute_id" : taskData.patrollRouteId.toString(),
-           "observation_type" : "Incident",
+           "observation_type" : RouteObservation.incident.value.toString(),
            "sectionCode " : taskData.sectionCode.toString(),
            "description" : incidentReport.toString(),
            "condition" : "",

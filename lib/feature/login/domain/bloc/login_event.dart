@@ -35,6 +35,13 @@ class LoginPasswordHideShowEvent extends LoginEvent {
   List<Object?> get props => [isPassword];
 }
 
+class SelectLoginTypeEvent extends LoginEvent {
+   final String loginType;
+   SelectLoginTypeEvent({required this.loginType});
+   @override
+   List<Object?> get props => [loginType];
+}
+
 class LoginSubmitDataEvent extends LoginEvent {
   final BuildContext context;
   final bool isLoginPage;

@@ -31,7 +31,7 @@ class TaskModel {
   dynamic patrollManStatus;
   dynamic createdAt;
   dynamic updatedAt;
-  String? vendorName;
+  dynamic vendorName;
   String? region;
   TaskStatus? taskStatus;
   ShapeModel? shapeData;

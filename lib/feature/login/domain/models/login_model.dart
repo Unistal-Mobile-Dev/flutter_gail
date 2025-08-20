@@ -102,10 +102,10 @@ class Users {
 
   Users.fromJson(Map<String, dynamic> json) {
     id = json['id'] ?? "";
-    firstName = json['first_name'] ?? "";
+    firstName = json['full_name'] ?? "";
     surName = json['sur_name'] ?? "";
-    emailId = json['email_id'] ?? "";
-    mobileNo = json['mobile_no'] ?? "";
+    emailId = json['email'] ?? "";
+    mobileNo = json['phone_number'] ?? "";
     countryCode = json['country_code'] ?? "";
     companyName = json['company_name'] ?? "";
     department = json['department'] ?? "";
@@ -213,7 +213,8 @@ class LoginScreenRequestModel {
       {required this.userEmailId,
       required this.password,
       required this.firebaseId,
-      required this.deviceId});
+      required this.deviceId,
+      });
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
@@ -233,8 +234,49 @@ class LoginScreenRequestModel {
         "postal": "",
         "latitude": 0,
         "longitude": 0,
-      }
+      },
     };
     return map;
   }
 }
+
+class LoginOTPScreenRequestModel {
+  final String userId;
+  final String otp;
+  final String firebaseId;
+  final String deviceId;
+  final String loginType;
+
+  LoginOTPScreenRequestModel(
+      {required this.userId,
+        required this.otp,
+        required this.firebaseId,
+        required this.deviceId,
+        required this.loginType,
+      });
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> map = {
+      "userId": int.parse(userId.toString()),
+      "otp": otp,
+      "browserDetails": {
+        "browserName": "",
+        "browserVersion": "",
+        "userAgent": "",
+        "platform": "android"
+      },
+      "ipAddress": "",
+      "location": {
+        "city": "",
+        "region": "",
+        "country": "",
+        "postal": "",
+        "latitude": 0,
+        "longitude": 0,
+      },
+      "userType": loginType == "1" ? "internal" :"external"
+    };
+    return map;
+  }
+}
+

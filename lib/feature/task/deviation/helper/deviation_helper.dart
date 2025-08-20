@@ -59,7 +59,7 @@ class DeviationHelper {
       var json = {
         "task_id" : taskData.taskId.toString(),
         "patrollroute_id" : taskData.patrollRouteId.toString(),
-        "observation_type" : "Deviation",
+        "observation_type" : RouteObservation.deviation.value.toString(),
         "sectionCode " : taskData.sectionCode.toString(),
         "description" : other,
         "condition" : "",

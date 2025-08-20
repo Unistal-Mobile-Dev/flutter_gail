@@ -50,11 +50,6 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
   Widget _tabView({required FetchTaskDataState dataState}) {
     return Stack(
       children: [
-        widget.isAssignTask == true ?
-        Positioned(
-            bottom: 20,
-            right: 20,
-            child: _addFloatingButton()) : const SizedBox.shrink(),
         Column(
           children: [
             Container(
@@ -95,6 +90,11 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
             ),
           ],
         ),
+        widget.isAssignTask == true ?
+        Positioned(
+            bottom: 20,
+            right: 20,
+            child: _addFloatingButton()) : const SizedBox.shrink(),
       ],
     );
   }

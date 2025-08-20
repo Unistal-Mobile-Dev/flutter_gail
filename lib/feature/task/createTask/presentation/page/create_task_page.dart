@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/bloc/create_task_bloc.dart';
+import 'package:flutter_gail/feature/task/createTask/domain/model/lineWalker_user_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/repeat_frequency_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/shift_type_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/user_name_model.dart';
@@ -82,9 +83,9 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
             // _verticalSpace(),
             _userTypeDropdown(dataState: dataState),
             _verticalSpace(),
-            _vendorDropdown(dataState: dataState),
+            _supervisorUsersDropdown(dataState: dataState),
             _verticalSpace(),
-            _userNameDropdown(dataState: dataState),
+            _lineWalkerUsersDropdown(dataState: dataState),
             _verticalSpace(),
             _shiftTimeSetWidget(dataState: dataState),
             _verticalSpace(),
@@ -222,39 +223,39 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
     );
   }
 
-  Widget _vendorDropdown({required FetchCreateTaskDataState dataState}) {
+  Widget _supervisorUsersDropdown({required FetchCreateTaskDataState dataState}) {
     return dataState.isVendorLoader == false ?
-    dataState.vendorList.isNotEmpty ?
+    dataState.supervisorUsersList.isNotEmpty ?
     DropDownSearchWidget(
       isRequired: true,
-      selectedItem: dataState.vendorData.name != null ? dataState.vendorData : null,
-      hint: AppString.vendor,
-      items: dataState.vendorList,
-      itemAsString: (vendorData) => vendorData.name.toString(),
+      selectedItem: dataState.supervisorUsersData.name != null ? dataState.supervisorUsersData : null,
+      hint: AppString.supervisorUsers,
+      items: dataState.supervisorUsersList,
+      itemAsString: (supervisorUsersData) => supervisorUsersData.name.toString(),
       onChanged: (value) {
         BlocProvider.of<CreateTaskBloc>(context)
-            .add(CreateTaskVendorEvent(vendorData: value));
+            .add(CreateTaskSupervisorUserEvent(supervisorUserData: value));
       },
     ): const SizedBox.shrink() : const DottedLoaderWidget();
   }
 
-  Widget _userNameDropdown({required FetchCreateTaskDataState dataState}) {
+  Widget _lineWalkerUsersDropdown({required FetchCreateTaskDataState dataState}) {
     return dataState.isUserNameLoader == false ?
     DropDownSearchMultiSelectWidget(
-      selectedItem: dataState.userNameData,
-      hint: AppString.userName,
-      items: dataState.userNameList,
+      selectedItem: dataState.lineWalkerUsersData,
+      hint: AppString.lineWalkerUsers,
+      items: dataState.lineWalkerUsersList,
       showSearchBox: true,
       compareFn: (item, selectedItem) =>
       item.name == selectedItem.name,
-      itemAsString: (repeatFrequencyData) => repeatFrequencyData.name.toString(),
+      itemAsString: (lineWalkerUsersData) => lineWalkerUsersData.name.toString(),
       onChanged: (value) {
-        List<UserNameModel> list = [];
+        List<LineWalkerUsersModel> list = [];
         for(var data in value){
           list.add(data);
         }
         BlocProvider.of<CreateTaskBloc>(context)
-            .add(CreateTaskUserNameEvent(userNameData: list));
+            .add(CreateTaskLineWalkerUserEvent(lineWalkerUserData: list));
       },
     ) : const DottedLoaderWidget();
   }

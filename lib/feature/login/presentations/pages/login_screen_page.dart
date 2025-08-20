@@ -46,13 +46,7 @@ class _LoginScreenPageState extends State<LoginScreenPage> {
       body: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {
           if (state is FetchLoginStateData) {
-            return Center(
-              child: AppConfig.getDeviceType(context: context) == DeviceType.phone
-                      ? PhoneLoginWidget(dataState: state)
-                      : TabletLoginWidget(
-                          dataState: state,
-                        ),
-            );
+            return PhoneLoginWidget(dataState: state);
           } else {
             return const Center(
               child: CenterLoaderWidget(),

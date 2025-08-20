@@ -163,6 +163,10 @@ class AppString {
 
   static get vendor => "Vendor";
 
+  static get supervisorUsers => "Supervisor Users";
+
+  static get lineWalkerUsers => "LineWalker Users";
+
   static get patrollingStartDate =>  "Patrolling Start Date";
 
   static get patrollingEndDate =>  "Patrolling End Date";

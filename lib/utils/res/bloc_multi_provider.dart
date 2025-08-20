@@ -4,6 +4,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/imageShare/domain/bloc/image_share_bloc.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
+import 'package:flutter_gail/feature/otp/domain/domain/bloc/otp_bloc.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
 import 'package:flutter_gail/feature/task/addEncroachment/domain/bloc/encroachment_bloc.dart';
 import 'package:flutter_gail/feature/task/addMarker/domain/bloc/add_marker_bloc.dart';
@@ -32,6 +33,7 @@ MultiProvider blocMultiProvider({required Widget child}) {
        BlocProvider(create: (BuildContext context) => DeviationBloc()),
        BlocProvider(create: (BuildContext context) => ImageShareBloc()),
        BlocProvider(create: (BuildContext context) => AddTlpSurveyBloc()),
+       BlocProvider(create: (BuildContext context) => OtpBloc()),
 
     ],
     child: child,

@@ -102,6 +102,22 @@ class CreateTaskPipelineTypeEvent extends CreateTaskEvent {
   List<Object?> get props => [pipelineData];
 }
 
+class CreateTaskSupervisorUserEvent extends CreateTaskEvent {
+  final SupervisorUsersModel supervisorUserData;
+  const CreateTaskSupervisorUserEvent({required this.supervisorUserData});
+
+  @override
+  List<Object?> get props => [supervisorUserData];
+}
+
+class CreateTaskLineWalkerUserEvent extends CreateTaskEvent {
+  final List<LineWalkerUsersModel> lineWalkerUserData;
+  const CreateTaskLineWalkerUserEvent({required this.lineWalkerUserData});
+
+  @override
+  List<Object?> get props => [lineWalkerUserData];
+}
+
 class CreateTaskSectionTypeEvent extends CreateTaskEvent {
   final SectionModel sectionData;
   const CreateTaskSectionTypeEvent({required this.sectionData});

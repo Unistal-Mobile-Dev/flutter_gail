@@ -66,7 +66,7 @@ class EncroachmentHelper {
       var json = {
         "task_id" : taskData.taskId.toString(),
         "patrollroute_id" : taskData.patrollRouteId.toString(),
-        "observation_type" : "Encroachment",
+        "observation_type" : RouteObservation.encroachment.value.toString(),
         "sectionCode " : taskData.sectionCode.toString(),
         "description" : chainage,
         "condition" : "",

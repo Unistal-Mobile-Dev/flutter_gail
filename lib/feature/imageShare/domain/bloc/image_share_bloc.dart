@@ -192,25 +192,23 @@ class ImageShareBloc extends Bloc<ImageShareEvent, ImageShareState> {
   _selectFile(ImageShareSelectFileEvent event, emit) async {
     isFileLoader = true;
     _eventCompleted(emit);
-
     var locationRes = await LocationHelper.getLocationOfflineMode(
         context: event.context.mounted ? event.context : event.context);
     LocationModel locationData = LocationModel();
     if (locationRes != null) {
       locationData = locationRes;
-    }
-
-    if (event.mediaType == 1) {
-      var res = await DashboardHelper.cameraPiker(
-          context: event.context.mounted ? event.context : event.context);
-      if (res != null) {
-        fileList.add(FileModel(name: "", file: res, keyName: "", lat: locationData.lat ?? 0.0, long: locationData.long ?? 0.0));
-      }
-    } else {
-      var res = await DashboardHelper.imagePiker(
-          context: event.context.mounted ? event.context : event.context);
-      if (res != null) {
-        fileList.add(FileModel(name: "", file: res, keyName: "", lat: locationData.lat ?? 0.0, long: locationData.long ?? 0.0));
+      if (event.mediaType == 1) {
+        var res = await DashboardHelper.cameraPiker(
+            context: event.context.mounted ? event.context : event.context);
+        if (res != null) {
+          fileList.add(FileModel(name: "", file: res, keyName: "", lat: locationData.lat ?? 0.0, long: locationData.long ?? 0.0));
+        }
+      } else {
+        var res = await DashboardHelper.imagePiker(
+            context: event.context.mounted ? event.context : event.context);
+        if (res != null) {
+          fileList.add(FileModel(name: "", file: res, keyName: "", lat: locationData.lat ?? 0.0, long: locationData.long ?? 0.0));
+        }
       }
     }
     isFileLoader = false;

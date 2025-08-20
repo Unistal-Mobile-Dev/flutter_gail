@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/task/createTask/domain/model/lineWalker_user_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/maintenance_type_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/pipeline_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/region_type_model.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_gail/feature/task/createTask/domain/model/route_model.da
 import 'package:flutter_gail/feature/task/createTask/domain/model/section_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/shift_group_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/shift_type_model.dart';
+import 'package:flutter_gail/feature/task/createTask/domain/model/supervisor_users_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/task_from_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/user_name_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/user_type_model.dart';
@@ -30,6 +32,10 @@ class CreateTaskHelper {
        repeatFrequencyList.add(RepeatFrequencyModel(
            id: "3",
            name: "Monthly"
+       ));
+       repeatFrequencyList.add(RepeatFrequencyModel(
+           id: "4",
+           name: "One Time"
        ));
 /*       repeatFrequencyList.add(RepeatFrequencyModel(
           id: "0",
@@ -90,18 +96,36 @@ class CreateTaskHelper {
     return null;
   }
 
+
   static Future<dynamic> fetchPipeline({
     required RegionTypeModel regionData,
     required MaintenanceTypeModel maintenanceTypeData
   }) async {
     try{
       String url =  APIs.areaStructureApi+"?region_code=${regionData.code}"
-          "&maint_base_name=${maintenanceTypeData.name}";
+          "&maintenance_base_code=${maintenanceTypeData.code}";
       var res =  await ServerRequest.getData(urlEndPoint: url);
       if(res != null && res['pipelineData'] != null){
         return pipelineLIstResponse(res['pipelineData']);
       }
     }catch(_){}
+    return null;
+  }
+
+  static Future<dynamic> fetchMaintenanceSupervisorUsers({required MaintenanceTypeModel maintenanceTypeData}) async {
+    try{
+      String url =  APIs.getsupervisorUserApi+"?maintenance_base_code=${maintenanceTypeData.code}";
+      var res =  await ServerRequest.getData(urlEndPoint: url);
+      if(res != null && res['supervisorUsers'] != null && res['lineWalkerUsers'] != null){
+        Map<String, dynamic> value = {
+          "supervisorUsers" : supervisorUsersListResponse(res['supervisorUsers']),
+          "lineWalkerUsers" : lineWalkerUsersFromJson(res['lineWalkerUsers'])
+        };
+        return value;
+      }
+    }catch(e){
+      print(e.toString());
+    }
     return null;
   }
 
@@ -112,7 +136,7 @@ class CreateTaskHelper {
   }) async {
     try{
       String url =  APIs.areaStructureApi+"?region_code=${regionData.code}"
-          "&maint_base_name=${maintenanceTypeData.name}&pipeline_code=${pipelineData.code}";
+          "&maintenance_base_code=${maintenanceTypeData.code}&pipeline_code=${pipelineData.code}";
       var res =  await ServerRequest.getData(urlEndPoint: url);
       if(res != null && res['sectionData'] != null){
         return sectionListResponse(res['sectionData']);
@@ -195,6 +219,8 @@ class CreateTaskHelper {
         required List<ShiftGroupModel> shiftGroupList,
         required List<UserNameModel> userNameList,
         required UserTypeModel userTypeModel,
+        required SupervisorUsersModel supervisorUsersData,
+        required List<LineWalkerUsersModel> lineWalkerUserList,
         required String assignedStartDate,
         required String assignedEndDate,
         required RepeatFrequencyModel repeatFrequencyData,
@@ -230,18 +256,18 @@ class CreateTaskHelper {
         SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select repeat frequency");
         return false;
       }
-      else if(userTypeModel.name == null){
-        SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select user type");
+      else if(userTypeModel.name.toString().toLowerCase() != "gail" && supervisorUsersData.name == null){
+        SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select supervisor name");
         return false;
       }
-      else if(userTypeModel.name.toString().toLowerCase() != "gail" && vendorData.name == null){
-        SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select vendor name");
+      else if(userTypeModel.name.toString().toLowerCase() != "gail" && lineWalkerUserList.isEmpty){
+        SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select lineWalker name");
         return false;
       }
-      else if(userNameList.isEmpty){
-        SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select user name");
-        return false;
-      }
+      // else if(userNameList.isEmpty){
+      //   SnackBarErrorWidget(!context.mounted ? context : context).show(message: "Please select user name");
+      //   return false;
+      // }
 
       for (var data in shiftGroupList) {
         if (data.userNameData?.name != null) {
@@ -271,7 +297,7 @@ class CreateTaskHelper {
         required String routeLength,
         required ShiftTypeModel shiftData,
         required List<ShiftGroupModel> shiftGroupList,
-        required List<UserNameModel> userNameList,
+        required List<LineWalkerUsersModel> userNameList,
         required UserTypeModel userTypeModel,
         required String assignedStartDate,
         required String assignedEndDate,
@@ -289,7 +315,7 @@ class CreateTaskHelper {
 
       List<String> userIdData = [];
       for(var data in userNameList){
-        userIdData.add(data.securityId.toString());
+        userIdData.add(data.userId.toString());
       }
 
       List<List<String>> shiftNameData = [];
@@ -313,9 +339,9 @@ class CreateTaskHelper {
         "patrollroute_name": routeModel.name.toString(),
         "patrollroute_length": routeLength.toString(),
         "sg_code": shiftData.sgCode.toString(),
-        "repeat_frequency": repeatFrequencyData.name.toString().toLowerCase(),
+        "repeat_frequency": repeatFrequencyData.id.toString() == "4" ? "once" : repeatFrequencyData.name.toString().toLowerCase(),
         "user_id": userIdData,
-        "user_name": userNameData,
+        // "user_name": userNameData,
         "shift_name": shiftNameData,
         "vendor": vendorData.name.toString(),
         "user_type": userTypeModel.name.toString(),

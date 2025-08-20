@@ -6,11 +6,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/commonWidgets/email_validation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 class LoginHelper {
-
   static const platform = MethodChannel('com.gail.app/channel');
 
   static Future<void> openDevSettings() async {
@@ -34,12 +34,21 @@ class LoginHelper {
   static Future<dynamic> textFieldValidation(
       {required String emilId,
       required String password,
+      required String loginType,
       required BuildContext context}) async {
     try {
-      if (emilId.isEmpty) {
+      if (loginType.isEmpty) {
+        SnackBarErrorWidget(context).show(message: "Please select user type");
+        return false;
+      } else if (emilId.isEmpty) {
         SnackBarErrorWidget(context).show(message: "Please enter email id");
         return false;
-      } else if (password.isEmpty) {
+      }
+      else if (await EmailValidation.checkEmailValidation(emailId: emilId) == false && loginType == "2") {
+        SnackBarErrorWidget(context).show(message: "Please enter correct email id");
+        return false;
+      }
+      else if (password.isEmpty) {
         SnackBarErrorWidget(context).show(message: "Please enter password");
         return false;
       }
@@ -88,7 +97,8 @@ class LoginHelper {
 
         String url = APIs.login;
         var res = await ServerRequest.postData(
-            urlEndPoint: url, body: jsonEncode(json),
+            urlEndPoint: url,
+            body: jsonEncode(json),
             context: !context.mounted ? context : context);
         if (res != null && res['users'] != null) {
           if (Platform.isAndroid) {
@@ -106,8 +116,56 @@ class LoginHelper {
     }
   }
 
-  static Future<dynamic> addDevice({required String userId, required BuildContext context}) async {
-    try{
+  static Future<dynamic> getLoginOTPData(
+      {required String userId,
+        required String otp,
+        required String loginType,
+        required BuildContext context}) async {
+    var deviceId = await getUniqueDeviceId();
+    String? firebaseToken;
+    try {
+      firebaseToken = await FirebaseMessaging.instance.getToken();
+      if (kDebugMode) {
+        print(firebaseToken.toString());
+      }
+    } catch (_) {
+      firebaseToken = "";
+    }
+
+    try {
+      if (await isInternetConnected() == true) {
+        var json = LoginOTPScreenRequestModel(
+          userId: userId,
+          otp: otp,
+          loginType: loginType,
+          firebaseId: firebaseToken.toString(),
+          deviceId: deviceId,
+        ).toJson();
+
+        String url = APIs.login;
+        var res = await ServerRequest.postData(
+            urlEndPoint: url,
+            body: jsonEncode(json),
+            context: !context.mounted ? context : context);
+        if (res != null && res['users'] != null) {
+          if (Platform.isAndroid) {
+            await deleteCacheDir();
+            await deleteAppDir();
+          }
+          return res;
+        }
+      }
+      return null;
+    } catch (e) {
+      if (!context.mounted) return null;
+      SnackBarErrorWidget(context).show(message: "Internal server error");
+      return null;
+    }
+  }
+
+  static Future<dynamic> addDevice(
+      {required String userId, required BuildContext context}) async {
+    try {
       final deviceInfo = DeviceInfoPlugin();
       var deviceId = await getUniqueDeviceId();
       String brand = "";
@@ -121,7 +179,7 @@ class LoginHelper {
         deviceVersion = androidInfo.version.release;
         deviceType = "Android";
       }
-      String url =  APIs.addDeviceApi;
+      String url = APIs.addDeviceApi;
       var json = {
         "user_id": userId,
         "device_id": deviceId.toString(),
@@ -132,9 +190,30 @@ class LoginHelper {
         "device_status": "Active"
       };
       await ServerRequest.postData(
-          urlEndPoint: url, body: jsonEncode(json),
+          urlEndPoint: url,
+          body: jsonEncode(json),
           context: !context.mounted ? context : context);
-    }catch(_){}
+    } catch (_) {}
+  }
+
+  static Future<dynamic> sendOtp(
+      {required String emailId,
+        required String password,
+        required BuildContext context}) async {
+
+     try {
+         String url =  APIs.generateOtpApi;
+         var json = {
+           "email" : emailId,
+           "password" : password,
+         };
+         var res =  await ServerRequest.postData(urlEndPoint: url, body: jsonEncode(json), context: context);
+         if(res != null && res['success'] != null && res['success'] == true){
+            return res['userId'].toString();
+         }
+     }catch(_){}
+    return null;
+
   }
 
   static Future<bool> isInternetConnected() async {

@@ -53,6 +53,10 @@ final class FetchCreateTaskDataState extends CreateTaskInitial {
   final bool isPatrolRouteNameLoader;
   final bool isVendorLoader;
   final bool isUserNameLoader;
+  final List<SupervisorUsersModel> supervisorUsersList;
+  final SupervisorUsersModel supervisorUsersData;
+  final List<LineWalkerUsersModel> lineWalkerUsersList;
+  final List<LineWalkerUsersModel> lineWalkerUsersData;
 
   FetchCreateTaskDataState({
     required this.isLoader,
@@ -95,6 +99,10 @@ final class FetchCreateTaskDataState extends CreateTaskInitial {
     required this.isPatrolRouteNameLoader,
     required this.isPipelineNameLoader,
     required this.isSectionNameLoader,
+    required this.lineWalkerUsersData,
+    required this.lineWalkerUsersList,
+    required this.supervisorUsersData,
+    required this.supervisorUsersList,
   });
 
   @override
@@ -140,5 +148,9 @@ final class FetchCreateTaskDataState extends CreateTaskInitial {
     isPatrolRouteNameLoader,
     isPipelineNameLoader,
     isSectionNameLoader,
+    lineWalkerUsersData,
+    lineWalkerUsersList,
+    supervisorUsersData,
+    supervisorUsersList,
   ];
 }

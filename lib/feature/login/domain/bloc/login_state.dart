@@ -16,6 +16,7 @@ class FetchLoginStateData extends LoginStateInit {
   final TextEditingController passwordTextFieldController;
   final String appLogo;
   final String appVersion;
+  final  String loginType;
 
   FetchLoginStateData({
     required this.isLoader,
@@ -25,6 +26,7 @@ class FetchLoginStateData extends LoginStateInit {
     required this.userNameTextFiledController,
     required this.passwordTextFieldController,
     required this.appVersion,
+    required this.loginType,
   });
 
   @override
@@ -35,6 +37,7 @@ class FetchLoginStateData extends LoginStateInit {
         appLogo,
         userNameTextFiledController,
         passwordTextFieldController,
-        appVersion
+        appVersion,
+        loginType
       ];
 }

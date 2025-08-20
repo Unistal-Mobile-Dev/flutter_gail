@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/task/createTask/domain/model/lineWalker_user_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/line_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/maintenance_type_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/pipeline_model.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_gail/feature/task/createTask/domain/model/route_model.da
 import 'package:flutter_gail/feature/task/createTask/domain/model/section_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/shift_group_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/shift_type_model.dart';
+import 'package:flutter_gail/feature/task/createTask/domain/model/supervisor_users_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/task_from_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/task_type_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/user_name_model.dart';
@@ -85,6 +87,11 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
   bool isUserNameLoader =  false;
   int id = 0;
 
+  List<SupervisorUsersModel> supervisorUsersList = [];
+  SupervisorUsersModel supervisorUsersData =  SupervisorUsersModel();
+  List<LineWalkerUsersModel> lineWalkerUsersList = [];
+  List<LineWalkerUsersModel> lineWalkerUsersData = [];
+
   CreateTaskBloc() : super(CreateTaskInitial()) {
     on<CreateTaskPageLoadEvent>(_pageLoad);
     on<CreateTaskSelectLineDataEvent>(_lineData);
@@ -98,6 +105,8 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     on<CreateTaskMaintenanceTypeEvent>(_selectMaintenance);
     on<CreateTaskTypeEvent>(_selectTaskType);
     on<CreateTaskPipelineTypeEvent>(_selectPipeline);
+    on<CreateTaskSupervisorUserEvent>(_selectSupervisorUser);
+    on<CreateTaskLineWalkerUserEvent>(_selectLineWalkerUser);
     on<CreateTaskRouteEvent>(_selectRoute);
     on<CreateTaskShiftGroupEvent>(_selectShiftGroup);
     on<CreateTaskUserTypeEvent>(_selectUserType);
@@ -138,6 +147,10 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     isPatrolRouteNameLoader =  false;
     isVendorLoader =  false;
     isUserNameLoader =  false;
+    supervisorUsersList = [];
+    supervisorUsersData =  SupervisorUsersModel();
+    lineWalkerUsersList = [];
+    lineWalkerUsersData = [];
 
 
     var resRegion =  await CreateTaskHelper.fetchArea();
@@ -282,6 +295,53 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     _eventComplete(emit);
   }
 
+  // For Supervisor User
+  _selectSupervisorUser(CreateTaskSupervisorUserEvent event, emit) async {
+    supervisorUsersData  =  event.supervisorUserData;
+    shiftGroupList = [];
+    lineWalkerUsersData = [];
+    shiftGroupData =  ShiftGroupModel();
+    id = 0;
+    _eventComplete(emit);
+  }
+
+// For Line Walker User
+  _selectLineWalkerUser(CreateTaskLineWalkerUserEvent event, emit) async {
+    lineWalkerUsersData =  event.lineWalkerUserData;
+    shiftGroupList = [];
+    id = 0;
+    shiftGroupData =  ShiftGroupModel();
+
+    // Filter once, outside the loop
+    List<ShiftTypeModel> filteredShiftList = shiftList
+        .where((element) => element.sgCode.toString() == shiftData.sgCode.toString())
+        .toList();
+
+    for (var userData in lineWalkerUsersData) {
+
+      List<ShiftTypeModel> copiedList = filteredShiftList.map((shift) {
+        return ShiftTypeModel(
+          id: id++, // assign a unique ID
+          sgCode: shift.sgCode,
+          name: shift.name,
+          startTime: shift.startTime,
+          endTime: shift.endTime,
+          isSelected: false,
+        );
+      }).toList();
+
+      shiftGroupList.add(
+        ShiftGroupModel(
+          userNameData: userData,
+          selectedValue: "",
+          shiftList: copiedList,
+        ),
+      );
+    }
+
+    _eventComplete(emit);
+  }
+
   _selectRoute(CreateTaskRouteEvent event, emit) {
     routeData =  event.routeData;
     _eventComplete(emit);
@@ -298,13 +358,23 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     userNameList = [];
     userNameData =  [];
     shiftGroupList = [];
+    supervisorUsersList =  [];
+    lineWalkerUsersList =  [];
+    supervisorUsersData =  SupervisorUsersModel();
+    lineWalkerUsersData = [];
     isVendorLoader = true;
+    isUserNameLoader =  true;
     _eventComplete(emit);
-    var resVendor =  await CreateTaskHelper.fetchVendor(
-        userTypeData: userTypeData, sectionData: sectionData);
-    if(resVendor != null){
-      vendorList = resVendor;
+    if(userTypeData.name.toString().toLowerCase() != "gail"){
+      var res =  await CreateTaskHelper.fetchMaintenanceSupervisorUsers(
+          maintenanceTypeData: maintenanceTypeData);
+      if(res != null){
+        supervisorUsersList =  res['supervisorUsers'];
+        lineWalkerUsersList =  res['lineWalkerUsers'];
+      }
     }
+
+    isUserNameLoader =  false;
     isVendorLoader = false;
     _eventComplete(emit);
   }
@@ -332,33 +402,6 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     userNameData = event.userNameData;
     shiftGroupList = [];
     id = 0;
-
-// Filter once, outside the loop
-    List<ShiftTypeModel> filteredShiftList = shiftList
-        .where((element) => element.sgCode.toString() == shiftData.sgCode.toString())
-        .toList();
-
-    for (var userData in userNameData) {
-
-      List<ShiftTypeModel> copiedList = filteredShiftList.map((shift) {
-        return ShiftTypeModel(
-          id: id++, // assign a unique ID
-          sgCode: shift.sgCode,
-          name: shift.name,
-          startTime: shift.startTime,
-          endTime: shift.endTime,
-          isSelected: false,
-        );
-      }).toList();
-
-      shiftGroupList.add(
-        ShiftGroupModel(
-          userNameData: userData,
-          selectedValue: "",
-          shiftList: copiedList,
-        ),
-      );
-    }
     _eventComplete(emit);
   }
 
@@ -400,6 +443,8 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
         assignedStartDate: startPatrollingDateController.text.toString(),
         assignedEndDate: endPatrollingDateController.text.toString(),
         repeatFrequencyData: repeatFrequencyData,
+        lineWalkerUserList: lineWalkerUsersData,
+        supervisorUsersData: supervisorUsersData,
         vendorData: vendorData);
     if(textFiledValidation == false){
       isLoader =  false;
@@ -418,7 +463,7 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
         routeLength: routeData.length !=  null ? routeData.length.toString(): "",
         shiftData: shiftData,
         shiftGroupList: shiftGroupList,
-        userNameList: userNameData,
+        userNameList: lineWalkerUsersData,
         userTypeModel: userTypeData,
         assignedStartDate: startPatrollingDateController.text.toString(),
         assignedEndDate: endPatrollingDateController.text.toString(),
@@ -445,6 +490,8 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
       pipelineData =  PipelineModel();
       sectionData =  SectionModel();
       shiftGroupList = [];
+      lineWalkerUsersData = [];
+      supervisorUsersData =  SupervisorUsersModel();
     }
     isLoader =  false;
     _eventComplete(emit);
@@ -492,7 +539,11 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
       isPipelineNameLoader: isPipelineNameLoader,
       isSectionNameLoader: isSectionNameLoader,
       isUserNameLoader: isUserNameLoader,
-      isVendorLoader: isVendorLoader
+      isVendorLoader: isVendorLoader,
+      lineWalkerUsersData: lineWalkerUsersData,
+      lineWalkerUsersList: lineWalkerUsersList,
+      supervisorUsersData: supervisorUsersData,
+      supervisorUsersList: supervisorUsersList,
     ));
   }
 }

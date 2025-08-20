@@ -3,6 +3,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/home/presentation/page/home_page.dart';
 import 'package:flutter_gail/feature/login/helper/login_helper.dart';
 import 'package:flutter_gail/feature/login/presentations/pages/login_screen_page.dart';
+import 'package:flutter_gail/feature/otp/presentation/page/otp_page.dart';
 import 'package:flutter_gail/utils/commonClass/connectivity_helper.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
 
@@ -12,6 +13,7 @@ import 'login_state.dart';
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc() : super(LoginStateInit()) {
     on<LoginPageLoadingEvent>(_pageLoad);
+    on<SelectLoginTypeEvent>(_selectLoginType);
     on<LoginSetEmailEvent>(_setEmailId);
     on<LoginSetPasswordEvent>(_setPassword);
     on<LoginPasswordHideShowEvent>(_passwordHideShow);
@@ -48,6 +50,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   String get appVersion => _appVersion;
 
+  String loginType = "1";
+  String userId = "";
+
+  _selectLoginType(SelectLoginTypeEvent event, emit) {
+    loginType = event.loginType;
+    _eventCompleted(emit);
+  }
+
   _setEmailId(LoginSetEmailEvent event, emit) {
     email = event.emailId.replaceAll("", "");
   }
@@ -67,6 +77,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     _isPassword = true;
     _isLoader = false;
     _appLogoLoader = true;
+    loginType = "1";
+    userId = "";
     _appLogo =
         "https://unistal.hrmmitra.in/uploads/logo/signin/signin_logo_1569825597.png";
     userNameTextFiledController.text = "";
@@ -87,16 +99,42 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         false) {
       return;
     }
-
+    userId = "";
     _loginData = LoginDataModel();
     var textFieldValidationCheck = await LoginHelper.textFieldValidation(
         emilId: email,
         password: password,
+        loginType: loginType,
         context: event.context.mounted ? event.context : event.context);
     if (textFieldValidationCheck == true) {
       _isLoader = true;
       _eventCompleted(emit);
-      var res = await LoginHelper.getLoginData(
+
+        var otpRes = await LoginHelper.sendOtp(
+            emailId: email,
+            password: password,
+            context: !event.context.mounted ? event.context : event.context);
+        if (otpRes == null) {
+          _isLoader = false;
+          _eventCompleted(emit);
+            return ;
+        }
+
+      _isLoader = false;
+      _eventCompleted(emit);
+        userId =  otpRes;
+        Navigator.push(
+            !event.context.mounted ? event.context : event.context,
+            MaterialPageRoute(
+                builder: (_) => OtpPage(
+                  emailId: email,
+                  password: password,
+                )
+            )
+        );
+
+
+/*      var res = await LoginHelper.getLoginData(
           emilId: email,
           password: password,
           context: event.context.mounted ? event.context : event.context);
@@ -104,13 +142,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       _eventCompleted(emit);
       if (res != null) {
         _loginData = loginResponse(res);
-        // AppConfig.instanceInit()?.roleType = loginData.roleType;
-        // if (loginData.roleType == RoleType.noRole) {
-        //   SnackBarErrorWidget(
-        //           !event.context.mounted ? event.context : event.context)
-        //       .show(message: "Invalid role");
-        //   return;
-        // }
         UserInfo.instanceInit()?.userData = loginData;
         SharedPreferencesUtils.setString(
             key: PreferencesName.userName, value: email.toString());
@@ -127,7 +158,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               MaterialPageRoute(builder: (_) => const LoginScreenPage()),
               (route) => false);
         }
-      }
+      }*/
     }
   }
 
@@ -140,6 +171,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       userNameTextFiledController: userNameTextFiledController,
       passwordTextFieldController: passwordTextFieldController,
       appVersion: appVersion,
+      loginType: loginType,
     ));
   }
 }

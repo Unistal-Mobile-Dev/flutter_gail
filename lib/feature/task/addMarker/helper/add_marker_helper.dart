@@ -108,7 +108,7 @@ class AddMarkerHelper {
           "task_id" : taskData.taskId.toString(),
           "patrollroute_id" : taskData.patrollRouteId.toString(),
           "sectionCode " : taskData.sectionCode.toString(),
-          "observation_type" : "Marker",
+          "observation_type" : RouteObservation.marker.value.toString(),
           "paint_condition" : painting.toString(),
           "description" : remark.toString(),
           "condition" : condition.toString(),

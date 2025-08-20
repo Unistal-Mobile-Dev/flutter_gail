@@ -36,6 +36,9 @@ class APIs {
   static get areaStructureApi =>
       "common-apis/area-structure";
 
+  static get getsupervisorUserApi =>
+      "patrolling-surveillance/patrollman-task/supervisor-users";
+
   static get assignTaskApi =>
       "patrolling-surveillance/patrollman-task/assign-task";
 
@@ -77,6 +80,10 @@ class APIs {
   static get getTlpTaskApi => "cp-system/short-interval/tasks";
 
   static get addTlpApi => "cp-system/short-interval/soil/create-tlp";
+
+  static get generateOtpApi => "auth/2fa/generate-otp";
+
+  static get verifyOtpApi => "auth/2fa/verify-otp";
 
   static get forgotPasswordApi => "";
 }

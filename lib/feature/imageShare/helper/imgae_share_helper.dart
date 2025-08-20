@@ -232,6 +232,7 @@ class ImageShareHelper extends ImageShareInterface {
        LocationModel locationData = LocationModel();
        if (locationRes != null) {
          locationData = locationRes;
+          return null;
        }
 
        final DateFormat formatter = DateFormat('dd-MM-yyyy');

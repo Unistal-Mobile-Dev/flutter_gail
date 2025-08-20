@@ -101,7 +101,7 @@ class AddCrossingHelper {
       var json = {
         "task_id" : taskData.taskId.toString(),
         "patrollroute_id" : taskData.patrollRouteId.toString(),
-        "observation_type" : "Crossing",
+        "observation_type" : RouteObservation.crossing.value.toString(),
         "sectionCode " : taskData.sectionCode.toString(),
         "description" : remark.toString(),
         "condition" : "",
