@@ -230,9 +230,10 @@ class ImageShareHelper extends ImageShareInterface {
        var locationRes = await LocationHelper.getLocationOfflineMode(
            context: context);
        LocationModel locationData = LocationModel();
-       if (locationRes != null) {
-         locationData = locationRes;
+       if (locationRes == null) {
           return null;
+       } else {
+         locationData = locationRes;
        }
 
        final DateFormat formatter = DateFormat('dd-MM-yyyy');
