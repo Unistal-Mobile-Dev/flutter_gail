@@ -3,11 +3,15 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  arcgis_maps
   audioplayers_windows
   battery_plus
+  desktop_webview_window
   file_selector_windows
   firebase_auth
   firebase_core
+  flutter_secure_storage_windows
+  flutter_tts
   geolocator_windows
   permission_handler_windows
   record_windows
@@ -17,7 +21,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
-  arcgis_maps
+  flutter_local_notifications_windows
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

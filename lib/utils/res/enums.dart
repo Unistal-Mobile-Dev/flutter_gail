@@ -19,3 +19,5 @@ enum RouteObservation {
   final int value;
   const RouteObservation(this.value);
 }
+
+enum AppPermissionStatus { granted, denied, permanentlyDenied }

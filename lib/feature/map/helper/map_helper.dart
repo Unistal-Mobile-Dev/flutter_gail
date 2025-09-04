@@ -47,13 +47,6 @@ class MapHelper {
     return null;
   }
 
-  static List<LatLng> decodeEncodedPolyline(String encoded) {
-    PolylinePoints polylinePoints = PolylinePoints();
-    List<PointLatLng> result = polylinePoints.decodePolyline(encoded);
-    return result
-        .map((point) => LatLng(point.latitude, point.longitude))
-        .toList();
-  }
 
   static Future<dynamic> fetchMarkerList({required String sectionCode}) async {
     try {

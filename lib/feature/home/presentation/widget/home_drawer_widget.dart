@@ -5,6 +5,7 @@ import 'package:flutter_gail/feature/home/domain/model/drawer_model.dart';
 import 'package:flutter_gail/feature/home/presentation/widget/logout_widget.dart';
 import 'package:flutter_gail/feature/imageShare/presentation/page/image_share_page.dart';
 import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
+import 'package:flutter_gail/feature/pgis/presentation/page/pgis_page.dart';
 import 'package:flutter_gail/feature/task/viewTask/presentation/page/task_page.dart';
 import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/presentation/page/add_tlp_survey_page.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
@@ -75,6 +76,7 @@ class HomeDrawerWidget extends StatelessWidget {
                   isImageSharing == true
                       ? _imageSharing(context: context)
                       : const SizedBox.shrink(),
+                  _pgis(context: context),
                   _logout(context: context),
                 ],
               ),
@@ -460,6 +462,51 @@ class HomeDrawerWidget extends StatelessWidget {
             ),
             TextWidget(
               AppString.imageSharing,
+              fontSize: AppFont.font_14,
+              color: AppColor.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _pgis({required BuildContext context}) {
+    return Padding(
+      padding: EdgeInsets.only(
+          top: MediaQuery.of(context).size.width * 0.02,
+          bottom: MediaQuery.of(context).size.width * 0.02),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+          // BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
+          //     widget: PgisPage(), title: AppString.pgis));
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PgisPage()),
+          );
+        },
+        child: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                // color: Colors.white.withOpacity(.2),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(7.0),
+                child: Icon(
+                  Icons.gps_fixed_sharp,
+                  color: AppColor.white,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.02,
+            ),
+            TextWidget(
+              AppString.pgis,
               fontSize: AppFont.font_14,
               color: AppColor.white,
             ),

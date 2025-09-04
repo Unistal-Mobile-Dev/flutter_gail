@@ -129,6 +129,8 @@ class AppString {
 
   static get imageSharing => "Image Sharing";
 
+  static get pgis => "PGIS";
+
   static get assigned => "Assigned";
 
   static get pipelineName => "Pipeline Name";
