@@ -218,7 +218,7 @@ class ImageShareHelper extends ImageShareInterface {
 
            var value = {
              "file-$id-lat" : data.lat.toString(),
-             "file-$id-lng" : data.lat.toString(),
+             "file-$id-lng" : data.long.toString(),
              "file-$id-section" : sectionData.sectionName != null ? sectionData.sectionName.toString()  : "",
              "file-$id-station" : stationData.name != null ? stationData.name.toString()  : "",
            };
