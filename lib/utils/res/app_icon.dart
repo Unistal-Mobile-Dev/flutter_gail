@@ -1,5 +1,5 @@
 class AppIcon {
-  static get gailLogo => "assets/gail_logo.png";
+  static get gailLogo => "assets/upims_logo.png";
 
   static get transperentBackground => "assets/transperent_background.png";
 
