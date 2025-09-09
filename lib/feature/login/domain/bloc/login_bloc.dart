@@ -113,6 +113,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         var otpRes = await LoginHelper.sendOtp(
             emailId: email,
             password: password,
+            loginType: loginType,
             context: !event.context.mounted ? event.context : event.context);
         if (otpRes == null) {
           _isLoader = false;

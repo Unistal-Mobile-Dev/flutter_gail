@@ -199,6 +199,7 @@ class LoginHelper {
   static Future<dynamic> sendOtp(
       {required String emailId,
         required String password,
+        required String loginType,
         required BuildContext context}) async {
 
      try {
@@ -206,6 +207,7 @@ class LoginHelper {
          var json = {
            "email" : emailId,
            "password" : password,
+           "userType": loginType == "1" ? "internal" :"external"
          };
          var res =  await ServerRequest.postData(urlEndPoint: url, body: jsonEncode(json), context: context);
          if(res != null && res['success'] != null && res['success'] == true){

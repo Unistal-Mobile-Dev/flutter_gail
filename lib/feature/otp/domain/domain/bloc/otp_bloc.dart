@@ -84,10 +84,11 @@ class OtpBloc extends Bloc<OtpEvent, OtpState> {
     isLoader = false;
     clearText = true;
     _eventComplete(emit);
-
+    String loginType =  BlocProvider.of<LoginBloc>(!event.context.mounted ? event.context : event.context).loginType;
     var otpRes = await LoginHelper.sendOtp(
         emailId: email,
         password: password,
+        loginType: loginType,
         context: !event.context.mounted ? event.context : event.context);
     if (otpRes == null) {
       return ;
