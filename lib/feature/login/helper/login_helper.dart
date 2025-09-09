@@ -44,10 +44,10 @@ class LoginHelper {
         SnackBarErrorWidget(context).show(message: "Please enter email id");
         return false;
       }
-      else if (await EmailValidation.checkEmailValidation(emailId: emilId) == false && loginType == "2") {
-        SnackBarErrorWidget(context).show(message: "Please enter correct email id");
-        return false;
-      }
+      // else if (await EmailValidation.checkEmailValidation(emailId: emilId) == false && loginType == "2") {
+      //   SnackBarErrorWidget(context).show(message: "Please enter correct email id");
+      //   return false;
+      // }
       else if (password.isEmpty) {
         SnackBarErrorWidget(context).show(message: "Please enter password");
         return false;
