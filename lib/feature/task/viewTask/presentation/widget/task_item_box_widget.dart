@@ -243,10 +243,13 @@ class TaskItemBoxWidget extends StatelessWidget {
                      child: TextWidget(
                    taskData.taskStatus == TaskStatus.notStarted ? "Not Started"
                       :  taskData.taskStatus == TaskStatus.started ? "Started"
-                       : taskData.taskStatus == TaskStatus.pause ? "Pause" : "Completed",
+                       : taskData.taskStatus == TaskStatus.pause ? "Pause"
+                       : taskData.taskStatus == TaskStatus.resume ? "Resume"
+                       : "Completed",
                    fontSize: AppFont.font_11,
                    color:  taskData.taskStatus == TaskStatus.notStarted ? Colors.orange
                        :  taskData.taskStatus == TaskStatus.started ? Colors.blueGrey
+                       :  taskData.taskStatus == TaskStatus.resume ? Colors.blueGrey
                        : taskData.taskStatus == TaskStatus.pause ?  Colors.red :  Colors.green,
                   )
                  )

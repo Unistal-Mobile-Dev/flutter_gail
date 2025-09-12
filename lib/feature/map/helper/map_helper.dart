@@ -217,15 +217,32 @@ class MapHelper {
     return coordinates;
   }
 
+  // static double calculateDistance(lat1, lon1, lat2, lon2) {
+  //   var p = 0.017453292519943295;
+  //   var c = cos;
+  //   var a = 0.5 -
+  //       c((lat2 - lat1) * p) / 2 +
+  //       c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+  //   var radiusOfEarth = 6371;
+  //   return radiusOfEarth * 2 * asin(sqrt(a));
+  // }
+
   static double calculateDistance(lat1, lon1, lat2, lon2) {
-    var p = 0.017453292519943295;
-    var c = cos;
-    var a = 0.5 -
-        c((lat2 - lat1) * p) / 2 +
-        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
-    var radiusOfEarth = 6371;
-    return radiusOfEarth * 2 * asin(sqrt(a));
+    const double R = 6371000; // Radius of Earth in meters
+    double dLat = toRadians(lat2 - lat1);
+    double dLon = toRadians(lon2 - lon1);
+
+    double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(toRadians(lat1)) *
+            math.cos(toRadians(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+
+    double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+
+    return R * c; // distance in meters
   }
+
 
   static double calculateBearing(lat1, lon1, lat2, lon2) {
     final double startLat = toRadians(lat1);
@@ -258,7 +275,7 @@ class MapHelper {
     for (var routeData in routes) {
       List<PointsModel> pointsList = routeData;
       for (var points in pointsList) {
-        double distance = calculateBearing(
+        double distance = calculateDistance(
             currentLocation.y, currentLocation.x, points.y, points.x);
         if (distance < shortestDistance) {
           print("Get Distance ===== $distance");

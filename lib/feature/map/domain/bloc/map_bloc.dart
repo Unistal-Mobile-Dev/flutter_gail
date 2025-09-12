@@ -221,7 +221,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       _eventComplete(emit);
     }
 
-    if (taskData.taskStatus == TaskStatus.started) {
+    if (taskData.taskStatus == TaskStatus.started
+         || taskData.taskStatus == TaskStatus.resume) {
       await MapHelper.locationSave(
           context: !context.mounted ? context : context,
           lastPoint: lastPoint,

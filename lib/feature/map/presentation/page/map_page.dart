@@ -232,38 +232,47 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           SizedBox(
             height: MediaQuery.of(context).size.width * 0.03,
           ),
-          dataState.taskData.taskStatus == TaskStatus.started ?
+          dataState.taskData.taskStatus == TaskStatus.started
+              || dataState.taskData.taskStatus == TaskStatus.resume ?
           _addMarkerButton()
               : const SizedBox.shrink(),
-          dataState.taskData.taskStatus == TaskStatus.started ?
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ): const SizedBox.shrink(),
-
-          dataState.taskData.taskStatus == TaskStatus.started ?
-          _addCrossingButton() : const SizedBox.shrink(),
-          dataState.taskData.taskStatus == TaskStatus.started ?
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ): const SizedBox.shrink(),
-
-          dataState.taskData.taskStatus == TaskStatus.started ?
-          _addIncidentButton() : const SizedBox.shrink(),
-          dataState.taskData.taskStatus == TaskStatus.started ?
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ): const SizedBox.shrink(),
-
-          dataState.taskData.taskStatus == TaskStatus.started ?
-          _addEncroachmentButton(): const SizedBox.shrink(),
-
-          dataState.taskData.taskStatus == TaskStatus.started ?
+          dataState.taskData.taskStatus == TaskStatus.started
+              || dataState.taskData.taskStatus == TaskStatus.resume ?
           SizedBox(
             height: MediaQuery.of(context).size.width * 0.03,
           ): const SizedBox.shrink(),
 
           dataState.taskData.taskStatus == TaskStatus.started
-              ? _addDeviationButton() : const SizedBox.shrink(),
+              || dataState.taskData.taskStatus == TaskStatus.resume ?
+          _addCrossingButton() : const SizedBox.shrink(),
+          dataState.taskData.taskStatus == TaskStatus.started
+              || dataState.taskData.taskStatus == TaskStatus.resume ?
+          SizedBox(
+            height: MediaQuery.of(context).size.width * 0.03,
+          ): const SizedBox.shrink(),
+
+          dataState.taskData.taskStatus == TaskStatus.started
+              || dataState.taskData.taskStatus == TaskStatus.resume ?
+          _addIncidentButton() : const SizedBox.shrink(),
+          dataState.taskData.taskStatus == TaskStatus.started
+              || dataState.taskData.taskStatus == TaskStatus.resume ?
+          SizedBox(
+            height: MediaQuery.of(context).size.width * 0.03,
+          ): const SizedBox.shrink(),
+
+          dataState.taskData.taskStatus == TaskStatus.started
+              || dataState.taskData.taskStatus == TaskStatus.resume ?
+          _addEncroachmentButton(): const SizedBox.shrink(),
+
+          dataState.taskData.taskStatus == TaskStatus.started
+              || dataState.taskData.taskStatus == TaskStatus.resume ?
+          SizedBox(
+            height: MediaQuery.of(context).size.width * 0.03,
+          ): const SizedBox.shrink(),
+
+          dataState.taskData.taskStatus == TaskStatus.started
+              || dataState.taskData.taskStatus == TaskStatus.resume ?
+               _addDeviationButton() : const SizedBox.shrink(),
         ],
       ) : const DottedLoaderWidget(),
     );
@@ -585,7 +594,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           }
           else if(dataSate.taskData.taskStatus == TaskStatus.started) {
             _mapViewController.locationDisplay.stop();
-            taskStatus =  TaskStatus.pause;
+              taskStatus =  TaskStatus.pause;
           }
           else if(dataSate.taskData.taskStatus == TaskStatus.pause) {
             _mapViewController.locationDisplay.start();
@@ -593,7 +602,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           }
           else if(dataSate.taskData.taskStatus == TaskStatus.resume) {
             _mapViewController.locationDisplay.stop();
-            taskStatus =  TaskStatus.pause;
+              taskStatus =  TaskStatus.pause;
           }
           BlocProvider.of<MapBloc>(context).add(MapPageUpdateTaskEvent(
             context: context,
@@ -787,25 +796,35 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       _locationHistoryPointOverlay,
     ]);
 
+    DateTime _lastLocationUpdate = DateTime.now();
     List<List<PointsModel>> routes =  BlocProvider.of<MapBloc>(context).routes;
-    MapModel mapData =  BlocProvider.of<MapBloc>(context).mapData;
-    double buffer =  double.parse(mapData.buffer.toString());
-    int timeInterval =  int.parse(mapData.timeInterval.toString());
 
-    DateTime _lastLocationUpdate = DateTime.now().subtract( Duration(seconds: timeInterval));
+    final mapData = BlocProvider.of<MapBloc>(context).mapData;
+    final double buffer = (mapData.buffer is num)
+        ? mapData.buffer.toDouble()
+        : double.tryParse(mapData.buffer.toString()) ?? 0.0;
+
+    final int timeInterval = (mapData.timeInterval is int)
+        ? mapData.timeInterval
+        : int.tryParse(mapData.timeInterval.toString()) ?? 5;
+
+    _lastLocationUpdate = DateTime.now().subtract(Duration(seconds: timeInterval));
+
     _mapViewController.locationDisplay.onLocationChanged.listen((onData) {
       final now = DateTime.now();
-      if (now.difference(_lastLocationUpdate).inSeconds >= timeInterval) {
+      if (mounted && now.difference(_lastLocationUpdate).inSeconds >= timeInterval) {
         _lastLocationUpdate = now;
-        BlocProvider.of<MapBloc>(!context.mounted ? context : context).add(MapRouteLocationCheck(
-          context: !context.mounted ? context : context,
-          currentPoint: ArcGISPoint(
-            x: onData.position.x,
-            y: onData.position.y,
+        context.read<MapBloc>().add(
+          MapRouteLocationCheck(
+            context: context,
+            currentPoint: ArcGISPoint(
+              x: onData.position.x,
+              y: onData.position.y,
+            ),
+            verticalAccuracy: onData.verticalAccuracy,
+            speed: onData.speed,
           ),
-          verticalAccuracy: onData.verticalAccuracy,
-          speed: onData.speed,
-        ));
+        );
       }
     });
 
