@@ -47,8 +47,8 @@ class _RootState extends State<Root> {
           child: child!,
         );
       },
-        // home: const SplashScreen(),
-        home: const LoginScreenPage(),
+      home: const SplashScreen(),
+        // home: const LoginScreenPage(),
     ));
   }
 }

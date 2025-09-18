@@ -42,6 +42,7 @@ class SelectLoginTypeEvent extends LoginEvent {
    List<Object?> get props => [loginType];
 }
 
+
 class LoginSubmitDataEvent extends LoginEvent {
   final BuildContext context;
   final bool isLoginPage;
@@ -50,4 +51,14 @@ class LoginSubmitDataEvent extends LoginEvent {
 
   @override
   List<Object?> get props => [context, isLoginPage];
+}
+
+
+class LoginCheckEvent extends LoginEvent {
+  final BuildContext context;
+
+  LoginCheckEvent({required this.context});
+
+  @override
+  List<Object?> get props => [context];
 }

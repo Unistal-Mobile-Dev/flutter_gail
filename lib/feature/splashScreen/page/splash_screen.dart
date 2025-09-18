@@ -22,8 +22,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   pageOpen() async {
     await AppConfig.instanceInit()!.getPackageInfo();
-    String userName =
-        await SharedPreferencesUtils.getString(key: PreferencesName.userName);
+    String token =
+        await SharedPreferencesUtils.getString(key: PreferencesName.token);
     if(kReleaseMode){
       if(await LoginHelper.isDeveloperModeEnabled() == true){
         if(await _onWillPop() == true){
@@ -35,24 +35,15 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     }
 
-
-    if (userName.isEmpty) {
+    if (token.isEmpty) {
       await Future.delayed(const Duration(seconds: 2));
       Navigator.pushAndRemoveUntil(
           !context.mounted ? context : context,
           MaterialPageRoute(builder: (_) => const LoginScreenPage()),
           (route) => false);
     } else {
-      String password =
-          await SharedPreferencesUtils.getString(key: PreferencesName.password);
       BlocProvider.of<LoginBloc>(!context.mounted ? context : context)
-          .add(LoginSetPasswordEvent(password: password));
-      BlocProvider.of<LoginBloc>(!context.mounted ? context : context)
-          .add(LoginSetEmailEvent(emailId: userName));
-      BlocProvider.of<LoginBloc>(!context.mounted ? context : context).add(
-          LoginSubmitDataEvent(
-              context: !context.mounted ? context : context,
-              isLoginPage: false));
+          .add(LoginCheckEvent(context: !context.mounted ? context : context));
     }
   }
 

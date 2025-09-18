@@ -15,6 +15,8 @@ class APIs {
 
   static get login => "auth/login";
 
+  static get checkLogin => "auth/token-login";
+
   static get getTaskApi => "patrolling-surveillance/patrollman-task/taskList";
 
   static get addMarkerPointApi => "patrolling-surveillance/marker/add-marker";

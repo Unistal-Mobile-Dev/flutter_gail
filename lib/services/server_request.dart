@@ -20,7 +20,7 @@ class ServerRequest {
           false) {
         return null;
       }
-      addToken();
+      await addToken();
       String url = APIs.baseUrl + urlEndPoint;
       log(Uri.parse(url.toString()).toString());
       log(header.toString());
@@ -50,7 +50,7 @@ class ServerRequest {
   static Future<dynamic> putData(
       {required var urlEndPoint, required var body, required BuildContext context}) async {
     try {
-      addToken();
+      await addToken();
       String url = APIs.baseUrl + urlEndPoint;
       log(url);
       log(body);
@@ -136,7 +136,7 @@ class ServerRequest {
     try {
       String url = APIs.baseUrl + urlEndPoint;
       log(url);
-      addToken();
+      await addToken();
       print(body);
       log(header.toString());
       final response = await post(Uri.parse(url), headers: header, body: body)
@@ -239,7 +239,7 @@ class ServerRequest {
       String? keyWord,
       List<FileModel>? fileList}) async {
     try {
-      addToken();
+      await addToken();
       String url = APIs.baseUrl + urlEndPoint;
       Uri uri = Uri.parse(url);
       log(url);
@@ -321,16 +321,13 @@ class ServerRequest {
     }
   }
 
-  static addToken() {
+  static addToken() async {
     try{
-      String token = UserInfo.instanceInit()!.userData!.tokens!.access != null
-          ? "Bearer ${UserInfo.instanceInit()!.userData!.tokens!.access.toString()}"
-          : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ik9jdG9iZXIhQDI0IiwiZW1haWwiOiJ1bmJoYXNrYXJAZ2FpbC5jby5pbiIsInJvbGVzIjpbInN1cGVyLWFkbWluIl0sImlhdCI6MTcyODQ3MDcxMywiZXhwIjoxNzI4NTU3MTEzfQ.RcSrJgyB2zCh8H2-ngdZgBdlBv2kt7lr_LvykL_mQ9M";
-      header["Authorization"] = token;
+      String token = await SharedPreferencesUtils.getString(key: PreferencesName.token);
+      header["Authorization"] = "Bearer $token";
     } catch(_){
       header["Authorization"] = "";
     }
-
   }
 
   static Future<String> fileCompress({required File file}) async {

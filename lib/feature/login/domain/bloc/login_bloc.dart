@@ -18,6 +18,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginSetPasswordEvent>(_setPassword);
     on<LoginPasswordHideShowEvent>(_passwordHideShow);
     on<LoginSubmitDataEvent>(_submitLoginData);
+    on<LoginCheckEvent>(_loginCheck);
   }
 
   String email = "";
@@ -120,7 +121,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           _eventCompleted(emit);
             return ;
         }
-
       _isLoader = false;
       _eventCompleted(emit);
         userId =  otpRes;
@@ -134,33 +134,29 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             )
         );
 
-
-/*      var res = await LoginHelper.getLoginData(
-          emilId: email,
-          password: password,
-          context: event.context.mounted ? event.context : event.context);
-      _isLoader = false;
-      _eventCompleted(emit);
-      if (res != null) {
-        _loginData = loginResponse(res);
-        UserInfo.instanceInit()?.userData = loginData;
-        SharedPreferencesUtils.setString(
-            key: PreferencesName.userName, value: email.toString());
-        SharedPreferencesUtils.setString(
-            key: PreferencesName.password, value: password.toString());
-        Navigator.pushAndRemoveUntil(
-            !event.context.mounted ? event.context : event.context,
-            MaterialPageRoute(builder: (_) => const HomePage()),
-            (route) => false);
-      } else {
-        if (event.isLoginPage == false) {
-          Navigator.pushAndRemoveUntil(
-              !event.context.mounted ? event.context : event.context,
-              MaterialPageRoute(builder: (_) => const LoginScreenPage()),
-              (route) => false);
-        }
-      }*/
     }
+  }
+
+  _loginCheck(LoginCheckEvent event, emit) async {
+    var res =  await LoginHelper.checkLogin(context: event.context);
+    if(res != null){
+      LoginDataModel _loginData = LoginDataModel();
+      _loginData = loginResponse(res);
+      UserInfo.instanceInit()?.userData = _loginData;
+      await SharedPreferencesUtils.setString(key: PreferencesName.token, value: UserInfo.instanceInit()!.userData!.tokens!.access.toString());
+      Navigator.pushAndRemoveUntil(
+          !event.context.mounted ? event.context : event.context,
+          MaterialPageRoute(builder: (_) => const HomePage()),
+              (route) => false);
+    }
+    else
+    {
+      Navigator.pushAndRemoveUntil(
+          !event.context.mounted ? event.context : event.context,
+          MaterialPageRoute(builder: (_) => const LoginScreenPage()),
+              (route) => false);
+    }
+
   }
 
   _eventCompleted(Emitter<LoginState> emit) {

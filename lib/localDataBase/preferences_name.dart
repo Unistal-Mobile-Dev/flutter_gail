@@ -16,4 +16,6 @@ class PreferencesName {
   static get routeId => "routeId";
 
   static get notificationSilent => "notificationSilent";
+
+  static get token => "token";
 }

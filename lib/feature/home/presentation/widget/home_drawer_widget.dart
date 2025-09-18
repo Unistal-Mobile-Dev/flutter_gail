@@ -4,6 +4,7 @@ import 'package:flutter_gail/feature/dashboard/presentation/page/dashboard_page.
 import 'package:flutter_gail/feature/home/domain/model/drawer_model.dart';
 import 'package:flutter_gail/feature/home/presentation/widget/logout_widget.dart';
 import 'package:flutter_gail/feature/imageShare/presentation/page/image_share_page.dart';
+import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
 import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
 import 'package:flutter_gail/feature/pgis/presentation/page/pgis_page.dart';
 import 'package:flutter_gail/feature/task/viewTask/presentation/page/task_page.dart';
@@ -399,8 +400,12 @@ class HomeDrawerWidget extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          BlocProvider.of<HomeBloc>(context).add( SelectWidgetHomeEvent(
-              widget: const AddIncidentPage(), title: AppString.incident));
+          BlocProvider.of<AddIncidentBloc>(context).add(AddIncidentPageLoadEvent(context: context));
+          Navigator.push(
+            !context.mounted ? context : context,
+            FadeRoute(
+                page: const AddIncidentPage()),
+          );
         },
         child: Row(
           children: [

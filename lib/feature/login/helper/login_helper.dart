@@ -163,6 +163,31 @@ class LoginHelper {
     }
   }
 
+  static Future<dynamic> checkLogin({required BuildContext context}) async {
+    try {
+      if (await isInternetConnected() == true) {
+        var json = {};
+        String url = APIs.checkLogin;
+        var res = await ServerRequest.postData(
+            urlEndPoint: url,
+            body: jsonEncode(json),
+            context: !context.mounted ? context : context);
+        if (res != null && res['users'] != null) {
+          if (Platform.isAndroid) {
+            await deleteCacheDir();
+            await deleteAppDir();
+          }
+          return res;
+        }
+      }
+      return null;
+    } catch (e) {
+      if (!context.mounted) return null;
+      SnackBarErrorWidget(context).show(message: "Internal server error");
+      return null;
+    }
+ }
+
   static Future<dynamic> addDevice(
       {required String userId, required BuildContext context}) async {
     try {
