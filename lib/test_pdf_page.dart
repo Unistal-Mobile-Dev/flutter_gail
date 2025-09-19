@@ -1,42 +1,166 @@
-import 'dart:convert';
-
-import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gail/feature/map/helper/map_helper.dart';
-import 'package:flutter_gail/feature/taskManagement/viewTask/domain/model/task_data_model.dart';
-import 'package:flutter_gail/feature/taskManagement/viewTask/helper/view_task_helper.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class TestPdfPage extends StatefulWidget {
-  const TestPdfPage({super.key});
-
-  @override
-  State<TestPdfPage> createState() => _TestPdfPageState();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MyApp());
 }
 
-class _TestPdfPageState extends State<TestPdfPage> {
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.green),
+      home: const GasPipelineMapPage(),
     );
   }
 }
 
-void main() async {
-/*  List<ArcGISPoint> list =   MapHelper.decodePolyline("}xenDseuvM@KCGOIl@sA\\s@NMHg@j@Tf@Hf@L~B\\vADXS~BNfCNx@BzBRPJv@DNwD@Ub@B`BFrAF~BNf@JxDxAvClA~A`@`A`@dDtAxB|@nAj@xB~@tFxBhGjCbFxB|@`@zAl@lChAjBx@jAd@lAl@zG~ClEnB~D`BbBl@fCv@pB`@rAXz@VBUZkBTc@vA{BfAm@vCmAtAk@\\EvBu@x@_@l@c@d@c@hA}AX\\\\b@pB}B\\[LKLCX?j@Q|As@bAa@|Aq@lBm@fAWhAEf@IhBMjCOb@Ef@EfBU~@?`@GfDi@fFq@~AY`A]~@i@r@s@`AgAdAu@~G_Ht@q@nFoDtIcGtGsEbI}FxB_B|C{B`BoAhAw@|AaAp@g@dBmAjAq@xAo@t@UhBa@rBa@bGoArG{A~A]~DuA|CuB`McKpC{B\\SzH}GrAeAv@o@~@w@`DiChFkErAmAnB_BjBaBzHwGbDqCtCmC\\_@h@y@Ve@Xu@Pi@R{@TmBBeCSmFA]\\KbDaAjDyA~CmAvAe@pA]vCcAfFcB|EwA~@W`@QhE}AhEiAjDkASs@iBqH}@_Ea@cCYmBKGOUGKEi@BYO_@i@wBkAiFoByIa@}AIi@Sw@WiAq@eEm@yC}A}G{A}G{B_KkCwLo@yCIs@MqASeDIsF?}@B}B?k@?mC?cH?gFAcM@eCHqMBkG@yB@cE@qOJss@?_MBkNDgV@mW@wAUq@O[c@e@QO[Ow@WOSI]Ae@Jm@RUZWxDoCp@]fBg@d@Kz@KpA?hCFzFFzC@vH@~GTrBDfJb@hDJJ}ABaAt@kSLiEPyDP{Ep@uTJuDjCHxJd@nCPvI^vCRbCDfI^X?tBLJqD");
-  for(var data in list){
-    var json = {
-      "login_id":"10",
-      "lat": "${data.y}",
-      "log": "${data.x}",
-      "address":"Location",
-      "date":"2024-11-19",
-      "gps":"1","network":"1","battery":"100",
-      "dt":"2024-11-19",
-      "status":"1",
-      "flight_mode":"0","distance":"1","geofencing":[]
-    };
-    print("${jsonEncode(json)},");
-  }*/
+class GasPipelineMapPage extends StatefulWidget {
+  const GasPipelineMapPage({super.key});
 
+  @override
+  State<GasPipelineMapPage> createState() => _GasPipelineMapPageState();
+}
+
+class _GasPipelineMapPageState extends State<GasPipelineMapPage> {
+  GoogleMapController? _mapController;
+
+  // Example pipeline points (replace with API/DB data)
+  final List<LatLng> _pipelinePoints = const [
+    LatLng(28.6139, 77.2090), // Delhi
+    LatLng(27.1767, 78.0081), // Agra
+    LatLng(26.9124, 75.7873), // Jaipur
+    LatLng(25.3176, 82.9739), // Varanasi
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        backgroundColor: Colors.green.shade700,
+        elevation: 0,
+        title: const Text(
+          "Gas Pipeline Viewer",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        centerTitle: true,
+      ),
+      body: Stack(
+        children: [
+          // 🌍 Google Map
+          GoogleMap(
+            initialCameraPosition: const CameraPosition(
+              target: LatLng(28.6139, 77.2090), // Start Delhi
+              zoom: 6,
+              tilt: 60, // Tilt for 3D effect
+              bearing: 30,
+            ),
+            onMapCreated: (controller) {
+              _mapController = controller;
+            },
+            polylines: {
+              Polyline(
+                polylineId: const PolylineId("gas_pipeline"),
+                points: _pipelinePoints,
+                color: Colors.orange.shade700,
+                width: 6,
+                patterns: [
+                  PatternItem.dash(30),
+                  PatternItem.gap(10),
+                ],
+              ),
+            },
+            markers: {
+              const Marker(
+                markerId: MarkerId("start"),
+                position: LatLng(28.6139, 77.2090),
+                infoWindow: InfoWindow(title: "Pipeline Start (Delhi)"),
+              ),
+              const Marker(
+                markerId: MarkerId("end"),
+                position: LatLng(25.3176, 82.9739),
+                infoWindow: InfoWindow(title: "Pipeline End (Varanasi)"),
+              ),
+            },
+            mapType: MapType.hybrid, // Satellite + terrain 3D
+            compassEnabled: true,
+            zoomControlsEnabled: false, // Custom zoom buttons banayenge
+          ),
+
+          // 🔹 Floating Buttons (Zoom In / Out)
+          Positioned(
+            right: 10,
+            bottom: 150,
+            child: Column(
+              children: [
+                FloatingActionButton.small(
+                  heroTag: "zoomIn",
+                  backgroundColor: Colors.green.shade700,
+                  onPressed: () {
+                    _mapController?.animateCamera(CameraUpdate.zoomIn());
+                  },
+                  child: const Icon(Icons.add, color: Colors.white),
+                ),
+                const SizedBox(height: 10),
+                FloatingActionButton.small(
+                  heroTag: "zoomOut",
+                  backgroundColor: Colors.green.shade700,
+                  onPressed: () {
+                    _mapController?.animateCamera(CameraUpdate.zoomOut());
+                  },
+                  child: const Icon(Icons.remove, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+
+          // 🔹 Bottom Information Card
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              margin: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  )
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Pipeline Route",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Icon(Icons.location_on, color: Colors.green),
+                      Text("Start: Delhi"),
+                      Spacer(),
+                      Icon(Icons.flag, color: Colors.red),
+                      Text("End: Varanasi"),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

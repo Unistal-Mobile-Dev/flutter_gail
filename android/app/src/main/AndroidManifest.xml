@@ -28,6 +28,7 @@
         android:name="${applicationName}"
         android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher_upims">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

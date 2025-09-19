@@ -54,8 +54,8 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
 
   @override
   void initState() {
-    BlocProvider.of<MapBloc>(context)
-        .add(MapPageLoadEvent(context: context));
+    // BlocProvider.of<MapBloc>(context)
+    //     .add(MapPageLoadEvent(context: context));
     super.initState();
   }
 
@@ -70,30 +70,30 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<MapBloc, MapState>(
-    builder: (context, state) {
-    if(state is FetchMapPageDataState){
-      direction(datState: state);
-      return SafeArea(
-        top: false,
-        child: Stack(
-          children: [
-            ArcGISMapView(
-              controllerProvider: () => _mapViewController,
-              onMapViewReady: onMapViewReady,
-              onTap: onTap,
-            ),
-            _mapViewType(dataState: state),
-            _actionButtons(dataState: state),
-          ],
-        ),
-      );
-    } else {
-      return const Center(child: CenterLoaderWidget());
-    }
-     })
-  );
- }
+        body: BlocBuilder<MapBloc, MapState>(
+            builder: (context, state) {
+              if(state is FetchMapPageDataState){
+                direction(datState: state);
+                return SafeArea(
+                  top: false,
+                  child: Stack(
+                    children: [
+                      ArcGISMapView(
+                        controllerProvider: () => _mapViewController,
+                        onMapViewReady: onMapViewReady,
+                        onTap: onTap,
+                      ),
+                      _mapViewType(dataState: state),
+                      _actionButtons(dataState: state),
+                    ],
+                  ),
+                );
+              } else {
+                return const Center(child: CenterLoaderWidget());
+              }
+            })
+    );
+  }
 
   void onTap(Offset localPosition) async {
 
@@ -122,70 +122,70 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
     );
 
     final graphic = identifyGraphicsOverlayResult.graphics.first;
-      Map<String, dynamic> jsonValue = graphic.attributes;
-      if(jsonValue['markername'] != null)
-      {
+    Map<String, dynamic> jsonValue = graphic.attributes;
+    if(jsonValue['markername'] != null)
+    {
 
-       var res =  await showDialog(
-          context: !context.mounted ? context : context,
-          builder: (context) {
-            return MessageBoxTwoButtonPopWidget(
-              message: "You want update the ${jsonValue['markerName']}?",
-              okButtonText: "Update",
-              onPressed: () => Navigator.pop(context, true),
-            );
-          },
-        );
-       if(res == true){
-         BlocProvider.of<AddMarkerBloc>(!context.mounted ? context : context)
-             .add(AddMarkerPageLoadEvent(context: !context.mounted ? context : context, data: jsonValue));
-         Navigator.push(
-           !context.mounted ? context : context,
-           FadeRoute(
-               page: const AddMarkerPage()),
-         );
-       }
-      }
-  }
-
-Widget _mapViewType({required FetchMapPageDataState dataState})   {
-  return Positioned(
-    top: 50,
-    right: 10,
-    child: Card(
-      shape: const CircleBorder(), // <-- Makes it circular
-      elevation: 2,
-      clipBehavior: Clip.antiAlias, // Ensures content is clipped to the circle
-      child: GestureDetector(
-        onTap: () {
-          BlocProvider.of<MapBloc>(context).add(
-            SelectMapArcGISStreets(
-              isArcGISStreets: dataState.isArcGISStreets ? false : true,
-            ),
-          );
-          _mapViewController.arcGISMap = ArcGISMap.withBasemapStyle(
-            dataState.isArcGISStreets
-                ? BasemapStyle.arcGISStreets
-                : BasemapStyle.arcGISImagery,
+      var res =  await showDialog(
+        context: !context.mounted ? context : context,
+        builder: (context) {
+          return MessageBoxTwoButtonPopWidget(
+            message: "You want update the ${jsonValue['markerName']}?",
+            okButtonText: "Update",
+            onPressed: () => Navigator.pop(context, true),
           );
         },
-        child: SizedBox(
-          height: 50,
-          width: 50,
-          child: Image.asset(
-            dataState.isArcGISStreets
-                ? AppIcon.arcGISStreetsIcon
-                : AppIcon.arcGISImageryIcon,
-            fit: BoxFit.cover,
+      );
+      if(res == true){
+        BlocProvider.of<AddMarkerBloc>(!context.mounted ? context : context)
+            .add(AddMarkerPageLoadEvent(context: !context.mounted ? context : context, data: jsonValue));
+        Navigator.push(
+          !context.mounted ? context : context,
+          FadeRoute(
+              page: const AddMarkerPage()),
+        );
+      }
+    }
+  }
+
+  Widget _mapViewType({required FetchMapPageDataState dataState})   {
+    return Positioned(
+      top: 50,
+      right: 10,
+      child: Card(
+        shape: const CircleBorder(), // <-- Makes it circular
+        elevation: 2,
+        clipBehavior: Clip.antiAlias, // Ensures content is clipped to the circle
+        child: GestureDetector(
+          onTap: () {
+            BlocProvider.of<MapBloc>(context).add(
+              SelectMapArcGISStreets(
+                isArcGISStreets: dataState.isArcGISStreets ? false : true,
+              ),
+            );
+            _mapViewController.arcGISMap = ArcGISMap.withBasemapStyle(
+              dataState.isArcGISStreets
+                  ? BasemapStyle.arcGISStreets
+                  : BasemapStyle.arcGISImagery,
+            );
+          },
+          child: SizedBox(
+            height: 50,
+            width: 50,
+            child: Image.asset(
+              dataState.isArcGISStreets
+                  ? AppIcon.arcGISStreetsIcon
+                  : AppIcon.arcGISImageryIcon,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
 
-}
+  }
 
-Widget _actionButtons({required FetchMapPageDataState dataState}){
+  Widget _actionButtons({required FetchMapPageDataState dataState}){
     return Positioned(
       top: 50,
       left: 10,
@@ -200,16 +200,17 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
             height: MediaQuery.of(context).size.width * 0.03,
           ) : const SizedBox.shrink(),
 
-         dataState.isStartPatrolling == true ?
-         _statusButton(dataSate: dataState)
-             : const SizedBox.shrink(),
+          dataState.isStartPatrolling == true ?
+          _statusButton(dataSate: dataState)
+              : const SizedBox.shrink(),
 
-          dataState.isEndPatrolling == true ?
+          dataState.taskData.taskStatus != TaskStatus.notStarted
+              && dataState.taskData.taskStatus != TaskStatus.completed ?
           SizedBox(
             height: MediaQuery.of(context).size.width * 0.03,
           ) : const SizedBox.shrink(),
 
-          dataState.isEndPatrolling == true
+          dataState.taskData.taskStatus != TaskStatus.notStarted
               && dataState.taskData.taskStatus != TaskStatus.completed ?
           _endPatrollingButton(dataSate: dataState)
               : const SizedBox.shrink(),
@@ -220,10 +221,10 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
             height: MediaQuery.of(context).size.width * 0.03,
           ) : const SizedBox.shrink(),
 
-         //  dataState.isStartPatrolling == false &&
-         //      dataState.isEndPatrolling == false ?
-         // _navigationButton(dataState: dataState)
-         //      : const SizedBox.shrink(),
+          //  dataState.isStartPatrolling == false &&
+          //      dataState.isEndPatrolling == false ?
+          // _navigationButton(dataState: dataState)
+          //      : const SizedBox.shrink(),
 
           SizedBox(
             height: MediaQuery.of(context).size.width * 0.03,
@@ -272,7 +273,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
 
           dataState.taskData.taskStatus == TaskStatus.started
               || dataState.taskData.taskStatus == TaskStatus.resume ?
-               _addDeviationButton() : const SizedBox.shrink(),
+          _addDeviationButton() : const SizedBox.shrink(),
         ],
       ) : const DottedLoaderWidget(),
     );
@@ -472,8 +473,8 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
         icon: Icon(Icons.transgender_outlined, color: AppColor.themeColor,
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () {
-               BlocProvider.of<AddCrossingBloc>(context)
-                   .add(AddCrossingPageLoadEvent(context: context));
+          BlocProvider.of<AddCrossingBloc>(context)
+              .add(AddCrossingPageLoadEvent(context: context));
           Navigator.push(
             !context.mounted ? context : context,
             FadeRoute(
@@ -521,7 +522,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     return SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
-        label: TextWidget('Add Encroachment',
+        label: TextWidget('Add Structures',
           color: AppColor.black,
           fontSize: AppFont.font_11,),
         icon: Icon(Icons.fence_rounded, color: AppColor.themeColor,
@@ -578,7 +579,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
       child: TextButton.icon(
         label: TextWidget(
           dataSate.taskData.taskStatus == TaskStatus.notStarted ? AppString.start
-          : dataSate.taskData.taskStatus == TaskStatus.started ? AppString.pause
+              : dataSate.taskData.taskStatus == TaskStatus.started ? AppString.pause
               : dataSate.taskData.taskStatus == TaskStatus.pause ? AppString.resume
               : dataSate.taskData.taskStatus == TaskStatus.resume ? AppString.pause : AppString.completed,
           color: AppColor.black,
@@ -594,7 +595,7 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           }
           else if(dataSate.taskData.taskStatus == TaskStatus.started) {
             _mapViewController.locationDisplay.stop();
-              taskStatus =  TaskStatus.pause;
+            taskStatus =  TaskStatus.pause;
           }
           else if(dataSate.taskData.taskStatus == TaskStatus.pause) {
             _mapViewController.locationDisplay.start();
@@ -602,11 +603,11 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
           }
           else if(dataSate.taskData.taskStatus == TaskStatus.resume) {
             _mapViewController.locationDisplay.stop();
-              taskStatus =  TaskStatus.pause;
+            taskStatus =  TaskStatus.pause;
           }
           BlocProvider.of<MapBloc>(context).add(MapPageUpdateTaskEvent(
-            context: context,
-            taskStatus: taskStatus
+              context: context,
+              taskStatus: taskStatus
           ));
         },
         style: ButtonStyle(
@@ -646,135 +647,133 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
   }
 
 
-  void onMapViewReady() async{
+  void onMapViewReady() async {
     _mapViewController.arcGISMap =
-        ArcGISMap.withBasemapStyle(BasemapStyle.arcGISStreets); // BasemapStyle.arcGISStreets //arcGISImagery
-    _mapViewController.graphicsOverlays.add(_routeGraphicsOverlay);
-    _mapViewController.graphicsOverlays.add(_stopsGraphicsOverlay);
-    _mapViewController.graphicsOverlays.add(_routePathGraphicsOverlay);
-    final imageStart = await ArcGISImage.fromAsset(AppIcon.pointerIcon);
-    final routeStartPointMarker = PictureMarkerSymbol.withImage(imageStart)
-      ..width = 20
-      ..height = 20;
+        ArcGISMap.withBasemapStyle(BasemapStyle.arcGISStreets);
 
-    final imageEnd = await ArcGISImage.fromAsset(AppIcon.flagIcon);
-    final routeEndPointMarker = PictureMarkerSymbol.withImage(imageEnd)
-      ..width = 20
-      ..height = 20;
+    // Add graphics overlays
+    _mapViewController.graphicsOverlays.addAll([
+      _routeGraphicsOverlay,
+      _stopsGraphicsOverlay,
+      _routePathGraphicsOverlay,
+    ]);
 
-
+    // Load marker images once
     final bpIcon = await ArcGISImage.fromAsset(AppIcon.bpIcon);
-    final bpIconMarker = PictureMarkerSymbol.withImage(bpIcon)
-      ..width = 15
-      ..height = 15;
-
-    final pipelineMarkerIcon = await ArcGISImage.fromAsset(AppIcon.bpIcon);
-    final pipelineMarker = PictureMarkerSymbol.withImage(pipelineMarkerIcon)
-      ..width = 15
-      ..height = 15;
-
-    final dmIcon = await ArcGISImage.fromAsset(AppIcon.dmIcon);
-    final dmIconMarker = PictureMarkerSymbol.withImage(dmIcon)
-      ..width = 15
-      ..height = 15;
-
     final kmIcon = await ArcGISImage.fromAsset(AppIcon.kmIcon);
-    final kmIconMarker = PictureMarkerSymbol.withImage(kmIcon)
-      ..width = 15
-      ..height = 15;
-
-    final tlpIcon = await ArcGISImage.fromAsset(AppIcon.tlpIcon);
-    final tlpIconMarker = PictureMarkerSymbol.withImage(tlpIcon)
-      ..width = 15
-      ..height = 15;
-
     final wmIcon = await ArcGISImage.fromAsset(AppIcon.wmIcon);
-    final wmIconMarker = PictureMarkerSymbol.withImage(wmIcon)
-      ..width = 15
-      ..height = 15;
+    final tlpIcon = await ArcGISImage.fromAsset(AppIcon.tlpIcon);
 
+    final bpIconMarker = PictureMarkerSymbol.withImage(bpIcon);
+    final kmIconMarker = PictureMarkerSymbol.withImage(kmIcon);
+    final wmIconMarker = PictureMarkerSymbol.withImage(wmIcon);
+    final tlpIconMarker = PictureMarkerSymbol.withImage(tlpIcon);
 
-    List<RoutePointsModel> routePointsList =  BlocProvider.of<MapBloc>(!context.mounted ? context : context).routePointsList;
-    for(var routePointsData in routePointsList){
-      for(var markerData in routePointsData.markerList){
-        final markerPoints = Viewpoint.withLatLongScale(
+    // Add graphics for route points
+    final routePointsList = BlocProvider.of<MapBloc>(context).routePointsList;
+
+    for (var routePointsData in routePointsList) {
+      for (var markerData in routePointsData.markerList) {
+        final point = Viewpoint.withLatLongScale(
           latitude: markerData.gpsy!,
           longitude: markerData.gpsx!,
           scale: 2e4,
-        );
+        ).targetGeometry;
 
-        Map<String, dynamic> attributes =
-        {
-          "markername" : markerData.markerName,
-          "markernumber" : markerData.markerNumber.toString(),
-          "markertype" : markerData.markerType.toString(),
-          "gpsx" : markerData.gpsx,
-          "gpsy" : markerData.gpsx,
-          "engroutename" : "",
+        final attributes = {
+          "markername": markerData.markerName,
+          "markernumber": markerData.markerNumber.toString(),
+          "markertype": markerData.markerType.toString(),
+          "gpsx": markerData.gpsx,
+          "gpsy": markerData.gpsy,
         };
-        _stopsGraphicsOverlay.graphics.addAll([
-          Graphic(geometry: markerPoints.targetGeometry,
-              symbol: markerData.markerType.toString() == "1"
-                  ? bpIconMarker // no
-                  // : markerData.markerType.toString() == "2"
-                  // ? dmIconMarker // no
-                  : markerData.markerType.toString() == "3"
-                  ? kmIconMarker
-                  : markerData.markerType.toString() == "4"
-                  ? wmIconMarker
-                  : markerData.markerType.toString() == "5"
-                  ? wmIconMarker
-                  : markerData.markerType.toString() == "6"
-                  ? wmIconMarker
-                  : markerData.markerType.toString() == "7"
-                  ? wmIconMarker
-                  : markerData.markerType.toString() == "8"
-                  ? wmIconMarker
-                  : markerData.markerType.toString() == "9"
-                  ? wmIconMarker
-                  : markerData.markerType.toString() == "10"
-                  ? wmIconMarker
-                  : markerData.markerType.toString() == "11"
-                  ? wmIconMarker
-                  : markerData.markerType.toString() == "12"
-                  ? kmIconMarker
-                  : markerData.markerType.toString() == "13"
-                  ? wmIconMarker
-                  : markerData.markerType.toString() == "14"
-                  ? wmIconMarker
-                  : markerData.markerType.toString() == "15"
-                  ? wmIconMarker
-                  : bpIconMarker,
-              attributes: attributes),
-        ]);
+
+        // Choose marker based on type
+        PictureMarkerSymbol symbol;
+        switch (markerData.markerType.toString()) {
+          case "1":
+            symbol = bpIconMarker;
+            break;
+          case "3":
+          case "12":
+            symbol = kmIconMarker;
+            break;
+          case "4":
+          case "5":
+          case "6":
+          case "7":
+          case "8":
+          case "9":
+          case "10":
+          case "11":
+          case "13":
+          case "14":
+          case "15":
+            symbol = wmIconMarker;
+            break;
+          default:
+            symbol = bpIconMarker;
+        }
+
+        _stopsGraphicsOverlay.graphics.add(
+          Graphic(geometry: point, symbol: symbol, attributes: attributes),
+        );
       }
 
-      for(var ltpData in routePointsData.tlpList){
-        final tlpPoints = Viewpoint.withLatLongScale(
-          latitude: ltpData.gpsy!,
-          longitude: ltpData.gpsx!,
+      // Add TLP markers
+      for (var tlpData in routePointsData.tlpList) {
+        final point = Viewpoint.withLatLongScale(
+          latitude: tlpData.gpsy!,
+          longitude: tlpData.gpsx!,
           scale: 2e4,
-        );
+        ).targetGeometry;
 
-        Map<String, dynamic> attributes =
-        {
-          "markername" : "TLP",
-          "markernumber" : ltpData.id.toString(),
-          "markertype" : "17",
-          "gpsx" : ltpData.gpsx,
-          "gpsy" : ltpData.gpsx,
-          "engroutename" : "",
+        final attributes = {
+          "markername": "TLP",
+          "markernumber": tlpData.id.toString(),
+          "markertype": "17",
+          "gpsx": tlpData.gpsx,
+          "gpsy": tlpData.gpsy,
         };
-        _stopsGraphicsOverlay.graphics.addAll([
-          Graphic(geometry: tlpPoints.targetGeometry,
-              symbol: tlpIconMarker,
-              attributes: attributes),
-        ]);
+
+        _stopsGraphicsOverlay.graphics.add(
+          Graphic(geometry: point, symbol: tlpIconMarker, attributes: attributes),
+        );
       }
     }
 
-    _initPolyline();
+    // Adjust marker sizes based on zoom level dynamically
+    _mapViewController.onViewpointChanged.listen((_) async {
+      final currentViewpoint = await _mapViewController.getCurrentViewpoint(
+          ViewpointType.centerAndScale);
+
+      if (currentViewpoint != null) {
+        final scale = currentViewpoint.targetScale;
+
+        double markerSize;
+        if (scale < 5000) {
+          markerSize = 35; // zoomed in
+        } else if (scale < 20000) {
+          markerSize = 25;
+        } else {
+          markerSize = 15; // zoomed out
+        }
+
+        for (var graphic in _stopsGraphicsOverlay.graphics) {
+          if (graphic.symbol is PictureMarkerSymbol) {
+            (graphic.symbol as PictureMarkerSymbol)
+              ..width = markerSize
+              ..height = markerSize;
+          }
+        }
+
+        // _stopsGraphicsOverlay.refresh(); // redraw symbols
+      }
+    });
+
+    _initPolyline(); // draw route lines & buffers
   }
+
 
   Future<void> _initPolyline() async {
 
@@ -810,6 +809,8 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
 
     _lastLocationUpdate = DateTime.now().subtract(Duration(seconds: timeInterval));
 
+    print("==========================location");
+
     _mapViewController.locationDisplay.onLocationChanged.listen((onData) {
       final now = DateTime.now();
       if (mounted && now.difference(_lastLocationUpdate).inSeconds >= timeInterval) {
@@ -834,78 +835,105 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
     setState(() {});
   }
 
-  Future<void> _startLocationDataSource({required List<PointsModel> pointsLists, required double buffer}) async {
-
-    List<PointsModel> pointsList =  pointsLists;
+  Future<void> _startLocationDataSource({
+    required List<PointsModel> pointsLists,
+    required double buffer, // here buffer = 100.0 (meters)
+  }) async {
     List<List<dynamic>> addPath = [];
 
-    final imageStart = await ArcGISImage.fromAsset(AppIcon.arrowIcon);
-    for(int i = 0; i < pointsList.length; i++){
-      if(i != pointsList.length - 1)
-      {
-        double bearing =  MapHelper.calculateBearing(pointsList[i].y, pointsList[i].x,
-            pointsList[1+i].y, pointsList[1+i].x);
-        final routeStartPointMarker = PictureMarkerSymbol.withImage(imageStart)
-          ..width = 10
-          ..angle = bearing
-          ..angleAlignment =  SymbolAngleAlignment.arcGISMap
-          ..height = 10;
-      }
+    for (var pointData in pointsLists) {
+      addPath.add([pointData.x, pointData.y]);
     }
 
-    for(var pointData in pointsList){
-      addPath.add([pointData.x,pointData.y]);
-    }
     var json = {
       "paths": [addPath],
-      "spatialReference": {
-        "wkid": 4326
-      }
+      "spatialReference": {"wkid": 4326}
     };
-    final routeLine = Geometry.fromJsonString(jsonEncode(json).toString()) as Polyline;
+
+    // Create route line
+    final routeLine =
+    Geometry.fromJsonString(jsonEncode(json).toString()) as Polyline;
+
+    // Normal line symbol
     final routeLineSymbol = SimpleLineSymbol(
       style: SimpleLineSymbolStyle.solid,
       color: Colors.blue,
       width: 2.0,
     );
 
-    final routeLineSymbol1 = SimpleLineSymbol(
-      style: SimpleLineSymbolStyle.solid,
-      color: Colors.red.withOpacity(0.2),
-      width: buffer,
+    // Add line to overlay
+    final routeGraphic = Graphic(geometry: routeLine, symbol: routeLineSymbol);
+    _routeGraphicsOverlay.graphics.add(routeGraphic);
 
+    final linearUnitMeters = LinearUnit(unitId: LinearUnitId.meters);
+
+    // ✅ Create a buffer polygon (100 m both sides)
+    final bufferPolygon = GeometryEngine.bufferGeodetic(
+      geometry: routeLine,
+      distance: buffer, // e.g. 100.0
+      distanceUnit: linearUnitMeters,
+      maxDeviation: double.nan,
+      curveType: GeodeticCurveType.geodesic,
     );
 
-    final routeGraphic =
-    Graphic(geometry: routeLine, symbol: routeLineSymbol,);
-     _routeGraphicsOverlay.graphics.add(routeGraphic);
+    // Fill symbol for buffer
+    final bufferSymbol = SimpleFillSymbol(
+      style: SimpleFillSymbolStyle.solid,
+      color: Colors.red.withOpacity(0.2),
+      outline: SimpleLineSymbol(
+        style: SimpleLineSymbolStyle.solid,
+        color: Colors.red,
+        width: 1.0,
+      ),
+    );
 
-    final routeGraphic1 =
-    Graphic(geometry: routeLine, symbol: routeLineSymbol1);
-    _routeGraphicsOverlay.graphics.add(routeGraphic1);
+    final bufferGraphic = Graphic(geometry: bufferPolygon, symbol: bufferSymbol);
+    _routeGraphicsOverlay.graphics.add(bufferGraphic);
+
+    // Start location tracking
     currentLocation();
     setState(() {});
   }
 
-  void currentLocation() async {
-    _mapViewController.locationDisplay.dataSource = _locationDataSource;
-    _mapViewController.locationDisplay.autoPanMode = LocationDisplayAutoPanMode.recenter;
+
+  Future<void> currentLocation() async {
+    final locationDisplay = _mapViewController.locationDisplay;
+    locationDisplay.dataSource = _locationDataSource;
+
+    // 🔹 Use navigation mode (map rotates with heading + stays centered)
+    locationDisplay.autoPanMode = LocationDisplayAutoPanMode.navigation;
+
+    // Custom marker for current location
     final imageEnd = await ArcGISImage.fromAsset(AppIcon.personLocation);
-    final routeEndPointMarker = PictureMarkerSymbol.withImage(imageEnd)
+    final personSymbol = PictureMarkerSymbol.withImage(imageEnd)
       ..width = 35
       ..height = 35;
 
-    _mapViewController.locationDisplay.courseSymbol = routeEndPointMarker;
+    locationDisplay.courseSymbol = personSymbol;
+    locationDisplay.defaultSymbol = personSymbol;
+
+    // Optional: separate heading arrow symbol
+    final headingImage = await ArcGISImage.fromAsset(AppIcon.gpsIcon);
+    final headingSymbol = PictureMarkerSymbol.withImage(headingImage)
+      ..width = 30
+      ..height = 30;
+    locationDisplay.headingSymbol = headingSymbol;
+
+    // Listen to status
     _statusSubscription = _locationDataSource.onStatusChanged.listen((status) {
       setState(() => _status = status);
     });
-
     setState(() => _status = _locationDataSource.status);
-    _autoPanModeSubscription = _mapViewController.locationDisplay.onAutoPanModeChanged.listen((mode) {
-          setState(() => _autoPanMode = mode);});
-    setState(() => _autoPanMode = _mapViewController.locationDisplay.autoPanMode);
+
+    _autoPanModeSubscription =
+        locationDisplay.onAutoPanModeChanged.listen((mode) {
+          setState(() => _autoPanMode = mode);
+        });
+    setState(() => _autoPanMode = locationDisplay.autoPanMode);
+
     try {
-       await _locationDataSource.start();
+      // ✅ Start the locationDisplay itself (not only the datasource)
+      await _locationDataSource.start();
     } on ArcGISException catch (e) {
       if (mounted) {
         showDialog(
@@ -914,81 +942,42 @@ Widget _actionButtons({required FetchMapPageDataState dataState}){
         );
       }
     }
+
     setState(() => _ready = true);
   }
 
+
+
   void direction({required FetchMapPageDataState datState}) async {
     _routePathGraphicsOverlay.graphics.clear();
-    if(datState.directionList.isNotEmpty){
-      List<ArcGISPoint> pointsList =  datState.directionList;
-      final imageStart = await ArcGISImage.fromAsset(AppIcon.arrowIcon);
-      if( pointsList.length > 10 ){
-        int j = 10;
-        for(int i = 0; i < pointsList.length; i++){
-          if(i == j )
-          {
-            double bearing =  MapHelper.calculateBearing(pointsList[i].y, pointsList[i].x,
-                pointsList[1+i].y, pointsList[1+i].x);
-            final routeStartPointMarker = PictureMarkerSymbol.withImage(imageStart)
-              ..width = 10
-              ..angle = bearing
-              ..angleAlignment =  SymbolAngleAlignment.arcGISMap
-              ..height = 10;
-            _routePathGraphicsOverlay.graphics.addAll([
-              Graphic(geometry: ArcGISPoint(
-                x: pointsList[1+i].x,
-                y: pointsList[1+i].y,
-                spatialReference: SpatialReference.wgs84,
-              ), symbol: routeStartPointMarker)
-            ]);
-            int k = j+10;
-            j = k;
-          }
-        }
-      }
-      else
-      {
-        for(int i = 0; i < pointsList.length; i++){
-          if(i != pointsList.length - 1 )
-          {
-            double bearing =  MapHelper.calculateBearing(pointsList[i].y, pointsList[i].x,
-                pointsList[1+i].y, pointsList[1+i].x);
-            final routeStartPointMarker = PictureMarkerSymbol.withImage(imageStart)
-              ..width = 10
-              ..angle = bearing
-              ..angleAlignment =  SymbolAngleAlignment.arcGISMap
-              ..height = 10;
-            _routePathGraphicsOverlay.graphics.addAll([
-              Graphic(geometry: ArcGISPoint(
-                x: pointsList[1+i].x,
-                y: pointsList[1+i].y,
-                spatialReference: SpatialReference.wgs84,
-              ), symbol: routeStartPointMarker)
-            ]);
-          }
-        }
-      }
 
-      List<List<dynamic>> addPath = [];
-      for(var pointData in pointsList) {
-        addPath.add([pointData.x, pointData.y]);
-      }
-      var json = {
-        "paths": [addPath],
-        "spatialReference": {
-          "wkid": 4326
-        }
-      };
-      final routeLine = Geometry.fromJsonString(jsonEncode(json).toString()) as Polyline;
-      final routeLineSymbol = SimpleLineSymbol(
-        style: SimpleLineSymbolStyle.solid,
-        color: Colors.green,
-        width: 2.0,
-      );
-      final routeGraphic =
-      Graphic(geometry: routeLine, symbol: routeLineSymbol);
-      _routePathGraphicsOverlay.graphics.add(routeGraphic);
-    }
+    if (datState.directionList.isEmpty) return;
+
+    List<ArcGISPoint> pointsList = datState.directionList;
+
+    // 🔹 Build Polyline from path
+    List<List<dynamic>> addPath =
+    pointsList.map((point) => [point.x, point.y]).toList();
+
+    var json = {
+      "paths": [addPath],
+      "spatialReference": {"wkid": 4326}
+    };
+
+    final routeLine =
+    Geometry.fromJsonString(jsonEncode(json)) as Polyline;
+
+    final routeLineSymbol = SimpleLineSymbol(
+      style: SimpleLineSymbolStyle.solid,
+      color: Colors.green,
+      width: 3.0,
+    );
+
+    final routeGraphic =
+    Graphic(geometry: routeLine, symbol: routeLineSymbol);
+
+    _routePathGraphicsOverlay.graphics.add(routeGraphic);
   }
+
 
 }

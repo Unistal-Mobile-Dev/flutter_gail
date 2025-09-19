@@ -19,7 +19,6 @@ class HomeDrawerWidget extends StatelessWidget {
 
   LoginDataModel get userData => _userData;
 
-  bool isImageSharing = false;
   bool isAssignTask = false;
 
   @override
@@ -27,11 +26,6 @@ class HomeDrawerWidget extends StatelessWidget {
     LoginDataModel userData = UserInfo.instanceInit()!.userData!;
     if (userData.modules != null) {
       for (var moduleData in userData.modules!) {
-        if (moduleData.permissionList != null &&
-            moduleData.moduleName.toString() == "image_sharing") {
-          isImageSharing = true;
-        }
-
         if (moduleData.permissionList != null &&
             moduleData.moduleName.toString() ==
                 "pipeline_patrolling_suervielliance") {
@@ -43,6 +37,41 @@ class HomeDrawerWidget extends StatelessWidget {
         }
       }
     }
+
+// Get the dashboard module object safely
+    final dashboardModule = userData.modules!.firstWhere(
+          (element) => element.moduleName!.toLowerCase() == "dashboard",
+      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+    );
+    final dashboardName = dashboardModule.moduleName;
+
+    // Get the pipeline_patrolling_suervielliance module object safely
+    final taskModule = userData.modules!.firstWhere(
+          (element) => element.moduleName!.toLowerCase() == "pipeline_patrolling_suervielliance",
+      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+    );
+    final taskName = taskModule.moduleName;
+
+    // Get the pipeline_cp_system module object safely
+    final tlpSurveyModule = userData.modules!.firstWhere(
+          (element) => element.moduleName!.toLowerCase() == "pipeline_cp_system",
+      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+    );
+    final tlpSurveyName = tlpSurveyModule.moduleName;
+
+    // Get the image_sharing module object safely
+    final imageSharingModule = userData.modules!.firstWhere(
+          (element) => element.moduleName!.toLowerCase() == "image_sharing",
+      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+    );
+    final imageSharingName = imageSharingModule.moduleName;
+
+    // Get the pgis module object safely
+    final pgisModule = userData.modules!.firstWhere(
+          (element) => element.moduleName!.toLowerCase() == "pgis",
+      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+    );
+    final pgisName = pgisModule.moduleName;
 
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, state) {
@@ -70,14 +99,22 @@ class HomeDrawerWidget extends StatelessWidget {
                   SizedBox(
                     height: MediaQuery.of(context).size.width * 0.10,
                   ),
-                  _dashboard(context: context),
-                  _task(context: context),
-                  _tlpSurvey(context: context),
-                  _incident(context: context),
-                  isImageSharing == true
+                  dashboardName.toString().isNotEmpty?
+                  _dashboard(context: context) : const SizedBox.shrink(),
+
+                  taskName.toString().isNotEmpty ?
+                  _task(context: context) :  const SizedBox.shrink(),
+
+                  tlpSurveyName.toString().isNotEmpty ?
+                  _tlpSurvey(context: context) : const SizedBox.shrink(),
+
+                  imageSharingName.toString().isNotEmpty
                       ? _imageSharing(context: context)
                       : const SizedBox.shrink(),
-                  _pgis(context: context),
+
+                  pgisName.toString().isNotEmpty ?
+                  _pgis(context: context) : const SizedBox.shrink(),
+
                   _logout(context: context),
                 ],
               ),
@@ -126,149 +163,6 @@ class HomeDrawerWidget extends StatelessWidget {
           ),
         )
       ],
-    );
-  }
-
-  Widget _listBuilder({required FetchHomeDataState dataState}) {
-    return ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: dataState.drawerList.length,
-        itemBuilder: (context, index) {
-          return _itemBuilder(
-              context: context,
-              drawerData: dataState.drawerList[index],
-              index: index);
-        });
-  }
-
-  Widget _itemBuilder(
-      {required BuildContext context,
-      required DrawerModel drawerData,
-      required int index}) {
-    return GestureDetector(
-      onTap: () {
-        if (drawerData.sublist.isEmpty) {
-          Navigator.pop(context);
-        }
-        if (drawerData.isSelected == false) {
-          BlocProvider.of<HomeBloc>(context).add(HomeDrawerItemSelectedEvent(
-              isSelected: true, index: index, context: context));
-        }
-      },
-      child: Padding(
-        padding: EdgeInsets.only(
-            top: MediaQuery.of(context).size.width * 0.02,
-            bottom: MediaQuery.of(context).size.width * 0.02),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.white.withOpacity(.2),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Icon(
-                      drawerData.icon,
-                      color: drawerData.isSelected == true
-                          ? AppColor.white
-                          : AppColor.white,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.03,
-                ),
-                Expanded(
-                  child: TextWidget(
-                    drawerData.label,
-                    fontSize: AppFont.font_13,
-                    color: drawerData.isSelected == true
-                        ? AppColor.white
-                        : AppColor.white,
-                    fontWeight: drawerData.isSelected == true
-                        ? FontWeight.w700
-                        : FontWeight.w400,
-                  ),
-                ),
-                Icon(
-                  drawerData.isSelected == true && drawerData.sublist.isNotEmpty
-                      ? Icons.keyboard_arrow_down_sharp
-                      : Icons.keyboard_arrow_right_sharp,
-                  color: AppColor.white,
-                ),
-              ],
-            ),
-            drawerData.isSublistLoader == false ||
-                    drawerData.isSublistLoader == null
-                ? drawerData.sublist.isNotEmpty && drawerData.isSelected == true
-                    ? _subListBuilder(
-                        context: context,
-                        drawerData: drawerData,
-                        listIndex: index)
-                    : const SizedBox.shrink()
-                : const DottedLoaderWidget(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _subListBuilder(
-      {required BuildContext context,
-      required DrawerModel drawerData,
-      required int listIndex}) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: drawerData.sublist.length,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pop();
-                  BlocProvider.of<HomeBloc>(context).add(
-                      HomeDrawerItemSubListSelectedEvent(
-                          isSelected: true,
-                          index: index,
-                          listIndex: listIndex));
-                },
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.circle,
-                      size: MediaQuery.of(context).size.width * 0.03,
-                      color: drawerData.sublist[index].isSelected == true
-                          ? AppColor.themeColor
-                          : AppColor.white,
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.03,
-                    ),
-                    Expanded(
-                      child: TextWidget(
-                        drawerData.sublist[index].label.toString(),
-                        fontSize: AppFont.font_12,
-                        color: drawerData.sublist[index].isSelected == true
-                            ? AppColor.themeColor
-                            : AppColor.white,
-                      ),
-                    ),
-                    Icon(
-                      Icons.keyboard_arrow_right_sharp,
-                      color: AppColor.white,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }),
     );
   }
 
@@ -392,49 +286,6 @@ class HomeDrawerWidget extends StatelessWidget {
     );
   }
 
-  Widget _incident({required BuildContext context}) {
-    return Padding(
-      padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.pop(context);
-          BlocProvider.of<AddIncidentBloc>(context).add(AddIncidentPageLoadEvent(context: context));
-          Navigator.push(
-            !context.mounted ? context : context,
-            FadeRoute(
-                page: const AddIncidentPage()),
-          );
-        },
-        child: Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                // color: Colors.white.withOpacity(.2),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.account_tree_outlined,
-                  color: AppColor.white,
-                ),
-              ),
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
-            TextWidget(
-              AppString.incident,
-              fontSize: AppFont.font_14,
-              color: AppColor.white,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _imageSharing({required BuildContext context}) {
     return Padding(
@@ -484,13 +335,13 @@ class HomeDrawerWidget extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          // BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
-          //     widget: PgisPage(), title: AppString.pgis));
+          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
+              widget: PgisPage(), title: AppString.pgis));
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => PgisPage()),
-          );
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => PgisPage()),
+          // );
         },
         child: Row(
           children: [

@@ -23,10 +23,8 @@ class EnvironmentConfig extends InheritedWidget {
     switch (flavours) {
       case EnvironmentFlavours.productionIglCng:
         return "https://upims.gail.co.in:8000/";
-      // case EnvironmentFlavours.developmentIglCng:
-      //   return "http://115.241.54.252:8000/";
       case EnvironmentFlavours.developmentIglCng:
-        return "https://1035572fba4f.ngrok-free.app/";
+        return "http://115.241.54.252:8000/";
     }
   }
 }

@@ -7,6 +7,7 @@ import 'package:flutter_gail/feature/map/domain/model/configuration_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/coordinates_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
+import 'package:flutter_gail/feature/map/domain/model/marker_point_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dar
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/helper/task_helper.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 part 'map_event.dart';
@@ -41,6 +43,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   bool isArcGISStreets = false;
   int routeLength = 1;
   ConfigurationModel configurationData = ConfigurationModel();
+  StreamSubscription<LatLng>? _positionStream;
+  final MapHelper _mapHelper = MapHelper();
+  LatLng? _lastLocation;
+  List<LatLng> locationPath =  [];
 
   MapBloc() : super(MapInitial()) {
     on<MapPageLoadEvent>(_pageLoadEvent);
@@ -48,6 +54,18 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<MapRouteDirection>(_routeDirection);
     on<MapRouteLocationCheck>(_locationCheck);
     on<MapPageUpdateTaskEvent>(_updateTask);
+    on<StartTracking>(_onStartTracking);
+    on<StopTracking>(_onStopTracking);
+    on<RestartTracking>(_onRestartTracking);
+    on<NewLocationReceived>(_onNewLocationReceived);
+  }
+
+
+
+  @override
+  Future<void> close() {
+    _positionStream?.cancel();
+    return super.close();
   }
 
   _pageLoadEvent(MapPageLoadEvent event, emit) async {
@@ -64,6 +82,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     routes = [];
     routePointsList = [];
     routeLength = 1;
+    locationPath =  [];
     lastPoint = PointsModel();
     configurationData = ConfigurationModel();
     taskList = BlocProvider.of<TaskBloc>(event.context).searchTaskList;
@@ -139,6 +158,24 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         }
       }
     }
+
+    var resMovingPath =  await MapHelper.fetchMovingPath(taskId: taskData.taskId.toString());
+    List<MarkerPointsModel> movingPathList =  resMovingPath;
+    if(movingPathList.isNotEmpty){
+      for(var data in movingPathList){
+        directionList.add(
+          ArcGISPoint(x: data.gpsx, y: data.gpsy),
+        );
+      }
+    }
+
+
+    if(taskData.taskStatus == TaskStatus.started || taskData.taskStatus == TaskStatus.resume){
+      add(StartTracking(!event.context.mounted ? event.context : event.context));
+    }
+    else {
+      add(StopTracking());
+    }
     _eventComplete(emit);
   }
 
@@ -182,9 +219,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     var res = await MapHelper.fetchRoute(
         startPoint: event.startPoint, endPoint: event.endPoint);
-    if (res != null) {
-      directionList = res;
-    }
+    directionList = res;
 
     isLoader = false;
     isNavigationBool = directionList.isNotEmpty ? true : false;
@@ -276,6 +311,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       return;
     }
 
+    if(taskData.taskStatus == TaskStatus.started || taskData.taskStatus == TaskStatus.resume){
+      add(StartTracking(!event.context.mounted ? event.context : event.context));
+    }
+    else {
+      add(StopTracking());
+    }
+
     var res = await TaskHelper.updateTask(
         taskData: taskData,
         taskStatus: taskStatus == TaskStatus.started
@@ -307,6 +349,43 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     _eventComplete(emit);
   }
 
+  _onStartTracking(StartTracking event, emit) {
+    _positionStream?.cancel();
+    _positionStream = _mapHelper.getLocationStream(event.context).listen(
+          (location) {
+        add(NewLocationReceived(location));
+      },
+    );
+  }
+
+  _onStopTracking(StopTracking event, emit) {
+    _positionStream?.cancel();
+    _positionStream = null;
+  }
+
+  _onRestartTracking(RestartTracking event, emit) {
+    add(StartTracking(event.context));
+  }
+
+  void _onNewLocationReceived(NewLocationReceived event, emit) {
+    final LatLng location = event.location;
+
+    // ignore if same as last location
+    if (_lastLocation != null &&
+        _lastLocation!.latitude == location.latitude &&
+        _lastLocation!.longitude == location.longitude) {
+      return;
+    }
+    _lastLocation = location;
+
+    directionList.add(
+      ArcGISPoint(x: location.longitude, y: location.latitude),
+    );
+    print("Lat : ${location.latitude}");
+    print("Long : ${location.longitude}");
+    _eventComplete(emit);
+  }
+
   _eventComplete(Emitter<MapState> emit) {
     emit(FetchMapPageDataState(
         isLoader: isLoader,
@@ -319,6 +398,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         isStartPatrolling: isStartPatrolling,
         markerList: markerList,
         routes: routes,
+        locationPath: locationPath,
         isArcGISStreets: isArcGISStreets));
   }
 }

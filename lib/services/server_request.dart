@@ -325,6 +325,7 @@ class ServerRequest {
     try{
       String token = await SharedPreferencesUtils.getString(key: PreferencesName.token);
       header["Authorization"] = "Bearer $token";
+      // header["Authorization"] = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjk2LCJlbWFpbCI6Im5hdXNoYWRhQHVuaXN0YWwuY29tIiwiaWF0IjoxNzU4MjYxMDQ2LCJleHAiOjE3NTgzNDc0NDZ9.TpdpfpLcTx92j2O9DwX603EtKE7KWPdlcV8IkjxdkaU";
     } catch(_){
       header["Authorization"] = "";
     }

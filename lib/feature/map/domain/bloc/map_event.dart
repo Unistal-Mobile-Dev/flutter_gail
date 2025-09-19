@@ -51,6 +51,36 @@ class SelectMapArcGISStreets extends MapEvent {
   ];
 }
 
+class StartTracking extends MapEvent {
+  final BuildContext context;
+
+  const StartTracking(this.context);
+
+  @override
+  List<Object?> get props => [context];
+}
+
+class StopTracking extends MapEvent {
+  @override
+  List<Object?> get props => [];
+}
+
+class RestartTracking extends MapEvent {
+  final BuildContext context;
+  const RestartTracking(this.context);
+  @override
+  List<Object?> get props => [context];
+}
+
+class NewLocationReceived extends MapEvent {
+  final LatLng location;
+
+  const NewLocationReceived(this.location);
+
+  @override
+  List<Object?> get props => [location];
+}
+
 class MapRouteDirection extends MapEvent {
   final BuildContext context;
   final ArcGISPoint startPoint;

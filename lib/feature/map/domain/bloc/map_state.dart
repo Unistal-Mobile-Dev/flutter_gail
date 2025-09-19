@@ -23,6 +23,7 @@ final class FetchMapPageDataState extends MapInitial {
   final List<MarkerModel> markerList;
   final List<List<PointsModel>> routes;
   final bool isArcGISStreets;
+  final List<LatLng> locationPath;
 
   FetchMapPageDataState({
    required this.isLoader,
@@ -36,6 +37,7 @@ final class FetchMapPageDataState extends MapInitial {
    required this.markerList,
    required this.routes,
    required this.isArcGISStreets,
+   required this.locationPath,
   });
 
   @override
@@ -51,6 +53,7 @@ final class FetchMapPageDataState extends MapInitial {
     markerList,
     routes,
     isArcGISStreets,
+    locationPath,
   ];
 
 }

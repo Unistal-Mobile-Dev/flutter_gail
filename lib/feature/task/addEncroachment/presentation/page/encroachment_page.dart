@@ -17,7 +17,7 @@ class _EncroachmentPageState extends State<EncroachmentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: TextWidget("Encroachment",
+      appBar: AppBar(title: TextWidget("Add Structures in RoU",
         fontSize: AppFont.font_16, color: AppColor.white,),),
       body: BlocBuilder<EncroachmentBloc, EncroachmentState>(
         builder: (context, state) {

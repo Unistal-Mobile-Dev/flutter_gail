@@ -65,8 +65,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeInitial()) {
     on<HomePageLoadEvent>(_pageLoad);
     on<SelectWidgetHomeEvent>(_selectWidget);
-    on<HomeDrawerItemSelectedEvent>(_drawerItemSelected);
-    on<HomeDrawerItemSubListSelectedEvent>(_drawerSublistSelected);
     on<HomeChangeBottomNavigationItemEvent>(_changeBottomNavigationBarIndex);
     on<HomePageNotificationSilentEvent>(_notificationSilent);
   }
@@ -79,7 +77,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _restaurantMenu = [];
     _pageWidgetList = [];
     FirebaseService.instance.setupInteractedMessage();
-    _childWidget = const DashboardPage();
+    _childWidget = Container();
     _title = "Dashboard";
     _actionButtonWidget = const SizedBox.shrink();
 
@@ -92,6 +90,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     await LoginHelper.addDevice(userId: userData.users!.id.toString(),
         context: !event.context.mounted ? event.context : event.context);
+
+    List<DrawerModel> pageList = await HomeHelper.fetchPageList();
+    if(pageList.isNotEmpty){
+      _childWidget = pageList[0].widget;
+      _title =  pageList[0].label.toString();
+    }
     
     _eventCompleted(emit);
 
@@ -103,70 +107,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _eventCompleted(emit);
   }
 
-  _drawerItemSelected(HomeDrawerItemSelectedEvent event, emit) async {
-    List<DrawerModel> tempList = drawerList;
-    _drawerList = [];
-    _eventCompleted(emit);
-
-    for (int i = 0; i < tempList.length; i++) {
-      if (i == event.index) {
-        tempList[event.index].isSelected = event.isSelected;
-        if (tempList[event.index].sublist.isEmpty) {
-          _childWidget = tempList[event.index].widget;
-          _title = tempList[event.index].label;
-          _actionButtonWidget = tempList[event.index].actionButtonWidget ??
-              const SizedBox.shrink();
-        }
-      } else {
-        tempList[i].isSelected = false;
-        for (int j = 0; j < tempList[i].sublist.length; j++) {
-          tempList[i].sublist[j].isSelected = false;
-        }
-      }
-    }
-    _drawerList = [];
-    _eventCompleted(emit);
-    _drawerList = tempList;
-    _eventCompleted(emit);
-  }
-
-  _drawerSublistSelected(HomeDrawerItemSubListSelectedEvent event, emit) {
-    List<DrawerModel> tempList = drawerList;
-    _drawerList = [];
-    _eventCompleted(emit);
-
-    for (int i = 0; i < tempList.length; i++) {
-      if (i == event.listIndex) {
-        for (int j = 0; j < tempList[i].sublist.length; j++) {
-          if (j == event.index) {
-            tempList[i].sublist[j].isSelected = event.isSelected;
-            _childWidget = tempList[i].sublist[j].widget!;
-            _title = tempList[i].sublist[j].label.toString();
-            _actionButtonWidget = tempList[i].sublist[j].actionButtonWidget ??
-                const SizedBox.shrink();
-          } else {
-            tempList[i].sublist[j].isSelected = false;
-          }
-        }
-      } else {
-        for (int j = 0; j < tempList[i].sublist.length; j++) {
-          tempList[i].sublist[j].isSelected = false;
-        }
-      }
-    }
-    _drawerList = tempList;
-    _eventCompleted(emit);
-  }
-
   _changeBottomNavigationBarIndex(
       HomeChangeBottomNavigationItemEvent event, emit) async {
-    if (await Vibration.hasAmplitudeControl() != null) {
-      Vibration.vibrate(duration: 100);
+    Vibration.vibrate(duration: 100);
+      _bottomTabIndex = event.index;
+    List<DrawerModel> pageList = await HomeHelper.fetchPageList();
+    if(pageList.isNotEmpty){
+      _childWidget = pageList[bottomTabIndex].widget;
+      _title =  pageList[bottomTabIndex].label.toString();
     }
-    _bottomTabIndex = event.index;
-    List<Widget> pageList = await HomeHelper.fetchPageList();
-    print(pageList.length);
-    _childWidget = pageList[bottomTabIndex];
+
     _eventCompleted(emit);
   }
 

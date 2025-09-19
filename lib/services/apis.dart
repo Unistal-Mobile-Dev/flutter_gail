@@ -55,6 +55,8 @@ class APIs {
 
   static get getMarkerApi => "patrolling-surveillance/marker/details";
 
+  static get getMovingPointApi => "patrolling-surveillance/mis/covered-points";
+
   static get getRouteApi => "patrolling-surveillance/patrollman-route/gps-coordinates/";
 
   static get addRouteObserveApi => "patrolling-surveillance/route-observer/add-type";

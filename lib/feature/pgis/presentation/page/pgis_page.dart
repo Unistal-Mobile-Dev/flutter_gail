@@ -61,19 +61,14 @@ class _PgisPageState extends State<PgisPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarWidget(title: "PGIS"),
-      body: SafeArea(
-        child: BlocBuilder<PgisBloc, PgisState>(
-          builder: (context, state) {
-            if (state is FetchPgisDataState) {
-              return _itemBuilder(dataState: state);
-            } else {
-              return const Center(child: SpinLoader());
-            }
-          },
-        ),
-      ),
+    return BlocBuilder<PgisBloc, PgisState>(
+      builder: (context, state) {
+        if (state is FetchPgisDataState) {
+          return _itemBuilder(dataState: state);
+        } else {
+          return const Center(child: SpinLoader());
+        }
+      },
     );
   }
 
