@@ -32,7 +32,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       pieChartList = [
         MapEntry("Pipeline Status", {
           for (var e in pipelineStatuses)
-            e.pipelineStatus: e.statusCount.toDouble()
+            e.pipelineStatus: e.statusCount.toDouble()/1000
         }),
         MapEntry("CP System Status", {
           for (var e in cpSystemStatuses)
