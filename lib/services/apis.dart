@@ -3,10 +3,34 @@ import 'package:flutter_gail/utils/commonClass/singleton.dart';
 import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class APIs {
-  static BuildContext? context = Singleton.instance.context;
+  static BuildContext? get context => Singleton.instance.context;
 
-  static final String baseUrl =
-      EnvironmentConfig.of(context!)!.generalUrlBaseOnFlavour;
+  static String get baseUrl {
+    if (context == null) {
+      debugPrint("⚠️ APIs.context is null — EnvironmentConfig not initialized yet.");
+      return ""; // or a default URL
+    }
+    final env = EnvironmentConfig.of(context!);
+    if (env == null) {
+      debugPrint("⚠️ EnvironmentConfig.of(context) returned null.");
+      return "";
+    }
+    final url = env.generalUrlBaseOnFlavour;
+    debugPrint("🌐 Base URL: $url");
+    return url;
+  }
+
+  static String get baseGailUrl {
+    if (context == null) {
+      return ""; // or a default URL
+    }
+    final env = EnvironmentConfig.of(context!);
+    if (env == null) {
+      return "";
+    }
+    final url = env.generalGailUrlBaseOnFlavour;
+    return url;
+  }
 
   static get sendNotificationApi => "https://fcm.googleapis.com/fcm/send";
 

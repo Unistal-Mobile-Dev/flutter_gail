@@ -25,6 +25,7 @@ import 'package:flutter_gail/pdf_helper.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
 import 'package:flutter_gail/utils/commonWidgets/message_box_pop_button_widget.dart';
 import 'package:flutter_gail/utils/commonWidgets/message_box_two_button_pop.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -54,10 +55,10 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
 
   @override
   void initState() {
-    // BlocProvider.of<MapBloc>(context)
-    //     .add(MapPageLoadEvent(context: context));
     super.initState();
   }
+
+
 
   @override
   void dispose() {
@@ -650,7 +651,6 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
   void onMapViewReady() async {
     _mapViewController.arcGISMap =
         ArcGISMap.withBasemapStyle(BasemapStyle.arcGISStreets);
-
     // Add graphics overlays
     _mapViewController.graphicsOverlays.addAll([
       _routeGraphicsOverlay,

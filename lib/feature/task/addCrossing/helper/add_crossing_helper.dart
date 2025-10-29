@@ -98,7 +98,7 @@ class AddCrossingHelper {
       }
       final DateFormat formatter = DateFormat('dd-MM-yyyy');
       final String currentDate = formatter.format(DateTime.now());
-      var json = {
+      var json = [{
         "task_id" : taskData.taskId.toString(),
         "patrollroute_id" : taskData.patrollRouteId.toString(),
         "observation_type" : RouteObservation.crossing.value.toString(),
@@ -114,7 +114,7 @@ class AddCrossingHelper {
         "gps_accuracy" : locationData.accuracy.toString(),
         "observation_subtype" : crossingTypeData.name.toString(),
         "device_id" : deviceId.toString(),
-      };
+      }];
       var res = await ServerRequest.postDataWithFile(urlEndPoint: url,
           body: json,
           context: !context.mounted ? context : context,

@@ -27,6 +27,16 @@ class EnvironmentConfig extends InheritedWidget {
         return "http://115.241.54.252:8000/";
     }
   }
+
+  String get generalGailUrlBaseOnFlavour {
+    switch (flavours) {
+      case EnvironmentFlavours.productionIglCng:
+        return "https://gailgis.gail.co.in/";
+      case EnvironmentFlavours.developmentIglCng:
+        // return "http://115.241.54.252:8000/";
+        return "https://gailgis.gail.co.in/";
+    }
+  }
 }
 
 enum EnvironmentFlavours { productionIglCng, developmentIglCng }

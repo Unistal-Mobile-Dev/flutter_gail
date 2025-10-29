@@ -1,9 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineMasterModel.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineSection.dart';
+import 'package:flutter_gail/services/network_helper.dart';
 
 part 'dashboard_event.dart';
 
@@ -24,6 +26,17 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   _pageLoad(DashboardPageLoadEvent event, emit) async {
     isLoader = false;
     lengthPiggabilty = {};
+
+    final service = FlutterBackgroundService();
+    var isRunning = await service.isRunning();
+    print("Background service running === ${isRunning}");
+
+/*    bool connected = await NetworkHelper.isConnected();
+    if(connected){
+      double mbps = await NetworkHelper.checkDownloadSpeed();
+      print("Speed  === $mbps");
+    }*/
+
     var resPipe =
         await DashboardHelper.getPipelineSummaryApi(context: event.context);
     if (resPipe != null) {

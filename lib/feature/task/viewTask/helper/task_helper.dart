@@ -8,7 +8,6 @@ import 'package:flutter_gail/services/firebase/notification_service.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class TaskHelper {
   static Future<dynamic> fetchTask(
@@ -55,9 +54,10 @@ class TaskHelper {
       final String currentTime =
           "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
       String url =
-          APIs.updateTaskApi + "?task_id=${taskData.taskId.toString()}";
-      var json = {
+          APIs.updateTaskApi;
+      var json = {"data" : [{
         "patrollman_status": taskStatus,
+        "task_id" : taskData.taskId.toString(),
         "timing_data": {
           "event_type": taskStatus == 1
               ? "start"
@@ -75,7 +75,7 @@ class TaskHelper {
           "no_of_points": taskData.noOfPoints.toString(),
           "no_of_points_covered": "",
         }
-      };
+      }]};
       var res = await ServerRequest.putData(
           urlEndPoint: url, body: jsonEncode(json), context: context);
       if (res != null && res['message'] != null) {
@@ -89,36 +89,4 @@ class TaskHelper {
     }
   }
 
-  static Future<void> showNotificationWithNumber() async {
-    const AndroidNotificationDetails androidNotificationDetails =
-    AndroidNotificationDetails(
-      'notifications_priority', // id
-      'High Importance Notifications',
-      importance: Importance.max,
-      priority: Priority.high,
-      icon: '@mipmap/ic_launcher_gail',
-      largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher_gail'),
-      ongoing: false,
-      color: Colors.red,
-      actions: <AndroidNotificationAction>[
-        AndroidNotificationAction(
-          "id",
-          'View',
-          icon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher_gail'),
-          cancelNotification: true,
-          showsUserInterface: true,
-          contextual: true,
-          titleColor: Colors.green,
-        ),
-      ],
-    );
-    await flutterLocalNotificationsPlugin.show(
-        1,
-        'Patrolling Assigned Task',
-        'We are found some assigned pending task.',
-        const NotificationDetails(
-          android: androidNotificationDetails,
-        ),
-        payload: 'item x');
-  }
 }

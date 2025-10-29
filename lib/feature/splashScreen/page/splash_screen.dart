@@ -36,12 +36,15 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
     if (token.isEmpty) {
-      await Future.delayed(const Duration(seconds: 2));
       Navigator.pushAndRemoveUntil(
           !context.mounted ? context : context,
           MaterialPageRoute(builder: (_) => const LoginScreenPage()),
           (route) => false);
     } else {
+      // Navigator.pushAndRemoveUntil(
+      //     !context.mounted ? context : context,
+      //     MaterialPageRoute(builder: (_) => const LoginScreenPage()),
+      //         (route) => false);
       BlocProvider.of<LoginBloc>(!context.mounted ? context : context)
           .add(LoginCheckEvent(context: !context.mounted ? context : context));
     }

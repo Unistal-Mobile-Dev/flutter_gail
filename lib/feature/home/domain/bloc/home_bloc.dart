@@ -5,7 +5,6 @@ import 'package:flutter_gail/feature/home/domain/model/drawer_model.dart';
 import 'package:flutter_gail/feature/home/domain/model/firebase_device_model.dart';
 import 'package:flutter_gail/feature/home/helper/home_helper.dart';
 import 'package:flutter_gail/feature/login/helper/login_helper.dart';
-import 'package:flutter_gail/services/firebase/notification_service.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
 import 'package:vibration/vibration.dart';
 
@@ -76,7 +75,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _bottomNavigationBarItemList = [];
     _restaurantMenu = [];
     _pageWidgetList = [];
-    FirebaseService.instance.setupInteractedMessage();
     _childWidget = Container();
     _title = "Dashboard";
     _actionButtonWidget = const SizedBox.shrink();

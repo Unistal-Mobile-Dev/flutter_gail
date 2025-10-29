@@ -8,8 +8,9 @@ class LocationModel {
   double? long;
   String? city;
   String? accuracy;
+  String? speed;
 
-  LocationModel({this.address, this.long, this.lat, this.city, this.accuracy});
+  LocationModel({this.address, this.long, this.lat, this.city, this.accuracy, this.speed});
 
   factory LocationModel.fromJson(Map<String, dynamic> json) {
     return LocationModel(
@@ -18,6 +19,7 @@ class LocationModel {
       long: json['long'] ?? 0.0,
       city: json['city'] ?? "",
       accuracy: json['accuracy'] ?? "",
+      speed: json['speed'] ?? "0",
     );
   }
 }

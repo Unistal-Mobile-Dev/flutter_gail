@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/home/presentation/widget/home_drawer_widget.dart';
 import 'package:flutter_gail/feature/login/presentations/Widgets/header_widget.dart';
-import 'package:flutter_gail/feature/task/viewTask/presentation/page/task_page.dart';
+import 'package:flutter_gail/services/app_control_helper.dart';
+import 'package:flutter_gail/services/app_lifecycle_channel.dart';
+import 'package:flutter_gail/services/background_location_service.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
 import 'package:flutter_gail/utils/commonWidgets/message_box_two_button_pop.dart';
 
@@ -24,6 +26,7 @@ class _HomePageState extends State<HomePage> {
     BlocProvider.of<HomeBloc>(context).add(HomePageLoadEvent(context: context));
     super.initState();
   }
+
 
   @override
   Widget build(BuildContext context) {

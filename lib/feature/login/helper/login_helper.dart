@@ -95,6 +95,11 @@ class LoginHelper {
           deviceId: deviceId,
         ).toJson();
 
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("baseUrl", APIs.baseUrl);
+
+        print("Fetch Base Url =  ${prefs.getString("baseUrl")}");
+
         String url = APIs.login;
         var res = await ServerRequest.postData(
             urlEndPoint: url,
@@ -102,8 +107,8 @@ class LoginHelper {
             context: !context.mounted ? context : context);
         if (res != null && res['users'] != null) {
           if (Platform.isAndroid) {
-            await deleteCacheDir();
-            await deleteAppDir();
+            // await deleteCacheDir();
+            // await deleteAppDir();
           }
           return res;
         }
@@ -149,8 +154,8 @@ class LoginHelper {
             context: !context.mounted ? context : context);
         if (res != null && res['users'] != null) {
           if (Platform.isAndroid) {
-            await deleteCacheDir();
-            await deleteAppDir();
+            // await deleteCacheDir();
+            // await deleteAppDir();
           }
           return res;
         }
@@ -167,6 +172,11 @@ class LoginHelper {
     try {
       if (await isInternetConnected() == true) {
         var json = {};
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("baseUrl", APIs.baseUrl);
+
+        print("Fetch Base Url =  ${prefs.getString("baseUrl")}");
+
         String url = APIs.checkLogin;
         var res = await ServerRequest.postData(
             urlEndPoint: url,
@@ -174,8 +184,8 @@ class LoginHelper {
             context: !context.mounted ? context : context);
         if (res != null && res['users'] != null) {
           if (Platform.isAndroid) {
-            await deleteCacheDir();
-            await deleteAppDir();
+            // await deleteCacheDir();
+            // await deleteAppDir();
           }
           return res;
         }

@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   arcgis_maps
   audioplayers_windows
   battery_plus
+  connectivity_plus
   desktop_webview_window
   file_selector_windows
   firebase_auth

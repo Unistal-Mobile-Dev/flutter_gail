@@ -34,7 +34,7 @@ class PGISHelper {
       'f': 'json',
     };
     String json = Uri(queryParameters: para).query;
-    final res = await ServerRequest.getData(urlEndPoint:  APIs.pipelineQuery + json);
+    final res = await ServerRequest.getDataGail(urlEndPoint:  APIs.pipelineQuery + json);
     if (res != null && res['features'] != null) {
       final features = res['features'] as List;
       print("features--->${features}");
@@ -67,7 +67,7 @@ class PGISHelper {
         'f': 'json',
       };
       String json = Uri(queryParameters: para).query;
-      final res = await ServerRequest.getData(urlEndPoint:  APIs.pipelineQuery + json);
+      final res = await ServerRequest.getDataGail(urlEndPoint:  APIs.pipelineQuery + json);
       if (res != null && res['features'] != null) {
         final features = res['features'] as List;
         if (features.isNotEmpty) {
@@ -102,7 +102,7 @@ class PGISHelper {
       final queryString = Uri(queryParameters: params).query;
       final fullUrl = '${APIs.stationQuery}$queryString';
 
-      final res = await ServerRequest.getData(urlEndPoint: fullUrl);
+      final res = await ServerRequest.getDataGail(urlEndPoint: fullUrl);
       if (res != null && res['features'] != null) {
         final features = res['features'] as List;
         return features.map((e) {
@@ -127,7 +127,7 @@ class PGISHelper {
   }) async {
     try {
       final geometryUrl = "${APIs.stationObject}/$query?f=pjson";
-      final geometryRes = await ServerRequest.getData(urlEndPoint: geometryUrl);
+      final geometryRes = await ServerRequest.getDataGail(urlEndPoint: geometryUrl);
       if (geometryRes != null && geometryRes['feature'] != null) {
         final geometry = geometryRes['feature']['geometry'];
         if (geometry != null ) {
@@ -186,7 +186,7 @@ class PGISHelper {
       final queryString = Uri(queryParameters: params).query;
       final fullUrl = '${APIs.tlpQuery}$queryString';
 
-      final res = await ServerRequest.getData(urlEndPoint: fullUrl);
+      final res = await ServerRequest.getDataGail(urlEndPoint: fullUrl);
       if (res != null && res['features'] != null) {
         final features = res['features'] as List;
         return features.map((e) {
@@ -212,7 +212,7 @@ class PGISHelper {
   }) async {
     try {
       final geometryUrl = "${APIs.tlpObject}/$query?f=pjson";
-      final geometryRes = await ServerRequest.getData(urlEndPoint: geometryUrl);
+      final geometryRes = await ServerRequest.getDataGail(urlEndPoint: geometryUrl);
       if (geometryRes != null && geometryRes.containsKey('feature')) {
         final feature = geometryRes['feature'];
         if (feature != null || feature['geometry'] != null) {

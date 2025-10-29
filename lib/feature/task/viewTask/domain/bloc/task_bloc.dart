@@ -63,7 +63,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     _eventComplete(emit);
 
     if(taskList.isNotEmpty){
-      TaskHelper.showNotificationWithNumber();
+      // TaskHelper.showNotificationWithNumber();
     }
   }
 

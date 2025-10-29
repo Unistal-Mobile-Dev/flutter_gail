@@ -66,6 +66,10 @@ dependencies:
   arcgis_maps: ^200.7.0+4560
   flutter_tts: ^4.2.3
   flutter_typeahead: ^5.2.0
+  connectivity_plus: ^7.0.0
+  hive: ^2.2.3
+  flutter_background_service: ^5.1.0
+  flutter_background_service_android: ^6.3.1
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +78,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.4
   build_runner: ^2.4.6
+  hive_generator: ^2.0.1
 
 flutter:
 

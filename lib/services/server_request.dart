@@ -11,17 +11,41 @@ import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
 
 class ServerRequest {
-  static BuildContext? context = Singleton.instance.context;
   static var header = {"Content-Type": "application/json"};
 
   static Future<dynamic> getData({required var urlEndPoint}) async {
     try {
-      if (await ConnectivityHelper.allConnectivityCheck(context: context!) ==
-          false) {
-        return null;
-      }
       await addToken();
       String url = APIs.baseUrl + urlEndPoint;
+      log(Uri.parse(url.toString()).toString());
+      log(header.toString());
+      final response = await get(Uri.parse(url.toString()), headers: header)
+          .timeout(const Duration(minutes: 1));
+      log(response.body);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else if (response.statusCode == 500) {
+        return jsonDecode(response.body);
+      }
+    } catch (e) {
+      if (e is SocketException) {
+        log("SocketException : ${e.toString()}");
+        return e.toString();
+      } else if (e is TimeoutException) {
+        log("TimeoutException : ${e.toString()}");
+        return e.toString();
+      } else {
+        log("Unhandled exception : ${e.toString()}");
+        return e.toString();
+      }
+    }
+    return null;
+  }
+
+  static Future<dynamic> getDataGail({required var urlEndPoint}) async {
+    try {
+      await addToken();
+      String url = APIs.baseGailUrl + urlEndPoint;
       log(Uri.parse(url.toString()).toString());
       log(header.toString());
       final response = await get(Uri.parse(url.toString()), headers: header)
@@ -174,12 +198,47 @@ class ServerRequest {
     }
   }
 
+  static Future<dynamic> backgroundPostData(
+      {required var urlEndPoint, required var body}) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String baseUrl =  prefs.getString("baseUrl") ?? "";
+    String url = baseUrl + urlEndPoint;
+    log(url);
+    try {
+      log(url);
+      await addToken();
+      log(header.toString());
+      final response = await post(Uri.parse(url), headers: header, body: body)
+          .timeout(const Duration(minutes: 1));
+      log(response.body);
+      if (response.statusCode == 200) {
+        // updateCookie(response);
+        return jsonDecode(response.body);
+      }
+      else if (response.statusCode == 201) {
+        // updateCookie(response);
+        return jsonDecode(response.body);
+      }
+      return null;
+    } catch (e) {
+      if (kDebugMode) {
+        print("${e}Post Data ");
+      }
+      if (e is SocketException) {
+        log("SocketException : ${e.toString()}");
+        return e.toString();
+      } else if (e is TimeoutException) {
+        log("TimeoutException : ${e.toString()}");
+        return e.toString();
+      } else {
+        log("Unhandled exception : ${e.toString()}");
+        return e.toString();
+      }
+    }
+  }
+
   static Future<dynamic> getGoogleData({required var url}) async {
     try {
-      if (await ConnectivityHelper.allConnectivityCheck(context: context!) ==
-          false) {
-        return null;
-      }
       log(url.toString());
       final response =
           await get(url, headers: header).timeout(const Duration(minutes: 1));
@@ -346,10 +405,6 @@ class ServerRequest {
 
   static Future<dynamic> imageUrlConvertToByte64({required var url}) async {
     try {
-      if (await ConnectivityHelper.allConnectivityCheck(context: context!) ==
-          false) {
-        return null;
-      }
       log(url);
       final response = await get(Uri.parse(url.toString()), headers: header)
           .timeout(const Duration(minutes: 1));

@@ -94,7 +94,10 @@ class LocationHelper {
             "city": "",
             "accuracy": position.accuracy.toString(),
             "address": '',
+            "speed" : position.speed.toString(),
           };
+
+
           if (kDebugMode) {
             print(location.toString());
           }
@@ -105,6 +108,38 @@ class LocationHelper {
       } catch (e) {
         return null;
       }
+  }
+
+  static Future<dynamic> getLocationFetchForBackground() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission != LocationPermission.denied) {
+        LocationSettings locationSettings = const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation, //accuracy of the location data
+          distanceFilter: 0, //minimum distance (measured in meters) a
+        );
+        Position position = await Geolocator.getCurrentPosition(
+            locationSettings: locationSettings
+        ).timeout(const Duration(seconds: 20));
+        Map<String, dynamic> location = {
+          "lat": position.latitude,
+          "long": position.longitude,
+          "city": "",
+          "accuracy": position.accuracy.toString(),
+          "address": '',
+          "speed" : position.speed.toString(),
+        };
+
+        if (kDebugMode) {
+          print(location.toString());
+        }
+        return responseLocationData(location);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
   }
 
   static Future<dynamic> _getAddressFromLatLng(Position position) async {
