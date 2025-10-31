@@ -49,18 +49,6 @@ class MainActivity : FlutterActivity() {
                         }
                     }
 
-                    "forceStopApp" -> {
-                        try {
-                            println("⚠️ Force stopping app...")
-                            finishAffinity() // close all activities
-                            android.os.Process.killProcess(android.os.Process.myPid())
-                            System.exit(0)
-                            result.success(true)
-                        } catch (e: Exception) {
-                            result.error("FORCE_STOP_ERROR", e.message, null)
-                        }
-                    }
-
                     else -> result.notImplemented()
                 }
             }
@@ -78,28 +66,5 @@ class MainActivity : FlutterActivity() {
             })
     }
 
-    override fun onPause() {
-        super.onPause()
-        println("🟡 MainActivity onPause — App going to background")
-        eventSink?.success("onPause")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        println("🟢 MainActivity onResume — App came to foreground")
-        eventSink?.success("onResume")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        println("🔵 MainActivity onStop — App not visible anymore")
-        eventSink?.success("onStop")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        println("🧩 MainActivity destroyed — cleaning up background service")
-
-    }
 
 }
