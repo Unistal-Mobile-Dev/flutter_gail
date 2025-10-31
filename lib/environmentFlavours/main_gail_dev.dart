@@ -8,6 +8,7 @@ import 'package:flutter_gail/services/app_control_helper.dart';
 import 'package:flutter_gail/services/background_location_service.dart';
 import 'package:flutter_gail/services/firebase/notification_service.dart';
 import 'package:flutter_gail/utils/res/environment_config.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -28,10 +29,28 @@ void main() async {
   }
 
   try {
+
+    final notificationPlugin = FlutterLocalNotificationsPlugin();
+
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher_upims');
+    await notificationPlugin.initialize(
+      const InitializationSettings(android: androidSettings),
+    );
+
+    const channel = AndroidNotificationChannel(
+      'my_foreground',
+      'Background Service Channel',
+      importance: Importance.low,
+    );
+
+    await notificationPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
     final backgroundManager = BackgroundManager();
-    if(!await backgroundManager.isRunning()){
-      backgroundManager.initializeService();
-    }
+    backgroundManager.initializeService();
+
     BackgroundManager.isServiceRunning.addListener(() {
       debugPrint(
         "Service State Changed → ${BackgroundManager.isServiceRunning.value ? 'RUNNING' : 'STOPPED'}",
