@@ -56,7 +56,7 @@ class DeviationHelper {
       if(locationRes != null){
         locationData =  locationRes;
       }
-      var json = [{
+      var json = {
         "task_id" : taskData.taskId.toString(),
         "patrollroute_id" : taskData.patrollRouteId.toString(),
         "observation_type" : RouteObservation.deviation.value.toString(),
@@ -71,7 +71,7 @@ class DeviationHelper {
         "gps_accuracy" : locationData.accuracy.toString(),
         "observation_subtype" : deviationData.name != null ? deviationData.name.toString() : "",
         "device_id" : deviceId.toString(),
-      }];
+      };
       var res = await ServerRequest.postDataWithFile(urlEndPoint: url,
           body: json,
           context: !context.mounted ? context : context,

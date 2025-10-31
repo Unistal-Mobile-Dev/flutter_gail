@@ -84,7 +84,7 @@ class AddIncidentHelper {
          final DateFormat formatter = DateFormat('dd-MM-yyyy');
          final String currentDate = formatter.format(DateTime.now());
          var deviceId = await LoginHelper.getUniqueDeviceId();
-         var json = [{
+         var json = {
            "task_id" : taskData.taskId.toString(),
            "patrollroute_id" : taskData.patrollRouteId.toString(),
            "observation_type" : RouteObservation.incident.value.toString(),
@@ -99,7 +99,7 @@ class AddIncidentHelper {
            "gps_accuracy" : locationData.accuracy.toString(),
            "observation_subtype" : incidentTypeData.name != null ? incidentTypeData.name.toString() : "",
            "device_id" : deviceId.toString(),
-         }];
+         };
          var res = await ServerRequest.postDataWithFile(urlEndPoint: url,
              body: json,
              context: !context.mounted ? context : context,

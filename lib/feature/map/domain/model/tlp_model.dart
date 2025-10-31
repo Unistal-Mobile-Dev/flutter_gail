@@ -14,8 +14,8 @@ class TlpModel {
     return TlpModel(
        id: json['id'] ?? "",
        type: json['type'] ?? "",
-       gpsx: json['gpsx'] ?? "",
-       gpsy: json['gpsy'] ?? "",
+       gpsx: json['gpsx'] ?? 0.0,
+       gpsy: json['gpsy'] ?? 0.0,
     );
   }
 }

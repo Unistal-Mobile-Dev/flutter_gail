@@ -104,7 +104,7 @@ class AddMarkerHelper {
         }
         final DateFormat formatter = DateFormat('dd-MM-yyyy');
         final String currentDate = formatter.format(DateTime.now());
-        var json = [{
+        var json = {
           "task_id" : taskData.taskId.toString(),
           "patrollroute_id" : taskData.patrollRouteId.toString(),
           "sectionCode " : taskData.sectionCode.toString(),
@@ -118,7 +118,7 @@ class AddMarkerHelper {
           "gps_accuracy" : locationData.accuracy.toString(),
           "observation_subtype" : markerTypeData.name.toString(),
           "device_id" : deviceId.toString(),
-        }];
+        };
         var res =  await ServerRequest.postDataWithFile(urlEndPoint: url,
             body: json, context: !context.mounted ? context :context, fileList: fileList);
         if(res != null &&  res['message'] != null){
