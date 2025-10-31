@@ -29,6 +29,7 @@ class DashboardHelper {
       String url =  APIs.pipelineSummary;
       String query = Uri(queryParameters: para).query;
       var res = await ServerRequest.getData(urlEndPoint: url+ query,);
+      log("getPipelineSummaryApi response → ${url+ query}");
       log("getPipelineSummaryApi response → $res");
       if (res != null && res is Map<String, dynamic>) {
         DashboardStatusModel dashboardStatusModel =

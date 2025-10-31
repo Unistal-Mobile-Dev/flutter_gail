@@ -1,17 +1,12 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/root.dart';
-import 'package:flutter_gail/services/app_control_helper.dart';
 import 'package:flutter_gail/services/background_location_service.dart';
 import 'package:flutter_gail/services/firebase/notification_service.dart';
 import 'package:flutter_gail/utils/res/environment_config.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-import '../feature/map/domain/model/hive_location_model.dart';
 import 'package:geolocator/geolocator.dart';
 
 void main() async {

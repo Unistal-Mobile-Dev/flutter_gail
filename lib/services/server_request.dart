@@ -44,11 +44,11 @@ class ServerRequest {
 
   static Future<dynamic> getDataGail({required var urlEndPoint}) async {
     try {
-      await addToken();
+
       String url = APIs.baseGailUrl + urlEndPoint;
       log(Uri.parse(url.toString()).toString());
       log(header.toString());
-      final response = await get(Uri.parse(url.toString()), headers: header)
+      final response = await get(Uri.parse(url.toString()),)
           .timeout(const Duration(minutes: 1));
       log(response.body);
       if (response.statusCode == 200) {

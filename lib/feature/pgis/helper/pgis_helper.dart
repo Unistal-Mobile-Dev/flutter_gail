@@ -28,8 +28,8 @@ class PGISHelper {
     required String query,
   }) async {
     Map<String, String> para = {
-      'where': "UPPER(engroutename) LIKE '%${query.toUpperCase()}%'",
-      'outFields': 'engroutename,namesection',
+      'where': "UPPER(ADMIN.PipelineLine.engroutename) LIKE '%${query.toUpperCase()}%'",
+      'outFields': 'ADMIN.PipelineLine.engroutename,dbo.vw_Pipeline_GIS_Attributes.sectionName',
       'returnGeometry': 'false',
       'f': 'json',
     };
@@ -43,14 +43,12 @@ class PGISHelper {
       return features.map((e) {
         final attr = e['attributes'];
         return PipelineModel(
-          objectId: attr['OBJECTID'] ?? 0,
-          sectionName: attr['namesection']?.toString() ?? '',
-          engRouteName: attr['engroutename']?.toString() ?? '',
+        //  objectId: attr['OBJECTID'] ?? 0,
+          objectId: attr['ADMIN.PipelineLine.OBJECTID'] ?? 0,
+          sectionName: attr['dbo.vw_Pipeline_GIS_Attributes.sectionName']?.toString() ?? '',
+          engRouteName: attr['ADMIN.PipelineLine.engroutename']?.toString() ?? '',
         );
       }).toList();
-      // features
-      //   .map((e) => e['attributes']['engroutename'].toString())
-      //   .toList();
     }
     return null;
   }
@@ -61,8 +59,8 @@ class PGISHelper {
   }) async {
     try {
       Map<String, String> para = {
-        'where': "UPPER(engroutename) LIKE '%${query.toUpperCase()}%'",
-        'outFields': 'engroutename',
+        'where': "UPPER(ADMIN.PipelineLine.engroutename) LIKE '%${query.toUpperCase()}%'",
+        'outFields': 'ADMIN.PipelineLine.engroutename',
         'returnGeometry': 'true',
         'f': 'json',
       };

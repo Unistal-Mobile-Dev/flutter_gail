@@ -64,7 +64,7 @@ class CpSystemStatus {
   factory CpSystemStatus.fromJson(Map<String, dynamic> json) {
     return CpSystemStatus(
       pipelineStatus: json['pipelineStatus'] ?? "",
-      statusCount: json['StatusCount'] ?? "",
+      statusCount: ((double.tryParse(json['StatusCount']?.toString() ?? '0') ?? 0) / 1000).round().toInt(),
     );
   }
 

@@ -113,11 +113,13 @@ class APIs {
 
   static get verifyOtpApi => "auth/2fa/verify-otp";
 
-  static get pipelineQuery => "server/rest/services/gail_production/MobApp/MapServer/210052/query?";
-  static get stationQuery => "server/rest/services/gail_production/MobApp/MapServer/910001/query?";
-  static get stationObject => "server/rest/services/gail_production/MobApp/MapServer/910001";
-  static get tlpQuery => "server/rest/services/gail_production/MobApp/MapServer/200052/query?";
-  static get tlpObject => "server/rest/services/gail_production/MobApp/MapServer/200052";
+
+  static get pipelineLayerUrl => "server/rest/services/UPIMS/MobileApp/MapServer";
+  static get pipelineQuery => "server/rest/services/UPIMS/MobileApp/MapServer/210052/query?";
+  static get stationQuery => "server/rest/services/UPIMS/MobileApp/MapServer/910001/query?";
+  static get stationObject => "server/rest/services/UPIMS/MobileApp/MapServer/910001";
+  static get tlpQuery => "server/rest/services/UPIMS/MobileApp/MapServer/200052/query?";
+  static get tlpObject => "server/rest/services/UPIMS/MobileApp/MapServer/200052";
 
   static get forgotPasswordApi => "";
 }
