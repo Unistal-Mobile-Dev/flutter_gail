@@ -40,10 +40,7 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
   final map = ArcGISMap.withBasemapStyle(BasemapStyle.arcGISStreets);
   final locationDataSource = SystemLocationDataSource();
 
-  //final pipelineLayerUrl = 'https://115.241.54.252/server/rest/services/gail_production/UPIMS15/MapServer';
-  final pipelineLayerUrl =
-     // 'https://192.168.40.250/server/rest/services/gail_production/MobApp/MapServer';
-      'https://gailgis.gail.co.in/server/rest/services/UPIMS/MobileApp/MapServer';
+  final pipelineLayerUrl = 'server/rest/services/UPIMS/MobileApp/MapServer';
 
   final indiaEnvelope = Envelope.fromXY(
     xMin: 68.0,
@@ -580,7 +577,8 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
 
   Future<void> _addPipelineLayer(ArcGISMapViewController controller) async {
     try {
-      String urlString = APIs.baseGailUrl + pipelineLayerUrl;
+      String urlString = APIs.baseGailUrl + APIs.pipelineLayerUrl ;
+      print("---urlString----${urlString}");
       final uri = Uri.parse(urlString);
       final pipelineLayer = ArcGISMapImageLayer.withUri(uri);
       await pipelineLayer.load();
