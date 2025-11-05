@@ -43,6 +43,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     taskData =  TaskModel();
     startDate = DateTime.now().subtract(const Duration(days: 7));
     endDate =  DateTime.now();
+    await DashboardHelper.requestMandatoryLocationPermission(event.context);
     userData =  UserInfo.instance!.userData!;
     if(userData.modules != null){
       for(var moduleData in userData.modules!) {

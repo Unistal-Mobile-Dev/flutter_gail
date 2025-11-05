@@ -3,6 +3,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PiggabilityDataModel.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineMasterModel.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineSection.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class DashboardHelper {
 
@@ -140,6 +141,94 @@ class DashboardHelper {
     double sizeInMb = sizeInBytes / (1024 * 1024);
     return sizeInMb;
   }
+
+  static Future<void> requestMandatoryLocationPermission(BuildContext context) async {
+
+    // Step 1: Request Foreground Location
+    var status = await Permission.location.status;
+
+    if (status.isDenied) {
+      await _showReasonDialog(
+        context,
+        "Location Required",
+        "This app needs your location to function properly.",
+      );
+      status = await Permission.location.request();
+    }
+
+    if (!status.isGranted) {
+      await _showSettingsDialog(
+        context,
+        "Permission Required",
+        "You must grant location access to continue using this app.",
+      );
+      return;
+    }
+
+    // Step 2: Request Background Location
+    var bgStatus = await Permission.locationAlways.status;
+
+    if (!bgStatus.isGranted) {
+      await _showReasonDialog(
+        context,
+        "Background Location Required",
+        "To track your location even when app is closed, please enable 'Allow all the time'.",
+      );
+
+      bgStatus = await Permission.locationAlways.request();
+    }
+
+    if (!bgStatus.isGranted) {
+      await _showSettingsDialog(
+        context,
+        "Mandatory Background Permission",
+        "You need to enable 'Allow all the time' for location in app settings.",
+      );
+    }
+  }
+
+  static Future<void> _showReasonDialog(
+      BuildContext context, String title, String msg) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => WillPopScope(
+        onWillPop: () async => false, // ❌ Disable back button
+        child: AlertDialog(
+          title: Text(title),
+          content: Text(msg),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Future<void> _showSettingsDialog(
+      BuildContext context, String title, String msg) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        title: Text(title),
+        content: Text(msg),
+        actions: [
+          TextButton(
+            child: const Text("Open Settings"),
+            onPressed: () async {
+              Navigator.pop(context);
+              await openAppSettings();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
 }
 
 mediaType({required BuildContext context,
