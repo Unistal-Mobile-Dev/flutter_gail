@@ -67,9 +67,9 @@ class _SplashScreenState extends State<SplashScreen> {
       body:Align(
         alignment: Alignment.center,
         child:  Image.asset(
-          AppConfig.instanceInit()!.client == Client.gail
-              ? AppIcon.gailLogo
-              : AppIcon.gailLogo,
+          AppConfig.instanceInit()!.client == Client.oil
+              ? AppIcon.oilLogo
+              : AppIcon.oilLogo,
           height: MediaQuery.of(context).size.width * 0.40,
           width: MediaQuery.of(context).size.width * 0.40,
         ),

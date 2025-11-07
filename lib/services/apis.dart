@@ -41,57 +41,57 @@ class APIs {
 
   static get checkLogin => "auth/token-login";
 
-  static get getTaskApi => "patrolling-surveillance/patrollman-task/taskList";
+  static get getTaskApi => "api/patrollman-task/taskList";
 
-  static get addMarkerPointApi => "patrolling-surveillance/marker/add-marker";
+  static get addMarkerPointApi => "api/marker/add-marker";
 
   static get addCrossingPointApi =>
-      "patrolling-surveillance/crossing/add-crossing";
+      "api/crossing/add-crossing";
 
-  static get getIncidentTypeApi => "patrolling-surveillance/route-observer/incident-types";
+  static get getIncidentTypeApi => "api/route-observer/incident-types";
 
   static get addIncidentDataApi =>
-      "patrolling-surveillance/incident/add-incident";
+      "api/incident/add-incident";
 
   static get updateTaskApi =>
-      "patrolling-surveillance/patrollman-task/update-task-status";
+      "api/patrollman-task/update-task-status";
 
   static get createTaskValuesListApi =>
-      "patrolling-surveillance/patrollman-task/task-form-details";
+      "api/patrollman-task/task-form-details";
 
   static get areaStructureApi =>
       "common-apis/area-structure";
 
   static get getsupervisorUserApi =>
-      "patrolling-surveillance/patrollman-task/supervisor-users";
+      "api/patrollman-task/supervisor-users";
 
   static get assignTaskApi =>
-      "patrolling-surveillance/patrollman-task/assign-task";
+      "api/patrollman-task/assign-task";
 
   static get getDailyTaskTrackingApi =>
-      "patrolling-surveillance/patrollman-task/taskList";
+      "api/patrollman-task/taskList";
 
   static get createDailyTaskApi =>
-      "patrolling-surveillance/daily-task-tracking/create";
+      "api/daily-task-tracking/create";
 
   static get saveLocationDataApi =>
-      "patrolling-surveillance/device-location/add-device-location";
+      "api/device-location/add-device-location";
 
-  static get getMarkerApi => "patrolling-surveillance/marker/details";
+  static get getMarkerApi => "api/marker/details";
 
-  static get getMovingPointApi => "patrolling-surveillance/mis/covered-points";
+  static get getMovingPointApi => "api/mis/covered-points";
 
-  static get getRouteApi => "patrolling-surveillance/patrollman-route/gps-coordinates/";
+  static get getRouteApi => "api/patrollman-route/gps-coordinates/";
 
-  static get addRouteObserveApi => "patrolling-surveillance/route-observer/add-type";
+  static get addRouteObserveApi => "api/route-observer/add-type";
 
-  static get addDeviceApi => "patrolling-surveillance/device/add-user-device";
+  static get addDeviceApi => "api/device/add-user-device";
 
-  static get getMarkerCrossingInidentTypePointsApi => "patrolling-surveillance/route-observer/point-details";
+  static get getMarkerCrossingInidentTypePointsApi => "api/route-observer/point-details";
 
   static get getEncroachmentTypeApi => "encroachment/types";
 
-  static get getConfigurationApi => "patrolling-surveillance/mis/configuration";
+  static get getConfigurationApi => "api/mis/configuration";
 
   static get getCategoryApi => "image-sharing/category";
 

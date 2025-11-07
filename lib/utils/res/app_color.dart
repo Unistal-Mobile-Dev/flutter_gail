@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppColor {
-  static dynamic theme_Color = 0xFFE63746;
-  static dynamic theme_LightColor = 0xFFE74957;
-  static dynamic theme_NormalLightColor = 0xFFE74957;
+  static dynamic theme_Color = 0xFFE31e24;
+  static dynamic theme_LightColor = 0xFFE05C60;
+  static dynamic theme_NormalLightColor = 0xFFE05C60;
 
   AppColor({required dynamic themeColor, required dynamic themeLightColor}) {
     theme_Color = themeColor;

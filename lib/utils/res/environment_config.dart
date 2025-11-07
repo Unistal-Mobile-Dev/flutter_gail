@@ -24,7 +24,7 @@ class EnvironmentConfig extends InheritedWidget {
       case EnvironmentFlavours.productionIglCng:
         return "https://upims.gail.co.in:8000/";
       case EnvironmentFlavours.developmentIglCng:
-        return "http://115.241.54.252:8000/";
+        return "https://tpimsdev.smartgasnet.com/";
     }
   }
 

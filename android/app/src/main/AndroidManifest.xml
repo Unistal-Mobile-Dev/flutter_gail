@@ -19,8 +19,8 @@
 
     <application
         android:name="${applicationName}"
-        android:label="GAIL UPIMS"
-        android:icon="@mipmap/ic_launcher_upims"
+        android:label="OIL"
+        android:icon="@mipmap/ic_launcher_oil"
         android:requestLegacyExternalStorage="true">
 
         <activity
@@ -57,7 +57,7 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/ic_launcher_upims"/>
+            android:resource="@mipmap/ic_launcher_oil"/>
 
         <!-- BACKGROUND SERVICE -->
         <service

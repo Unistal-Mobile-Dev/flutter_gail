@@ -59,7 +59,7 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
             Align(
               alignment: Alignment.topLeft,
               child: TextWidget(
-                "Gail Login",
+                "OIL Login",
                 fontSize: AppFont.font_22,
                 fontWeight: FontWeight.w800,
                 color: AppColor.themeColor,
@@ -84,7 +84,7 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
                 const SizedBox(width: 5),
                 dataState.loginType == "1" ?
                 Center(
-                  child: TextWidget("@gail.co.in",
+                  child: TextWidget("@oil.co.in",
                       color: AppColor.black, fontSize: AppFont.font_11),
                 ) : const SizedBox.shrink(),
               ],
@@ -169,9 +169,9 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
     return Hero(
       tag: 'logo',
       child: Image.asset(
-        AppConfig.instanceInit()!.client == Client.gail
-            ? AppIcon.gailLogo
-            : AppIcon.gailLogo,
+        AppConfig.instanceInit()!.client == Client.oil
+            ? AppIcon.oilLogo
+            : AppIcon.oilLogo,
       ),
     );
   }

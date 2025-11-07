@@ -15,10 +15,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  // Hive.registerAdapter(HiveLocationModelAdapter());
-  // await Hive.openBox<HiveLocationModel>('location_box');
-  await FirebaseService.instance.initializeService();
-
   LocationPermission permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied ||
       permission == LocationPermission.deniedForever) {
@@ -29,7 +25,7 @@ void main() async {
   try {
     final notificationPlugin = FlutterLocalNotificationsPlugin();
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher_upims');
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher_oil');
     await notificationPlugin.initialize(
       const InitializationSettings(android: androidSettings),
     );
@@ -66,7 +62,7 @@ void main() async {
   var configuredApp = const EnvironmentConfig(
       flavours: EnvironmentFlavours.productionIglCng,
       child: Root(
-        client: Client.gail,
+        client: Client.oil,
       ));
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

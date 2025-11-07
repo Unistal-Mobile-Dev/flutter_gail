@@ -53,7 +53,7 @@ class FirebaseService {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher_upims');
+        AndroidInitializationSettings('@mipmap/ic_launcher_oil');
     final DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
       requestAlertPermission: false,
@@ -158,7 +158,7 @@ class FirebaseService {
           AndroidNotificationAction(
             "id",
             'View',
-            icon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher_upims'),
+            icon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher_oil'),
             contextual: true,
           ),
         ],

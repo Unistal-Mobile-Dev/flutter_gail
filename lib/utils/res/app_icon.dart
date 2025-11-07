@@ -1,6 +1,8 @@
 class AppIcon {
   static get gailLogo => "assets/upims_logo.png";
 
+  static get oilLogo => "assets/oil.png";
+
   static get transperentBackground => "assets/transperent_background.png";
 
   static get gpsMovedIcon => "assets/ic_gps_moved.png";

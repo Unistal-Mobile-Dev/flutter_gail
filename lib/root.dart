@@ -33,7 +33,7 @@ class _RootState extends State<Root> {
     return blocMultiProvider(
       child: MaterialApp(
       navigatorKey: navigatorKey,
-      title: 'Gail',
+      title: 'Oil',
       debugShowCheckedModeBanner: false,
       theme: appTheme(),
       initialRoute: '/',

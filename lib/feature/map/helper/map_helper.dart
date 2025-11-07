@@ -225,6 +225,7 @@ class MapHelper {
   }
 
   /// Check if nearest point exists in routes
+  /// Check if nearest point exists in routes
   static Future<bool> getNearestLocation({
     required ArcGISPoint currentLocation,
     required List<List<PointsModel>> routes,

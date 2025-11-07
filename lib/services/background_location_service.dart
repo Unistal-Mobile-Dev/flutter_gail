@@ -99,7 +99,7 @@ void onStart(ServiceInstance service) async {
     DartPluginRegistrant.ensureInitialized();
 
     final notifications = FlutterLocalNotificationsPlugin();
-    const initSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher_upims');
+    const initSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher_oil');
     const initSettings = InitializationSettings(android: initSettingsAndroid);
     await notifications.initialize(initSettings);
 
@@ -146,7 +146,7 @@ void onStart(ServiceInstance service) async {
                   ongoing: true,
                   importance: Importance.low,
                   priority: Priority.low,
-                  icon: '@mipmap/ic_launcher_upims',
+                  icon: '@mipmap/ic_launcher_oil',
                 ),
               ),
             );

@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                 )),
             actions: [
               Image.asset(
-                AppIcon.gailLogo,
+                AppIcon.oilLogo,
                 height: MediaQuery.of(context).size.width * 0.08,
               ),
               SizedBox(

@@ -135,7 +135,7 @@ class HomeDrawerWidget extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: Image.asset(
-            AppConfig.instanceInit()!.client == Client.gail
+            AppConfig.instanceInit()!.client == Client.oil
                 ? AppIcon.gailLogo
                 : AppIcon.gailLogo,
             height: MediaQuery.of(context).size.width * 0.15,
