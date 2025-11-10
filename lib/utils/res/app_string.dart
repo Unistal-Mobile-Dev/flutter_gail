@@ -1,5 +1,5 @@
 class AppString {
-  static get appName => "Gail";
+  static get appName => "GAIL";
 
   static get googleApiKey => "AIzaSyAiFoe5ZuDbEVu0B3wyCrQsODy0lFQTxZ0";
 

@@ -59,7 +59,7 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
             Align(
               alignment: Alignment.topLeft,
               child: TextWidget(
-                "Gail Login",
+                "GAIL Login",
                 fontSize: AppFont.font_22,
                 fontWeight: FontWeight.w800,
                 color: AppColor.themeColor,
