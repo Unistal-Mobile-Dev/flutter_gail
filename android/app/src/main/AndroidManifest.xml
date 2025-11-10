@@ -55,6 +55,9 @@
         </activity>
 
 
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCtfQscD8eBWz9ev3w62g_ebxyL6jV4DR4"/>
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@mipmap/ic_launcher_oil"/>

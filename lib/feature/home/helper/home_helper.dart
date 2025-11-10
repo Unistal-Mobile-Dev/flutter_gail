@@ -45,35 +45,35 @@ class HomeHelper {
 
       // Get the dashboard module object safely
       final dashboardModule = userData.modules!.firstWhere(
-            (element) => element.moduleName!.toLowerCase() == "dashboard",
+            (element) => element.moduleId!.toString() == "dashboard",
         orElse: () => Modules(moduleName: ""), // provide a default Modules object
       );
       final dashboardName = dashboardModule.moduleName;
 
       // Get the pipeline_patrolling_suervielliance module object safely
       final taskModule = userData.modules!.firstWhere(
-            (element) => element.moduleName!.toLowerCase() == "pipeline_patrolling_suervielliance",
+            (element) => element.moduleId!.toString() == "166",
         orElse: () => Modules(moduleName: ""), // provide a default Modules object
       );
       final taskName = taskModule.moduleName;
 
       // Get the pipeline_cp_system module object safely
       final tlpSurveyModule = userData.modules!.firstWhere(
-            (element) => element.moduleName!.toLowerCase() == "pipeline_cp_system",
+            (element) => element.moduleId!.toString() == "pipeline_cp_system",
         orElse: () => Modules(moduleName: ""), // provide a default Modules object
       );
       final tlpSurveyName = tlpSurveyModule.moduleName;
 
       // Get the image_sharing module object safely
       final imageSharingModule = userData.modules!.firstWhere(
-            (element) => element.moduleName!.toLowerCase() == "image_sharing",
+            (element) => element.moduleId!.toString() == "image_sharing",
         orElse: () => Modules(moduleName: ""), // provide a default Modules object
       );
       final imageSharingName = imageSharingModule.moduleName;
 
       // Get the pgis module object safely
       final pgisModule = userData.modules!.firstWhere(
-            (element) => element.moduleName!.toLowerCase() == "pgis",
+            (element) => element.moduleId!.toString() == "pgis",
         orElse: () => Modules(moduleName: ""), // provide a default Modules object
       );
       final pgisName = pgisModule.moduleName;
@@ -119,7 +119,9 @@ class HomeHelper {
         );
       }
 
-    } catch (_) {}
+    } catch (e) {
+      print("Dashboard list fetch  ========================= ${e.toString()}");
+    }
     return pageList;
   }
 

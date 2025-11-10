@@ -146,6 +146,7 @@ class Users {
 class Modules {
   String? permissionMask;
   String? moduleName;
+  dynamic moduleId;
   List<PermissionsModel>? permissionList;
 
   Modules({this.permissionMask, this.moduleName});
@@ -153,6 +154,7 @@ class Modules {
   Modules.fromJson(Map<String, dynamic> json) {
     permissionMask = json['permission_mask'] ?? "";
     moduleName = json['module_name'] ?? "";
+    moduleId = json['module_id'] ?? "";
     permissionList = json['permissions'] != null ? permissionsListResponse(json['permissions']) :[];
   }
 

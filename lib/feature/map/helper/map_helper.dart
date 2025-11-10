@@ -267,6 +267,9 @@ class MapHelper {
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String taskId =  prefs.getString("taskId") ?? "";
+      if(taskId.isEmpty){
+        return {"status": "error", "message": ""};
+      }
       String subTaskId =  prefs.getString("subTaskId") ?? "";
 
       // 4. Create Hive model

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
 import 'package:flutter_gail/feature/map/presentation/page/map_page.dart';
+import 'package:flutter_gail/feature/map/presentation/page/map_sample.dart';
 import 'package:flutter_gail/feature/task/createTask/presentation/page/create_task_page.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
 import 'package:flutter_gail/feature/task/viewTask/presentation/widget/tab_item.dart';
@@ -114,7 +115,7 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
                  Navigator.push(
                    !context.mounted ? context : context,
                    FadeRoute(
-                       page: const MapPage()),
+                       page: const MapSample()),
                  );
                }
              },

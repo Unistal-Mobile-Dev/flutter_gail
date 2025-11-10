@@ -33,9 +33,8 @@ class BackgroundManager {
         iosConfiguration: IosConfiguration(),
       );
 
-      final running = await service.isRunning();
-      isServiceRunning.value = running;
-      log("🧠 Service initial state: ${running ? 'RUNNING' : 'STOPPED'}");
+      // final running = await service.isRunning();
+      // isServiceRunning.value = running;
     } catch (e, s) {
       log("⚠️ Error initializing background service: $e", stackTrace: s);
     }
