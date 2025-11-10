@@ -494,6 +494,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         routes: routes,
         locationPath: locationPath,
         isArcGISStreets: isArcGISStreets,
+        routePointsList: routePointsList,
       ),
     );
   }

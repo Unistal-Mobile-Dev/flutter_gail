@@ -176,7 +176,33 @@ class MapSampleState extends State<MapSample> {
                   compassEnabled: true,
                   mapType: MapType.normal,
                   initialCameraPosition: _initialCameraPosition!,
-                  markers: _markers,
+                  markers: {
+                    ..._markers,
+                    ...state.routePointsList.expand((route) {
+                      // 🟦 Marker Points
+                      final markerPoints = route.markerList.map((marker) {
+                        return Marker(
+                          markerId: MarkerId('marker_${route.sectionCode}'),
+                          position: LatLng(double.parse(marker.gpsx), double.parse(marker.gpsy)),
+                          infoWindow: InfoWindow(title: marker.markerName ?? "Marker"),
+                          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                        );
+                      });
+
+                      // 🟢 TLPs
+                      final tlpMarkers = route.tlpList
+                          .where((tlp) => tlp.id != null && tlp.gpsx != null && tlp.gpsy != null)
+                          .map((tlp) => Marker(
+                        markerId: MarkerId('tlp_${route.sectionCode}_${tlp.id}'),
+                        position: LatLng(tlp.gpsy!, tlp.gpsx!), // Note: Check if gpsx = longitude, gpsy = latitude
+                        infoWindow: InfoWindow(title: tlp.type ?? "TLP"),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+                      )).toList();
+
+                      return [...markerPoints,  ...tlpMarkers];
+                    }),
+
+                  },
                   onMapCreated: (GoogleMapController controller) {
                     if (!_controller.isCompleted) _controller.complete(controller);
                   },
@@ -553,6 +579,8 @@ class MapSampleState extends State<MapSample> {
       ),
     );
   }
+
+
 
   /// ✅ Create 5m buffer polygon with rounded corners
   List<LatLng> _createBufferPolygon(List<LatLng> polyline, double bufferMeters) {
