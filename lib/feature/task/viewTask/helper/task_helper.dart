@@ -72,12 +72,12 @@ class TaskHelper {
           "inspected_datetime": "${DateTime.now()}",
           "gpsx": locationModel.long ?? "",
           "gpsy": locationModel.lat ?? "",
-          "no_of_points": taskData.noOfPoints.toString(),
-          "no_of_points_covered": "",
+          "no_of_points": taskData.noOfPoints.toString().isNotEmpty ? taskData.noOfPoints.toString() : "0",
+          "no_of_points_covered": "0",
         }
       }]};
-      var res = await ServerRequest.putData(
-          urlEndPoint: url, body: jsonEncode(json), context: context);
+      var res = await ServerRequest.postData(
+          urlEndPoint: url, body: jsonEncode(json), context: !context.mounted ? context : context);
       if (res != null && res['message'] != null) {
         SnackBarSuccessWidget(!context.mounted ? context : context)
             .show(message: res['message'].toString());

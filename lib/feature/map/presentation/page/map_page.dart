@@ -815,17 +815,17 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
       final now = DateTime.now();
       if (mounted && now.difference(_lastLocationUpdate).inSeconds >= timeInterval) {
         _lastLocationUpdate = now;
-        context.read<MapBloc>().add(
-          MapRouteLocationCheck(
-            context: context,
-            currentPoint: ArcGISPoint(
-              x: onData.position.x,
-              y: onData.position.y,
-            ),
-            verticalAccuracy: onData.verticalAccuracy,
-            speed: onData.speed,
-          ),
-        );
+        // context.read<MapBloc>().add(
+        //   MapRouteLocationCheck(
+        //     context: context,
+        //     currentPoint: ArcGISPoint(
+        //       x: onData.position.x,
+        //       y: onData.position.y,
+        //     ),
+        //     verticalAccuracy: onData.verticalAccuracy,
+        //     speed: onData.speed,
+        //   ),
+        // );
       }
     });
 

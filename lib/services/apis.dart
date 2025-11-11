@@ -89,7 +89,7 @@ class APIs {
 
   static get getMarkerCrossingInidentTypePointsApi => "api/route-observer/point-details";
 
-  static get getEncroachmentTypeApi => "encroachment/types";
+  static get getEncroachmentTypeApi => "api/encroachment/types";
 
   static get getConfigurationApi => "api/mis/configuration";
 

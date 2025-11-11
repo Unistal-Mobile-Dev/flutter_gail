@@ -21,7 +21,7 @@ class MapPageUpdateTaskEvent extends MapEvent {
 
 class MapRouteLocationCheck extends MapEvent {
   final BuildContext context;
-  final ArcGISPoint currentPoint;
+  final LatLng currentPoint;
   final double speed;
   final double verticalAccuracy;
 

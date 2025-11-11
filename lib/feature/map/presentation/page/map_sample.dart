@@ -34,6 +34,10 @@ class MapSampleState extends State<MapSample> {
 
   Set<Marker> _markers = {};
   BitmapDescriptor? _personIcon;
+  BitmapDescriptor? _directionIcon;
+  BitmapDescriptor? _bpIcon;
+  BitmapDescriptor? _kmIcon;
+  BitmapDescriptor? _wmIcon;
   StreamSubscription<Position>? _positionStream;
 
   bool _isAutoFollow = true;
@@ -45,8 +49,12 @@ class MapSampleState extends State<MapSample> {
   }
 
   Future<void> _initializeMap() async {
-    await _loadCustomMarker();
     await _getCurrentLocation();
+    await _loadCustomMarker();
+    await _loadDirectionMarker();
+    await _loadBPMarker();
+    await _loadKMMarker();
+    await _loadWMMarker();
   }
 
   /// ✅ Load custom marker icon
@@ -54,12 +62,61 @@ class MapSampleState extends State<MapSample> {
     final ByteData data = await rootBundle.load('assets/ic_location_person.png');
     final ui.Codec codec = await ui.instantiateImageCodec(
       data.buffer.asUint8List(),
-      targetWidth: 90,
+      targetWidth: 80,
     );
     final ui.FrameInfo fi = await codec.getNextFrame();
     final ByteData? bytes = await fi.image.toByteData(format: ui.ImageByteFormat.png);
     _personIcon = BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
+
+  /// ✅ Load custom marker icon
+  Future<void> _loadDirectionMarker() async {
+    final ByteData data = await rootBundle.load(AppIcon.dmIcon);
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: 50,
+    );
+    final ui.FrameInfo fi = await codec.getNextFrame();
+    final ByteData? bytes = await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    _directionIcon = BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+  }
+
+  /// ✅ Load custom marker icon
+  Future<void> _loadBPMarker() async {
+    final ByteData data = await rootBundle.load(AppIcon.bpIcon);
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: 50,
+    );
+    final ui.FrameInfo fi = await codec.getNextFrame();
+    final ByteData? bytes = await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    _bpIcon = BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+  }
+
+  /// ✅ Load custom marker icon
+  Future<void> _loadKMMarker() async {
+    final ByteData data = await rootBundle.load(AppIcon.kmIcon);
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: 50,
+    );
+    final ui.FrameInfo fi = await codec.getNextFrame();
+    final ByteData? bytes = await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    _kmIcon = BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+  }
+
+  /// ✅ Load custom marker icon
+  Future<void> _loadWMMarker() async {
+    final ByteData data = await rootBundle.load(AppIcon.wmIcon);
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: 50,
+    );
+    final ui.FrameInfo fi = await codec.getNextFrame();
+    final ByteData? bytes = await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    _wmIcon = BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+  }
+
 
   /// ✅ Get current location + listen to updates
   Future<void> _getCurrentLocation() async {
@@ -87,16 +144,45 @@ class MapSampleState extends State<MapSample> {
         distanceFilter: 5,
       ),
     ).listen((Position newPos) {
-      if (_currentLatLng != null &&
-          Geolocator.distanceBetween(
-            _currentLatLng!.latitude,
-            _currentLatLng!.longitude,
-            newPos.latitude,
-            newPos.longitude,
-          ) <
-              1) {
-        return;
-      }
+      // if (_currentLatLng != null &&
+      //     Geolocator.distanceBetween(
+      //       _currentLatLng!.latitude,
+      //       _currentLatLng!.longitude,
+      //       newPos.latitude,
+      //       newPos.longitude,
+      //     ) <
+      //         1) {
+      //   return;
+      // }
+
+      context.read<MapBloc>().add(MapRouteLocationCheck(
+          context: !context.mounted ? context : context,
+          currentPoint: LatLng(newPos.latitude, newPos.longitude),
+          speed: newPos.speed,
+          verticalAccuracy: newPos.speedAccuracy
+      ));
+
+/*      DateTime _lastLocationUpdate = DateTime.now();
+      final mapData = BlocProvider.of<MapBloc>(context).mapData;
+      final double buffer = (mapData.buffer is num)
+          ? mapData.buffer.toDouble()
+          : double.tryParse(mapData.buffer.toString()) ?? 0.0;
+
+      final int timeInterval = (mapData.timeInterval is int)
+          ? mapData.timeInterval
+          : int.tryParse(mapData.timeInterval.toString()) ?? 5;
+      final now = DateTime.now();
+      if (mounted && now.difference(_lastLocationUpdate).inSeconds >= timeInterval) {
+        _lastLocationUpdate = now;
+         // check location start button
+        context.read<MapBloc>().add(MapRouteLocationCheck(
+          context: context,
+          currentPoint: LatLng(newPos.latitude, newPos.longitude),
+          speed: newPos.speed,
+          verticalAccuracy: newPos.speedAccuracy
+        ));
+      }*/
+
       _updateMarkerPosition(newPos, moveCamera: _isAutoFollow);
     });
   }
@@ -182,10 +268,14 @@ class MapSampleState extends State<MapSample> {
                       // 🟦 Marker Points
                       final markerPoints = route.markerList.map((marker) {
                         return Marker(
-                          markerId: MarkerId('marker_${route.sectionCode}'),
-                          position: LatLng(double.parse(marker.gpsx), double.parse(marker.gpsy)),
+                          markerId: MarkerId('marker_${marker.gpsy.toString()}'),
+                          position: LatLng(double.parse(marker.gpsy.toString()), double.parse(marker.gpsx.toString())),
                           infoWindow: InfoWindow(title: marker.markerName ?? "Marker"),
-                          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                          icon: marker.markerType.toString() == "1" ? _bpIcon ?? BitmapDescriptor.defaultMarker
+                               : marker.markerType.toString() == "12" ? _kmIcon ?? BitmapDescriptor.defaultMarker
+                               : marker.markerType.toString() == "15" ? _wmIcon ?? BitmapDescriptor.defaultMarker
+                               : marker.markerType.toString() == "8" ? _directionIcon ?? BitmapDescriptor.defaultMarker
+                              : BitmapDescriptor.defaultMarker,
                         );
                       });
 
@@ -232,7 +322,11 @@ class MapSampleState extends State<MapSample> {
                     final route = entry.value;
                     final polylinePoints =
                     route.map((p) => LatLng(p.y ?? 0.0, p.x ?? 0.0)).toList();
-                    final polygonPoints = _createBufferPolygon(polylinePoints, 5);
+                    final mapData = BlocProvider.of<MapBloc>(context).mapData;
+                    final double buffer = (mapData.buffer is num)
+                        ? mapData.buffer.toDouble()
+                        : double.tryParse(mapData.buffer.toString()) ?? 0.0;
+                    final polygonPoints = _createBufferPolygon(polylinePoints, buffer);
 
                     return Polygon(
                       polygonId: PolygonId('buffer_$index'),

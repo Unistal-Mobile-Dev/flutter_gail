@@ -190,7 +190,8 @@ class MapHelper {
 
   /// Calculate distance in meters
   static double calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371000.0; // meters
+    // const R = 6371000.0; // meters
+    const R = 6371.0; // meters
     double dLat = toRadians(lat2 - lat1);
     double dLon = toRadians(lon2 - lon1);
 
@@ -227,14 +228,15 @@ class MapHelper {
   /// Check if nearest point exists in routes
   /// Check if nearest point exists in routes
   static Future<bool> getNearestLocation({
-    required ArcGISPoint currentLocation,
+    required LatLng currentLocation,
     required List<List<PointsModel>> routes,
+    required double bufferZone,
   }) async {
-    double shortestDistance = double.infinity;
+    double shortestDistance = bufferZone;
 
     for (var routeData in routes) {
       for (var points in routeData) {
-        double distance = calculateDistance(currentLocation.y, currentLocation.x, points.y, points.x);
+        double distance = calculateDistance(currentLocation.latitude, currentLocation.longitude, points.y, points.x);
         if (distance < shortestDistance) {
           shortestDistance = distance;
           return true;

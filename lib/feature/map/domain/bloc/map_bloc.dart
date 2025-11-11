@@ -201,7 +201,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     List<MarkerPointsModel> movingPathList = resMovingPath;
     if (movingPathList.isNotEmpty) {
       for (var data in movingPathList) {
-        directionList.add(ArcGISPoint(x: data.gpsx, y: data.gpsy));
+        directionList.add(ArcGISPoint(x: double.parse(data.gpsx.toString()), y: double.parse(data.gpsy.toString())));
       }
     }
 
@@ -277,27 +277,32 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   _locationCheck(MapRouteLocationCheck event, emit) async {
     BuildContext context = event.context;
-    ArcGISPoint points = event.currentPoint;
+    LatLng points = event.currentPoint;
     double speed = event.speed;
     double verticalAccuracy = event.verticalAccuracy;
     if (lastPoint.y == null) {
-      lastPoint = PointsModel(x: points.x, y: points.y);
+      lastPoint = PointsModel(x: points.longitude, y: points.latitude);
     }
 
     if (taskData.taskStatus == TaskStatus.started ||
         taskData.taskStatus == TaskStatus.resume ||
         taskData.taskStatus == TaskStatus.pause) {
-      isStartPatrolling = true;
-      isEndPatrolling = true;
+        isStartPatrolling = true;
+        isEndPatrolling = true;
     } else {
       isStartPatrolling = false;
       isEndPatrolling = false;
     }
 
+    final double buffer = (mapData.buffer is num)
+        ? mapData.buffer.toDouble()
+        : double.tryParse(mapData.buffer.toString()) ?? 100.0;
+
     if (isStartPatrolling == false) {
       bool isBufferZone = await MapHelper.getNearestLocation(
         currentLocation: points,
         routes: routes,
+        bufferZone : 600000,
       );
       isStartPatrolling = isBufferZone;
       isEndPatrolling = isBufferZone;
@@ -315,7 +320,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       // );
     }
 
-    lastPoint = PointsModel(x: points.x, y: points.y);
+    lastPoint = PointsModel(x: points.longitude, y: points.latitude);
   }
 
   _updateTask(MapPageUpdateTaskEvent event, emit) async {
