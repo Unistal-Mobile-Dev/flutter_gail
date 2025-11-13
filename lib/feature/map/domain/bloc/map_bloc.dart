@@ -1,4 +1,3 @@
-import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,7 +23,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 part 'map_event.dart';
-
 part 'map_state.dart';
 
 PointsModel lastPoint = PointsModel();
@@ -33,11 +31,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   bool isLoader = false;
   List<MapModel> mapList = [];
   MapModel mapData = MapModel();
-  List<ArcGISPoint> directionList = [];
   bool isNavigationBool = false;
   List<PointsModel> pointsList = [];
-  ArcGISPoint startPoint = ArcGISPoint(x: 0.0, y: 0.0);
-  ArcGISPoint endPoint = ArcGISPoint(x: 0.0, y: 0.0);
   bool isStartPatrolling = false;
   bool isEndPatrolling = false;
   TaskModel taskData = TaskModel();
@@ -58,7 +53,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   MapBloc() : super(MapInitial()) {
     on<MapPageLoadEvent>(_pageLoadEvent);
     on<SelectMapArcGISStreets>(_selectMapType);
-    on<MapRouteDirection>(_routeDirection);
     on<MapRouteLocationCheck>(_locationCheck);
     on<MapPageUpdateTaskEvent>(_updateTask);
     on<StartTracking>(_onStartTracking);
@@ -82,7 +76,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     isTaskStatusChange = false;
     isArcGISStreets = false;
     mapList = [];
-    directionList = [];
     markerList = [];
     routes = [];
     routePointsList = [];
@@ -109,8 +102,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       }
     });
 
-    taskList = BlocProvider.of<TaskBloc>(event.context).searchTaskList;
-    taskData = BlocProvider.of<TaskBloc>(event.context).taskData;
+    taskList = BlocProvider.of<TaskBloc>(!event.context.mounted ? event.context : event.context).searchTaskList;
+    taskData = BlocProvider.of<TaskBloc>(!event.context.mounted ? event.context : event.context).taskData;
 
     var resConfiguration = await MapHelper.fetchConfiguration();
     if (resConfiguration != null) {
@@ -156,16 +149,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         }
       }
     }
-    //  pointsList =  taskData.shapeData!.pointsList!;
-    if (pointsList.isNotEmpty) {
-      startPoint = ArcGISPoint(x: pointsList[0].x, y: pointsList[0].y);
-      endPoint = ArcGISPoint(
-        x: pointsList[pointsList.length - 1].x,
-        y: pointsList[pointsList.length - 1].y,
-      );
-    } else {
-      startPoint = ArcGISPoint(x: 0.0, y: 0.0);
-    }
 
     if (taskData.taskStatus == TaskStatus.started ||
         taskData.taskStatus == TaskStatus.resume ||
@@ -201,7 +184,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     List<MarkerPointsModel> movingPathList = resMovingPath;
     if (movingPathList.isNotEmpty) {
       for (var data in movingPathList) {
-        directionList.add(ArcGISPoint(x: double.parse(data.gpsx.toString()), y: double.parse(data.gpsy.toString())));
+        // directionList.add(ArcGISPoint(x: double.parse(data.gpsx.toString()), y: double.parse(data.gpsy.toString())));
       }
     }
 
@@ -225,55 +208,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     _eventComplete(emit);
   }
 
-  _routeDirection(MapRouteDirection event, emit) async {
-    DateFormat formatter = DateFormat('yyyy-MM-dd');
-    DateTime currentDate = formatter.parse(DateTime.now().toString());
-    DateTime dt1 = DateTime.parse(currentDate.toString());
-    DateTime dt2 = DateTime.parse(
-      taskData.assignedDate.toString().isNotEmpty
-          ? taskData.assignedDate.toString()
-          : DateTime.now().toString(),
-    );
-
-    final List<TaskModel> tempList =
-    taskList.where((data) {
-      return data.taskStatus == TaskStatus.started &&
-          taskData.subTaskId != data.subTaskId;
-    }).toList();
-
-    if (dt1.compareTo(dt2) < 0) {
-      SnackBarErrorWidget(
-        event.context,
-      ).show(message: "This task are future date");
-      return;
-    } else if (dt1.compareTo(dt2) > 0) {
-      SnackBarErrorWidget(
-        event.context,
-      ).show(message: "This task are Back date");
-      return;
-    } else if (tempList.isNotEmpty) {
-      SnackBarErrorWidget(event.context).show(
-        message:
-        "Your already start another task.So please complete first old task then start.",
-      );
-      return;
-    }
-
-    isLoader = true;
-    isNavigationBool = true;
-    directionList = [];
-    _eventComplete(emit);
-
-    var res = await MapHelper.fetchRoute(
-      startPoint: event.startPoint,
-      endPoint: event.endPoint,
-    );
-    directionList = res;
-
-    isLoader = false;
-    isNavigationBool = directionList.isNotEmpty ? true : false;
-    _eventComplete(emit);
-  }
 
   _locationCheck(MapRouteLocationCheck event, emit) async {
     BuildContext context = event.context;
@@ -302,7 +236,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       bool isBufferZone = await MapHelper.getNearestLocation(
         currentLocation: points,
         routes: routes,
-        bufferZone : 600000,
+        bufferZone : buffer,
       );
       isStartPatrolling = isBufferZone;
       isEndPatrolling = isBufferZone;
@@ -378,6 +312,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString("taskStatus", "0");
+    print("Task Id ======================== ${taskData.taskId}");
     await prefs.setString("taskId", taskData.taskId.toString());
     await prefs.setString("subTaskId", taskData.subTaskId.toString());
 
@@ -476,8 +411,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       return;
     }
     _lastLocation = location;
-
-    directionList.add(ArcGISPoint(x: location.longitude, y: location.latitude));
     print("Lat : ${location.latitude}");
     print("Long : ${location.longitude}");
     // MapHelper.locationSave();
@@ -492,7 +425,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         isEndPatrolling: isEndPatrolling,
         isTaskStatusChange: isTaskStatusChange,
         mapList: mapList,
-        directionList: directionList,
         taskData: taskData,
         isStartPatrolling: isStartPatrolling,
         markerList: markerList,

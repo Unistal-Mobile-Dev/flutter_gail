@@ -4,9 +4,6 @@ import 'package:flutter_gail/feature/dashboard/presentation/page/dashboard_page.
 import 'package:flutter_gail/feature/home/domain/model/drawer_model.dart';
 import 'package:flutter_gail/feature/home/presentation/widget/logout_widget.dart';
 import 'package:flutter_gail/feature/imageShare/presentation/page/image_share_page.dart';
-import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
-import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
-import 'package:flutter_gail/feature/pgis/presentation/page/pgis_page.dart';
 import 'package:flutter_gail/feature/task/viewTask/presentation/page/task_page.dart';
 import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/presentation/page/add_tlp_survey_page.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
@@ -111,10 +108,6 @@ class HomeDrawerWidget extends StatelessWidget {
                   imageSharingName.toString().isNotEmpty
                       ? _imageSharing(context: context)
                       : const SizedBox.shrink(),
-
-                  pgisName.toString().isNotEmpty ?
-                  _pgis(context: context) : const SizedBox.shrink(),
-
                   _logout(context: context),
                 ],
               ),
@@ -334,10 +327,6 @@ class HomeDrawerWidget extends StatelessWidget {
           bottom: MediaQuery.of(context).size.width * 0.02),
       child: GestureDetector(
         onTap: () {
-          Navigator.pop(context);
-          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
-              widget: PgisPage(), title: AppString.pgis));
-
           // Navigator.push(
           //   context,
           //   MaterialPageRoute(builder: (context) => PgisPage()),

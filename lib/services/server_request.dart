@@ -206,6 +206,7 @@ class ServerRequest {
     log(url);
     try {
       log(url);
+      print(body);
       await addToken();
       log(header.toString());
       final response = await post(Uri.parse(url), headers: header, body: body)

@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
-
-import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -132,61 +130,6 @@ class MapHelper {
     return null;
   }
 
-  /// Fetch Google Directions polyline points
-  static Future<List<ArcGISPoint>> fetchRoute({
-    required ArcGISPoint startPoint,
-    required ArcGISPoint endPoint,
-  }) async {
-    List<ArcGISPoint> directionList = [];
-    try {
-      String url = APIs.googleDirectionsApi +
-          "?destination=${endPoint.y},${endPoint.x}&origin=${startPoint.y},${startPoint.x}&mode=walking&key=AIzaSyAiFoe5ZuDbEVu0B3wyCrQsODy0lFQTxZ0";
-
-      var res = await ServerRequest.getGoogleData(url: Uri.parse(url));
-      if (res != null && res['geocoded_waypoints'] != null) {
-        GoogleRouteModel routeData = GoogleRouteModel.fromJson(res);
-        for (var route in routeData.routes!) {
-          for (var leg in route.legs!) {
-            for (var step in leg.steps!) {
-              if (step.polyline?.points != null && step.polyline!.points!.isNotEmpty) {
-                directionList.addAll(decodePolyline(step.polyline!.points!));
-              }
-            }
-          }
-        }
-      }
-
-      if (directionList.isNotEmpty) directionList.add(endPoint);
-    } catch (_) {}
-    return directionList;
-  }
-
-  /// Decode Google polyline to ArcGIS points
-  static List<ArcGISPoint> decodePolyline(String polyline, {int accuracyExponent = 5}) {
-    final accuracyMultiplier = math.pow(10, accuracyExponent);
-    List<ArcGISPoint> coordinates = [];
-    int index = 0, lat = 0, lng = 0;
-
-    while (index < polyline.length) {
-      int shift = 0, result = 0, char;
-
-      int getCoordinate() {
-        do {
-          char = polyline.codeUnitAt(index++) - 63;
-          result |= (char & 0x1f) << shift;
-          shift += 5;
-        } while (char >= 0x20);
-
-        final value = result >> 1;
-        return (result & 1) != 0 ? (~BigInt.from(value)).toInt() : value;
-      }
-
-      lat += getCoordinate();
-      lng += getCoordinate();
-      coordinates.add(ArcGISPoint(x: lng / accuracyMultiplier, y: lat / accuracyMultiplier));
-    }
-    return coordinates;
-  }
 
   /// Calculate distance in meters
   static double calculateDistance(lat1, lon1, lat2, lon2) {
@@ -269,6 +212,7 @@ class MapHelper {
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String taskId =  prefs.getString("taskId") ?? "";
+      print("--------------------Task Id $taskId");
       if(taskId.isEmpty){
         return {"status": "error", "message": ""};
       }

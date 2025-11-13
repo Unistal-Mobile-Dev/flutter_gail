@@ -4,6 +4,7 @@ import 'package:flutter_gail/feature/dashboard/domain/model/PiggabilityDataModel
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineMasterModel.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineSection.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:android_intent_plus/android_intent.dart';
 
 class DashboardHelper {
 
@@ -227,6 +228,16 @@ class DashboardHelper {
         ],
       ),
     );
+  }
+
+  static Future<void> requestIgnoreBatteryOptimizations() async {
+    if (Platform.isAndroid) {
+      const intent = AndroidIntent(
+        action: 'android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS',
+        package: 'package:unistal.app.oil'
+      );
+      await intent.launch();
+    }
   }
 
 }

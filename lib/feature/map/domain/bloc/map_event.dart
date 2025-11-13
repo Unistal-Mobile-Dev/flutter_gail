@@ -80,25 +80,3 @@ class NewLocationReceived extends MapEvent {
   @override
   List<Object?> get props => [location];
 }
-
-class MapRouteDirection extends MapEvent {
-  final BuildContext context;
-  final ArcGISPoint startPoint;
-  final ArcGISPoint endPoint;
-  final ArcGISPoint currentPoint;
-
-  const MapRouteDirection({
-    required this.context,
-    required this.endPoint,
-    required this.startPoint,
-    required this.currentPoint
-  });
-
-  @override
-  List<Object?> get props => [
-    context,
-    endPoint,
-    startPoint,
-    currentPoint,
-  ];
-}

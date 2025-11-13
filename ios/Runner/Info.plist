@@ -60,5 +60,11 @@
    </array>
    <key>FlutterDeepLinkingEnabled</key>
    <true/>
+   <key>UIBackgroundModes</key>
+   <array>
+     <string>remote-notification</string>
+   </array>
+   <key>NSUserTrackingUsageDescription</key>
+   <string>This app uses notifications to alert you about background updates.</string>
 </dict>
 </plist>
