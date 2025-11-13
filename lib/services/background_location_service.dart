@@ -9,8 +9,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 
 class BackgroundManager {
-  static const _channelId = 'my_foreground';
-  static const _notificationId = 941678;
+  static const _channelId = 'my_foreground_gail';
+  static const _notificationId = 9416789;
 
   /// 🔄 Stream to notify app when service starts/stops
   static final ValueNotifier<bool> isServiceRunning = ValueNotifier(false);
@@ -24,6 +24,7 @@ class BackgroundManager {
         androidConfiguration: AndroidConfiguration(
           onStart: onStart,
           autoStart: false,
+          autoStartOnBoot: false,
           isForegroundMode: true,
           notificationChannelId: _channelId,
           initialNotificationTitle: 'Background Service',
@@ -33,9 +34,8 @@ class BackgroundManager {
         iosConfiguration: IosConfiguration(),
       );
 
-      final running = await service.isRunning();
-      isServiceRunning.value = running;
-      log("🧠 Service initial state: ${running ? 'RUNNING' : 'STOPPED'}");
+      // final running = await service.isRunning();
+      // isServiceRunning.value = running;
     } catch (e, s) {
       log("⚠️ Error initializing background service: $e", stackTrace: s);
     }
@@ -68,6 +68,7 @@ class BackgroundManager {
       if (isRunning) {
         service.invoke('stopService');
         isServiceRunning.value = false;
+
         log("🔴 Background service stopped");
       } else {
         log("⚠️ Background service already stopped");
@@ -98,41 +99,57 @@ void onStart(ServiceInstance service) async {
     WidgetsFlutterBinding.ensureInitialized();
     DartPluginRegistrant.ensureInitialized();
 
+    if (service is AndroidServiceInstance) {
+      service.setAsForegroundService();
+      service.setForegroundNotificationInfo(
+        title: "Tracking Active",
+        content: "Running even when locked",
+      );
+    }
+
     final notifications = FlutterLocalNotificationsPlugin();
     const initSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher_upims');
     const initSettings = InitializationSettings(android: initSettingsAndroid);
     await notifications.initialize(initSettings);
 
-    // 🛑 Stop listener
-    service.on('stopService').listen((event) async {
-      try {
-        log("🔴 Background service stop requested");
-        service.stopSelf();
-      } catch (e, s) {
-        log("⚠️ Error stopping service listener: $e", stackTrace: s);
+    // 🔄 Timer reference
+    Timer? locationTimer;
+
+    Future<void> stopLocationTimer() async {
+      if (locationTimer != null && locationTimer!.isActive) {
+        locationTimer!.cancel();
+        locationTimer = null;
       }
-    });
+    }
 
-    // ✅ Periodic location update every 20 seconds
-    Timer.periodic(const Duration(seconds: 30), (timer) async {
-      try {
-        if (!(await Geolocator.isLocationServiceEnabled())) {
-          if (kDebugMode) print("⚠️ Location service disabled");
-          return;
-        }
-
-        final pos = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.high,
-            distanceFilter: 10,
-          ),
-        );
-
-        log("📍 Background Location: ${pos.latitude}, ${pos.longitude}");
-        await MapHelper.locationSave();
-
-        // ✅ Update notification safely
+    /// 🧭 Function to start periodic location updates
+    Future<void> startLocationTimer() async {
+      locationTimer?.cancel(); // Cancel any old timer before starting new one
+      locationTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
         try {
+          if (!(await Geolocator.isLocationServiceEnabled())) {
+            log("⚠️ Location service disabled");
+            return;
+          }
+
+          final permission = await Geolocator.checkPermission();
+          if (permission == LocationPermission.denied ||
+              permission == LocationPermission.deniedForever) {
+            log("⚠️ Location permission not granted");
+            return;
+          }
+
+          final pos = await Geolocator.getCurrentPosition(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.high,
+              distanceFilter: 10,
+            ),
+          );
+
+          log("📍 Background Location: ${pos.latitude}, ${pos.longitude}");
+          await MapHelper.locationSave();
+
+          // ✅ Update notification safely
           if (service is AndroidServiceInstance &&
               await service.isForegroundService()) {
             await notifications.show(
@@ -141,34 +158,51 @@ void onStart(ServiceInstance service) async {
               "Lat: ${pos.latitude}, Lng: ${pos.longitude}",
               const NotificationDetails(
                 android: AndroidNotificationDetails(
-                  'my_foreground',
-                  'Foreground Service',
+                  BackgroundManager._channelId,
+                  'Background Service',
+                  channelDescription: 'Used for background location tracking',
                   ongoing: true,
-                  importance: Importance.low,
-                  priority: Priority.low,
+                  importance: Importance.high,
+                  priority: Priority.high,
                   icon: '@mipmap/ic_launcher_upims',
                 ),
               ),
             );
           }
-        } catch (notifError, s) {
-          log("⚠️ Error showing notification: $notifError", stackTrace: s);
-        }
 
-        // ✅ Send update safely
-        try {
+          // ✅ Notify main isolate
           service.invoke("update", {
             "lat": pos.latitude,
             "lng": pos.longitude,
             "timestamp": DateTime.now().toIso8601String(),
           });
-        } catch (invokeError, s) {
-          log("⚠️ Error invoking update: $invokeError", stackTrace: s);
+        } catch (e, s) {
+          log("⚠️ Location update error: $e", stackTrace: s);
         }
-      } catch (locError, s) {
-        log("⚠️ Location fetch error: $locError", stackTrace: s);
+      });
+      log("🟢 Location timer started");
+    }
+
+    // 🛑 Stop listener
+    service.on('stopService').listen((event) async {
+      try {
+        stopLocationTimer();
+        log("🔴 Background service stop requested");
+        service.stopSelf();
+      } catch (e, s) {
+        log("⚠️ Error stopping service listener: $e", stackTrace: s);
       }
     });
+
+    // 🔄 Restart listener (optional)
+    service.on('restartService').listen((event) async {
+      log("🔁 Restarting background timer...");
+      await startLocationTimer();
+    });
+
+    // ✅ Start timer initially
+    await startLocationTimer();
+
   } catch (e, s) {
     log("💥 Fatal error in onStart(): $e", stackTrace: s);
   }

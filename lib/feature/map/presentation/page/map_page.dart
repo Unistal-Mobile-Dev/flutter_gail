@@ -630,12 +630,24 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
           fontSize: AppFont.font_11,),
         icon: Icon(Icons.task_outlined, color: AppColor.themeColor,
           size: MediaQuery.of(context).size.width * 0.05,),
-        onPressed: () {
-          _mapViewController.locationDisplay.stop();
-          BlocProvider.of<MapBloc>(context).add(MapPageUpdateTaskEvent(
-              context: context,
-              taskStatus: TaskStatus.completed
-          ));
+        onPressed: () async {
+          var res =  await showDialog(
+            context: !context.mounted ? context : context,
+            builder: (context) {
+              return MessageBoxTwoButtonPopWidget(
+                message: "Are you sure you want to end this task?",
+                okButtonText: "End Task",
+                onPressed: () => Navigator.pop(context, true),
+              );
+            },
+          );
+          if(res == true){
+            _mapViewController.locationDisplay.stop();
+            BlocProvider.of<MapBloc>(context).add(MapPageUpdateTaskEvent(
+                context: context,
+                taskStatus: TaskStatus.completed
+            ));
+          }
         },
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
