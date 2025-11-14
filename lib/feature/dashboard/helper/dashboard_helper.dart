@@ -3,7 +3,16 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PiggabilityDataModel.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineMasterModel.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineSection.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:install_plugin/install_plugin.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/material.dart';
+
+import '../../../utils/commonWidgets/message_box_pop_button_widget.dart' show MessageBoxPopButtonWidget;
 
 class DashboardHelper {
 
@@ -228,6 +237,114 @@ class DashboardHelper {
       ),
     );
   }
+
+  static Future<void> checkAppVersion(BuildContext context) async {
+      try {
+          String baseUrl = "http://192.168.40.14:8080";
+           String url = "$baseUrl/api/gail-app?id=1";
+           var res =  await ServerRequest.getGoogleData(url: Uri.parse(url));
+           if(res != null && res['download'] != null){
+              if(res['download'].toString().isNotEmpty){
+                String downloadUrl  =  baseUrl+res['download'].toString();
+                String version  =    res['version'].toString();
+                String versionCode  =  res['versionCode'].toString();
+
+                PackageInfo packageInfo = await PackageInfo.fromPlatform();
+                String appVersion       = packageInfo.version;        // 1.0.0
+                String buildNumber   = packageInfo.buildNumber;    // versionCode (Android)
+
+                if(version.toString() != appVersion.toString()
+                     && buildNumber.toString() != versionCode.toString()){
+
+                  var result =  await showDialog(
+                    barrierDismissible: false,
+                    context: !context.mounted ? context : context,
+                    builder: (context) {
+                      return WillPopScope(
+                        onWillPop: () async => false, // Disable back button
+                        child: MessageBoxPopButtonWidget(
+                          title: "New Update Available",
+                          message: "A new mandatory update is available. You must update the app to continue using its services.",
+                          buttonText: "Update",
+                          onPressed: () => Navigator.pop(context, true),
+                        ),
+                      );
+                    },
+                  );
+                  if(result == true){
+                    downloadAndInstallApk(downloadUrl, !context.mounted ? context : context);
+                  }
+                }
+              }
+           }
+      }catch(_){}
+  }
+
+  static Future<void> downloadAndInstallApk(String url, BuildContext context) async {
+    // Ask for storage permission
+    if(await requestPermission() == false){
+      return;
+    }
+
+    // Get download directory
+    Directory directory = await getTemporaryDirectory();
+    String fileName = url.split("/").last;
+    String filePath = "${directory.path}/$fileName";
+
+    // Download APK
+    Dio dio = Dio();
+
+    showDialog(
+        barrierDismissible: false,
+        context: !context.mounted ? context : context,
+        builder: (_) => WillPopScope(
+          onWillPop: () async => false, // Disable back button
+          child: const Center(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CenterLoaderWidget(),
+              TextWidget("Please wait.. app downloading", color: Colors.black,),
+            ],
+          )),
+        ));
+
+    await dio.download(url, filePath);
+    Navigator.pop(!context.mounted ? context : context); // close progress dialog
+
+    // Install APK
+    try {
+      await InstallPlugin.installApk(filePath);
+      await checkAppVersion(!context.mounted ? context : context);
+    } catch (e) {
+      ScaffoldMessenger.of(!context.mounted ? context : context)
+          .showSnackBar(SnackBar(content: Text("Install error: $e")));
+    }
+  }
+
+  static Future<bool> requestPermission() async {
+    if (Platform.isAndroid) {
+      if (await Permission.manageExternalStorage.isGranted) {
+        return true;
+      }
+
+      // For Android 11+ (Scoped Storage)
+      var status = await Permission.manageExternalStorage.request();
+      if (status.isGranted) {
+        return true;
+      }
+
+      // For Android < 11
+      status = await Permission.storage.request();
+      if (status.isGranted) {
+        return true;
+      }
+      print("Permission denied");
+      return false;
+    }
+    return true;
+  }
+
 
 }
 

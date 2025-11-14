@@ -4,12 +4,14 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 class MessageBoxPopButtonWidget extends StatelessWidget {
   final String message;
   final String title;
+  final String? buttonText;
   final VoidCallback onPressed;
 
   const MessageBoxPopButtonWidget(
       {super.key,
       required this.message,
       required this.title,
+      this.buttonText,
       required this.onPressed});
 
   @override
@@ -56,7 +58,7 @@ class MessageBoxPopButtonWidget extends StatelessWidget {
                       child: TextButton(
                         onPressed: onPressed,
                         child: TextWidget(
-                          "OK",
+                          buttonText?? "OK",
                           fontWeight: FontWeight.w700,
                           color: AppColor.themeColor,
                           fontSize: AppFont.font_16,

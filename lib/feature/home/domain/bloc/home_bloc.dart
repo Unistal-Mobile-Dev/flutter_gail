@@ -79,6 +79,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _title = "Dashboard";
     _actionButtonWidget = const SizedBox.shrink();
 
+
+    await DashboardHelper.checkAppVersion(event.context);
+
     String notificationSilent = await SharedPreferencesUtils.getString(key: PreferencesName.notificationSilent);
     if(notificationSilent == "1"){
       isNotificationSilent =  true;

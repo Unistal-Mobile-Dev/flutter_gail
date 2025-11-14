@@ -25,6 +25,8 @@ Future<void> main() async {
     permission = await Geolocator.requestPermission();
   }
 
+  await DashboardHelper.requestPermission();
+
   try {
     // ✅ 2. Notification Initialization
     final FlutterLocalNotificationsPlugin notificationPlugin =
