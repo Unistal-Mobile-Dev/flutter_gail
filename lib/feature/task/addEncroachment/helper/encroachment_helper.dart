@@ -60,8 +60,9 @@ class EncroachmentHelper {
             file: file,
             keyName: "photo_link"));
       }
-      final DateFormat formatter = DateFormat('dd-MM-yyyy');
-      final String currentDate = formatter.format(DateTime.now());
+      final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
+      final DateTime now = DateTime.now();
+      final String currentDate = formatter.format(now);
       var deviceId = await LoginHelper.getUniqueDeviceId();
       var json = {
         "task_id" : taskData.taskId.toString(),

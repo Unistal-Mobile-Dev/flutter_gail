@@ -96,8 +96,9 @@ class AddCrossingHelper {
       if (locationRes != null) {
         locationData = locationRes;
       }
-      final DateFormat formatter = DateFormat('dd-MM-yyyy');
-      final String currentDate = formatter.format(DateTime.now());
+      final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
+      final DateTime now = DateTime.now();
+      final String currentDate = formatter.format(now);
       var json = {
         "task_id" : taskData.taskId.toString(),
         "patrollroute_id" : taskData.patrollRouteId.toString(),

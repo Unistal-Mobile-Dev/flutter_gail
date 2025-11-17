@@ -48,8 +48,9 @@ class DeviationHelper {
             file: file,
             keyName: "photo_link"));
       }
-      final DateFormat formatter = DateFormat('dd-MM-yyyy');
-      final String currentDate = formatter.format(DateTime.now());
+      final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
+      final DateTime now = DateTime.now();
+      final String currentDate = formatter.format(now);
       var deviceId = await LoginHelper.getUniqueDeviceId();
       var locationRes =  await LocationHelper.getLocationOfflineMode(context: !context.mounted ? context : context);
       LocationModel locationData =  LocationModel();
