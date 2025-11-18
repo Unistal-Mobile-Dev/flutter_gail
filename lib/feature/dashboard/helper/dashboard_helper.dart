@@ -240,7 +240,7 @@ class DashboardHelper {
 
   static Future<void> checkAppVersion(BuildContext context) async {
       try {
-          String baseUrl = "http://192.168.40.14:8080";
+          String baseUrl = "https://dev.indiait360.com:8441/unistalchat";
            String url = "$baseUrl/api/gail-app?id=1";
            var res =  await ServerRequest.getGoogleData(url: Uri.parse(url));
            if(res != null && res['download'] != null){

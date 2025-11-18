@@ -14,7 +14,7 @@ import 'package:arcgis_maps/arcgis_maps.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
+  // await Hive.initFlutter();
 
   await FirebaseService.instance.initializeService();
 
