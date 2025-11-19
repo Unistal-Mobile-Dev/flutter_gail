@@ -16,7 +16,7 @@ class LoginScreenPage extends StatefulWidget {
 class _LoginScreenPageState extends State<LoginScreenPage> {
   @override
   void initState() {
-    BlocProvider.of<LoginBloc>(context).add(LoginPageLoadingEvent());
+    BlocProvider.of<LoginBloc>(context).add(LoginPageLoadingEvent(context: context));
     super.initState();
   }
 

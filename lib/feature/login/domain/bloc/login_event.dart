@@ -4,8 +4,10 @@ import 'package:flutter/cupertino.dart';
 abstract class LoginEvent extends Equatable {}
 
 class LoginPageLoadingEvent extends LoginEvent {
+  final BuildContext context;
+  LoginPageLoadingEvent({required this.context});
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [context];
 }
 
 class LoginSetEmailEvent extends LoginEvent {

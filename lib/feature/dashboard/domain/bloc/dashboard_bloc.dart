@@ -33,11 +33,11 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     var isRunning = await service.isRunning();
     print("Background service running === ${isRunning}");
 
-/*    bool connected = await NetworkHelper.isConnected();
+    bool connected = await NetworkHelper.isConnected();
     if(connected){
       double mbps = await NetworkHelper.checkDownloadSpeed();
       print("Speed  === $mbps");
-    }*/
+    }
 
     var resPipe =
         await DashboardHelper.getPipelineSummaryApi(context: event.context);
