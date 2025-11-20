@@ -205,18 +205,18 @@ class ServerRequest {
     String url = baseUrl + urlEndPoint;
     log(url);
     try {
-      log(url);
-      await addToken();
+      String token = await SharedPreferencesUtils.getString(key: PreferencesName.token);
+      var header = {"Content-Type": "application/json"};
+      header["Authorization"] = "Bearer $token";
+      log(body.toString());
       log(header.toString());
       final response = await post(Uri.parse(url), headers: header, body: body)
           .timeout(const Duration(minutes: 1));
       log(response.body);
       if (response.statusCode == 200) {
-        // updateCookie(response);
         return jsonDecode(response.body);
       }
       else if (response.statusCode == 201) {
-        // updateCookie(response);
         return jsonDecode(response.body);
       }
       return null;

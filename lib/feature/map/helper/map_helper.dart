@@ -327,8 +327,11 @@ class MapHelper {
     List<Map<String, dynamic>> payload = [];
 
     for (var location in box.values) {
-      if (!location.isSynced) {
+      if (!location.isSynced && location.taskId.isNotEmpty) {
         payload.add(location.toServerJson());
+      }
+      else {
+        await location.delete();
       }
     }
 

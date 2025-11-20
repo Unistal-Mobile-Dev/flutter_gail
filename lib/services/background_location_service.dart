@@ -9,7 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 
 class BackgroundManager {
-  static const _channelId = 'my_foreground_gail';
+  static const _channelId = 'my_foreground';
   static const _notificationId = 9416789;
 
   /// 🔄 Stream to notify app when service starts/stops
@@ -99,18 +99,33 @@ void onStart(ServiceInstance service) async {
     WidgetsFlutterBinding.ensureInitialized();
     DartPluginRegistrant.ensureInitialized();
 
-    if (service is AndroidServiceInstance) {
-      service.setAsForegroundService();
-      service.setForegroundNotificationInfo(
-        title: "Tracking Active",
-        content: "Running even when locked",
-      );
-    }
+    const channel = AndroidNotificationChannel(
+      'my_foreground',
+      'Background Service Channel',
+      description: 'Used for background location updates',
+      importance: Importance.high,
+    );
 
     final notifications = FlutterLocalNotificationsPlugin();
     const initSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher_upims');
     const initSettings = InitializationSettings(android: initSettingsAndroid);
     await notifications.initialize(initSettings);
+
+    await notifications
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+
+    if (service is AndroidServiceInstance) {
+      service.setAsForegroundService();
+      service.setForegroundNotificationInfo(
+        title: "Background Service",
+        content: "Location tracking running",
+      );
+    }
+
+
 
     // 🔄 Timer reference
     Timer? locationTimer;
@@ -153,7 +168,7 @@ void onStart(ServiceInstance service) async {
           if (service is AndroidServiceInstance &&
               await service.isForegroundService()) {
             await notifications.show(
-              999,
+              BackgroundManager._notificationId,
               "Background Service Running",
               "Lat: ${pos.latitude}, Lng: ${pos.longitude}",
               const NotificationDetails(
@@ -162,8 +177,8 @@ void onStart(ServiceInstance service) async {
                   'Background Service',
                   channelDescription: 'Used for background location tracking',
                   ongoing: true,
-                  importance: Importance.high,
-                  priority: Priority.high,
+                  importance: Importance.low,
+                  priority: Priority.low,
                   icon: '@mipmap/ic_launcher_upims',
                 ),
               ),

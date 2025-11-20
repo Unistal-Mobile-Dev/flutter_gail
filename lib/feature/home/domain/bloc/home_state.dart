@@ -25,6 +25,7 @@ class FetchHomeDataState extends HomeInitial {
   final Widget actionButtonWidget;
   final String title;
   final bool isNotificationSilent;
+  final String appVersion;
 
   FetchHomeDataState({
     required this.isLoader,
@@ -37,6 +38,7 @@ class FetchHomeDataState extends HomeInitial {
     required this.title,
     required this.actionButtonWidget,
     required this.isNotificationSilent,
+    required this.appVersion,
   });
 
   @override
@@ -51,5 +53,6 @@ class FetchHomeDataState extends HomeInitial {
         title,
         actionButtonWidget,
         isNotificationSilent,
+        appVersion,
       ];
 }

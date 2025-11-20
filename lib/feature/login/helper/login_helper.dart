@@ -147,6 +147,8 @@ class LoginHelper {
           deviceId: deviceId,
         ).toJson();
 
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("baseUrl", APIs.baseUrl);
         String url = APIs.login;
         var res = await ServerRequest.postData(
             urlEndPoint: url,

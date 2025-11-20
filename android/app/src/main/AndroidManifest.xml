@@ -1,30 +1,37 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- FOREGROUND SERVICE PERMISSION -->
+    <!-- FOREGROUND SERVICE PERMISSIONS -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <!-- LOCATION PERMISSIONS -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <!-- NOTIFICATION PERMISSION (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- BATTERY OPTIMIZATION -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- STORAGE -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <!-- Required for Android 11+ -->
+    <!-- Android 11+ Special Permission -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 
+    <!-- Install APK permission -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- INTERNET -->
     <uses-permission android:name="android.permission.INTERNET" />
+
 
     <application
         android:name="${applicationName}"
@@ -63,22 +70,28 @@
             </intent-filter>
         </activity>
 
-
+        <!-- FCM default icon -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/ic_launcher_upims"/>
+            android:resource="@mipmap/ic_launcher_upims" />
 
         <!-- BACKGROUND SERVICE -->
+<!--        <service-->
+<!--            android:name="id.flutter.flutter_background_service.BackgroundService"-->
+<!--            android:exported="false"-->
+<!--            android:enabled="true"-->
+<!--            android:foregroundServiceType="location|dataSync"-->
+<!--            tools:replace="android:exported" />-->
+
         <service
             android:name="id.flutter.flutter_background_service.BackgroundService"
-            android:foregroundServiceType="location"
-            android:exported="false"
             android:enabled="true"
-            tools:replace="android:exported" />
-
+            android:exported="true"
+            android:foregroundServiceType="location|dataSync" />
 
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
     </application>
 </manifest>

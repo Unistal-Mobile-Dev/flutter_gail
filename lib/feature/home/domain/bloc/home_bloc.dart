@@ -6,6 +6,7 @@ import 'package:flutter_gail/feature/home/domain/model/firebase_device_model.dar
 import 'package:flutter_gail/feature/home/helper/home_helper.dart';
 import 'package:flutter_gail/feature/login/helper/login_helper.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:vibration/vibration.dart';
 
 part 'home_event.dart';
@@ -60,6 +61,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   List<FirebaseDeviceModel> firebaseDeviceList = [];
 
   bool isNotificationSilent =  false;
+  String appVersion = "";
 
   HomeBloc() : super(HomeInitial()) {
     on<HomePageLoadEvent>(_pageLoad);
@@ -78,6 +80,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _childWidget = Container();
     _title = "Dashboard";
     _actionButtonWidget = const SizedBox.shrink();
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    appVersion       = packageInfo.version;        // 1.0.0
 
 
     await DashboardHelper.checkAppVersion(event.context);
@@ -145,6 +149,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       title: title,
       actionButtonWidget: actionButtonWidget,
       isNotificationSilent: isNotificationSilent,
+      appVersion: appVersion,
     ));
   }
 }
