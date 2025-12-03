@@ -1,18 +1,14 @@
-import 'dart:async';
 import 'dart:convert';
-
 import 'package:arcgis_maps/arcgis_maps.dart';
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/pgis/helper/pgis_helper.dart';
 import 'package:flutter_gail/feature/pgis/presentation/widget/filter_widget.dart';
-import 'package:flutter_gail/utils/res/enums.dart';
+import 'package:flutter_gail/feature/pgis/presentation/widget/map_layer_widget.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:permission_handler/permission_handler.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 part 'pgis_event.dart';
 part 'pgis_state.dart';
 
@@ -49,7 +45,7 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
     yMax: 36.0,
     spatialReference: SpatialReference(wkid: 4326),
   );
-
+String selectedLayerType = "";
   final TextEditingController fromController = TextEditingController();
   final TextEditingController toController = TextEditingController();
   List<dynamic> fromLocationList = [];
@@ -60,17 +56,18 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
   PgisBloc() : super(PgisInitial()) {
     on<PgisPageLoadedEvent>(_pageLoad);
     on<SelectMapArcGISStreets>(_selectMapType);
-    on<PgisMapReady>(_onMapReady);
+    on<PGISMapReady>(_onMapReady);
     on<IdentifyFeaturesAtTapEvent>(_onIdentifyFeatures);
     on<StartNavigationEvent>(_onStartNavigation);
     on<LocationEvent>(_location);
     on<SearchRoundedEvent>(_searchRounded);
-    on<MuteVoiceGuidanceEvent>(_muteVoiceGuidance);
+    on<MapLayerEvent>(_mapLayer);
     on<SelectPipelineEngRouteEvent>(_selectEngRoute);
     on<SelectStationEvent>(_selectStation);
     on<SelectTLPEvent>(_selectTLP);
     on<TrackingStatusUpdatedEvent>(_onTrackingStatusUpdated);
     on<StopNavigationEvent>(_onStopNavigation);
+    on<SelectLayerTypeEvent>(_selectLayerType);
     _initTts();
     _initRouteTask();
   }
@@ -112,6 +109,7 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
     isMuted = false;
     fromController.text = "";
     toController.text = "";
+    selectedLayerType = "";
     fromLocationList = [];
     toLocationList = [];
     textEditingController = TextEditingController();
@@ -188,6 +186,17 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
       context: event.ctx,
       builder: (BuildContext context) {
         return FilterWidget(mapViewController: event.arcGISMapViewController);
+      },
+    );
+
+    _eventCompleted(emit);
+  }
+
+  _mapLayer(MapLayerEvent event, emit) {
+    showDialog(
+      context: event.ctx,
+      builder: (BuildContext context) {
+        return MapLayerWidget();
       },
     );
 
@@ -293,17 +302,7 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
     }
   }
 
-  _muteVoiceGuidance(MuteVoiceGuidanceEvent event, emit) async {
-    if (isMuted) {
-      await ttsEngine.setVolume(1);
-      isMuted = false;
-      _eventCompleted(emit);
-    } else {
-      await ttsEngine.setVolume(0);
-      isMuted = true;
-      _eventCompleted(emit);
-    }
-  }
+
 
   Future<void> _onIdentifyFeatures(
       IdentifyFeaturesAtTapEvent event,
@@ -376,84 +375,72 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
     _eventCompleted(emit);
   }
 
+
   Future<void> _onStartNavigation(StartNavigationEvent event, emit) async {
-    destinationPoint = event.destination;
     final mapController = event.controller;
 
     final currentPos = mapController.locationDisplay.location?.position;
-    if (currentPos == null) return;
-
-    final currentLocation = ArcGISPoint(
-      x: currentPos.x,
-      y: currentPos.y,
-      spatialReference: SpatialReference.wgs84,
-    );
-
-    final routeParameters =
-    await routeTask.createDefaultParameters()
-      ..returnDirections = true
-      ..returnStops = true
-      ..returnRoutes = true
-      ..outputSpatialReference = SpatialReference.wgs84;
-
-    routeParameters.setStops([
-      Stop(currentLocation)..name = "Current Location",
-      Stop(destinationPoint!)..name = "Destination",
-    ]);
-
-    routeResult = await routeTask.solveRoute(routeParameters);
-
-    if (mapController.graphicsOverlays.isEmpty) {
-      mapController.graphicsOverlays.add(GraphicsOverlay());
+    if (currentPos == null) {
+      print("❌ Current location not found!");
+      return;
     }
-    mapController.graphicsOverlays.first.graphics.clear();
 
-    // Draw initial route polyline
-    final routeGeometry = routeResult!.routes.first.routeGeometry;
-    final routeSymbol = SimpleLineSymbol(
-      style: SimpleLineSymbolStyle.solid,
-      color: Colors.blue,
-      width: 4,
+    final currentGeo = GeometryEngine.project(
+      currentPos,
+      outputSpatialReference: SpatialReference.wgs84,
+    ) as ArcGISPoint;
+
+    double currentLat = currentGeo.y;
+    double currentLng = currentGeo.x;
+
+
+    final destGeo = GeometryEngine.project(
+      event.destination,
+      outputSpatialReference: SpatialReference.wgs84,
+    ) as ArcGISPoint;
+
+    final double destLat = destGeo.y;
+    final double destLng = destGeo.x;
+
+
+    await _openGoogleMapsNavigation(
+      sourceLat: currentLat,
+      sourceLng: currentLng,
+      destLat: destLat,
+      destLng: destLng,
     );
-    final routeGraphic = Graphic(geometry: routeGeometry, symbol: routeSymbol);
-    mapController.graphicsOverlays.first.graphics.add(routeGraphic);
-
-    // Initialize tracker
-    routeTracker = RouteTracker.create(
-      routeResult: routeResult!,
-      routeIndex: 0,
-      skipCoincidentStops: true,
-    )!;
-
-    // Voice guidance
-    voiceGuidanceSub = routeTracker?.onNewVoiceGuidance.listen((vg) {
-      if (vg.text.isNotEmpty) {
-        routeTracker?.setSpeechEngineReady(() => false);
-        flutterTts.speak(vg.text).then((_) {
-          routeTracker?.setSpeechEngineReady(() => true);
-        });
-      }
-    });
-
-    // Tracking status listener
-    trackingStatusSub = routeTracker!.onTrackingStatusChanged.listen((status) {
-      // Update UI, remaining distance, ETA, etc.
-      add(
-        TrackingStatusUpdatedEvent(status: status, controller: mapController),
-      );
-    });
-
-    // 🔑 LIVE GPS tracking feed into RouteTracker
-    mapController.locationDisplay.onLocationChanged.listen((location) {
-      routeTracker?.trackLocation(location);
-    });
-
-    mapController.locationDisplay.autoPanMode =
-        LocationDisplayAutoPanMode.navigation;
-    mapController.locationDisplay.start();
 
     _eventCompleted(emit);
   }
+
+  Future<void> _openGoogleMapsNavigation({
+    required double sourceLat,
+    required double sourceLng,
+    required double destLat,
+    required double destLng,
+  }) async {
+
+    final googleUrl =
+        "https://www.google.com/maps/dir/?api=1"
+        "&origin=$sourceLat,$sourceLng"
+        "&destination=$destLat,$destLng"
+        "&travelmode=driving&dir_action=navigate";
+
+    final uri = Uri.parse(googleUrl);
+
+    print("Google Maps URL -> $googleUrl");
+
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!launched) {
+      throw Exception("❌ Could not open Google Maps");
+    }
+  }
+
+
 
 
   void showLoaderDialog(BuildContext context, {String message = "Loading..."}) {
@@ -559,7 +546,7 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
   }
 
 
-  Future<void> _onMapReady(PgisMapReady event, emit) async {
+  _onMapReady(PGISMapReady event, emit) async {
     final controller = event.controller;
     controller.arcGISMap = map;
     await controller.setViewpointGeometry(indiaEnvelope, paddingInDiPs: 50);
@@ -569,6 +556,9 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
     await initRoute();
     _eventCompleted(emit);
   }
+
+
+
 
   Future<void> _enableUserLocation(ArcGISMapViewController controller) async {
     controller.locationDisplay.dataSource = locationDataSource;
@@ -589,19 +579,19 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
           final sublayerUri = content.table?.uri;
           if (sublayerUri != null) {
             print('🆔 Sublayer URI: $sublayerUri');
-            final serviceFeatureTable = ServiceFeatureTable.withUri(
-              sublayerUri,
-            );
-            final featureLayer = FeatureLayer.withFeatureTable(
-              serviceFeatureTable,
-            );
+            final serviceFeatureTable = ServiceFeatureTable.withUri(sublayerUri,);
+            final featureLayer = FeatureLayer.withFeatureTable(serviceFeatureTable);
             await featureLayer.load();
-            final lineSymbol = SimpleLineSymbol(
-              style: SimpleLineSymbolStyle.solid,
-              color: Colors.yellow.shade800,
-              width: 2.5,
-            );
-            featureLayer.renderer = SimpleRenderer(symbol: lineSymbol);
+            // final lineSymbol = SimpleLineSymbol(
+            //   style: SimpleLineSymbolStyle.solid,
+            //   color: Colors.yellow,
+            //   width: 2.5,
+            // );
+            // featureLayer.renderer = SimpleRenderer(symbol: lineSymbol);
+
+            // featureLayer.minScale = 50000; // visible only when zoomed in
+            // featureLayer.maxScale = 0;
+
             featureLayerList.add(featureLayer);
           }
         }
@@ -905,6 +895,11 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
     _eventCompleted(emit);
   }
 
+  _selectLayerType(SelectLayerTypeEvent event, emit) {
+    selectedLayerType = event.selectedLayerValue;
+    _eventCompleted(emit);
+  }
+
   _eventCompleted(Emitter<PgisState> emit) {
     emit(
       FetchPgisDataState(
@@ -913,6 +908,7 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
         isNavigating: isNavigating,
         isMuted: isMuted,
         isArcGISStreets: isArcGISStreets,
+        selectedLayerType: selectedLayerType,
         fromController: fromController,
         toController: toController,
         fromLocationList: fromLocationList,

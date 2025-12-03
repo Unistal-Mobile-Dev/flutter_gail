@@ -16,7 +16,6 @@ class HomeDrawerWidget extends StatelessWidget {
   HomeDrawerWidget({super.key});
 
   final LoginDataModel _userData = UserInfo.instance!.userData!;
-
   LoginDataModel get userData => _userData;
 
   bool isAssignTask = false;
@@ -38,38 +37,40 @@ class HomeDrawerWidget extends StatelessWidget {
       }
     }
 
-// Get the dashboard module object safely
+    // Get the dashboard module object safely
     final dashboardModule = userData.modules!.firstWhere(
-          (element) => element.moduleName!.toLowerCase() == "dashboard",
+      (element) => element.moduleName!.toLowerCase() == "dashboard",
       orElse: () => Modules(moduleName: ""), // provide a default Modules object
     );
     final dashboardName = dashboardModule.moduleName;
 
     // Get the pipeline_patrolling_suervielliance module object safely
     final taskModule = userData.modules!.firstWhere(
-          (element) => element.moduleName!.toLowerCase() == "pipeline_patrolling_suervielliance",
+      (element) =>
+          element.moduleName!.toLowerCase() ==
+          "pipeline_patrolling_suervielliance",
       orElse: () => Modules(moduleName: ""), // provide a default Modules object
     );
     final taskName = taskModule.moduleName;
 
     // Get the pipeline_cp_system module object safely
     final tlpSurveyModule = userData.modules!.firstWhere(
-          (element) => element.moduleName!.toLowerCase() == "pipeline_cp_system",
+      (element) => element.moduleName!.toLowerCase() == "pipeline_cp_system",
       orElse: () => Modules(moduleName: ""), // provide a default Modules object
     );
     final tlpSurveyName = tlpSurveyModule.moduleName;
 
-    // Get the image_sharing module object safely
+
     final imageSharingModule = userData.modules!.firstWhere(
-          (element) => element.moduleName!.toLowerCase() == "image_sharing",
-      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+      (element) => element.moduleName!.toLowerCase() == "image_sharing",
+      orElse: () => Modules(moduleName: ""),
     );
     final imageSharingName = imageSharingModule.moduleName;
 
-    // Get the pgis module object safely
+
     final pgisModule = userData.modules!.firstWhere(
-          (element) => element.moduleName!.toLowerCase() == "pgis",
-      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+      (element) => element.moduleName!.toLowerCase() == "pgis",
+      orElse: () => Modules(moduleName: ""),
     );
     final pgisName = pgisModule.moduleName;
 
@@ -96,24 +97,26 @@ class HomeDrawerWidget extends StatelessWidget {
               child: ListView(
                 children: [
                   _header(context: context),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.width * 0.10,
-                  ),
-                  dashboardName.toString().isNotEmpty?
-                  _dashboard(context: context) : const SizedBox.shrink(),
+                  SizedBox(height: MediaQuery.of(context).size.width * 0.10),
+                  dashboardName.toString().isNotEmpty
+                      ? _dashboard(context: context)
+                      : const SizedBox.shrink(),
 
-                  taskName.toString().isNotEmpty ?
-                  _task(context: context) :  const SizedBox.shrink(),
+                  taskName.toString().isNotEmpty
+                      ? _task(context: context)
+                      : const SizedBox.shrink(),
 
-                  tlpSurveyName.toString().isNotEmpty ?
-                  _tlpSurvey(context: context) : const SizedBox.shrink(),
+                  tlpSurveyName.toString().isNotEmpty
+                      ? _tlpSurvey(context: context)
+                      : const SizedBox.shrink(),
 
                   imageSharingName.toString().isNotEmpty
                       ? _imageSharing(context: context)
                       : const SizedBox.shrink(),
 
-                  pgisName.toString().isNotEmpty ?
-                  _pgis(context: context) : const SizedBox.shrink(),
+                  pgisName.toString().isNotEmpty
+                      ? _pgis(context: context)
+                      : const SizedBox.shrink(),
 
                   _logout(context: context),
                 ],
@@ -121,9 +124,7 @@ class HomeDrawerWidget extends StatelessWidget {
             ),
           );
         } else {
-          return const Center(
-            child: CenterLoaderWidget(),
-          );
+          return const Center(child: CenterLoaderWidget());
         }
       },
     );
@@ -142,9 +143,7 @@ class HomeDrawerWidget extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.15,
           ),
         ),
-        SizedBox(
-          width: MediaQuery.of(context).size.width * 0.03,
-        ),
+        SizedBox(width: MediaQuery.of(context).size.width * 0.03),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +160,7 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
@@ -169,13 +168,18 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _dashboard({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          BlocProvider.of<HomeBloc>(context)
-              .add(SelectWidgetHomeEvent(widget: const DashboardPage(), title: AppString.dashboard));
+          BlocProvider.of<HomeBloc>(context).add(
+            SelectWidgetHomeEvent(
+              widget: const DashboardPage(),
+              title: AppString.dashboard,
+            ),
+          );
         },
         child: Row(
           children: [
@@ -186,15 +190,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.home_outlined,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.home_outlined, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.dashboard,
               fontSize: AppFont.font_14,
@@ -209,13 +208,18 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _task({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
-              widget: TaskPage(isAssignTask: isAssignTask), title: AppString.task));
+          BlocProvider.of<HomeBloc>(context).add(
+            SelectWidgetHomeEvent(
+              widget: TaskPage(isAssignTask: isAssignTask),
+              title: AppString.task,
+            ),
+          );
         },
         child: Row(
           children: [
@@ -226,15 +230,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.task_outlined,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.task_outlined, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.task,
               fontSize: AppFont.font_14,
@@ -249,13 +248,18 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _tlpSurvey({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
-              widget: const AddTlpSurveyPage(), title: AppString.tlpSurvey));
+          BlocProvider.of<HomeBloc>(context).add(
+            SelectWidgetHomeEvent(
+              widget: const AddTlpSurveyPage(),
+              title: AppString.tlpSurvey,
+            ),
+          );
         },
         child: Row(
           children: [
@@ -266,15 +270,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.add_chart,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.add_chart, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.tlpSurvey,
               fontSize: AppFont.font_14,
@@ -286,17 +285,21 @@ class HomeDrawerWidget extends StatelessWidget {
     );
   }
 
-
   Widget _imageSharing({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
-              widget: const ImageSharePage(), title: AppString.imageSharing));
+          BlocProvider.of<HomeBloc>(context).add(
+            SelectWidgetHomeEvent(
+              widget: const ImageSharePage(),
+              title: AppString.imageSharing,
+            ),
+          );
         },
         child: Row(
           children: [
@@ -307,15 +310,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.image_aspect_ratio,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.image_aspect_ratio, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.imageSharing,
               fontSize: AppFont.font_14,
@@ -330,13 +328,15 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _pgis({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
-              widget: PgisPage(), title: AppString.pgis));
+          BlocProvider.of<HomeBloc>(context).add(
+            SelectWidgetHomeEvent(widget: PgisPage(), title: AppString.pgis),
+          );
 
           // Navigator.push(
           //   context,
@@ -352,15 +352,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.gps_fixed_sharp,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.gps_fixed_sharp, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.pgis,
               fontSize: AppFont.font_14,
@@ -375,12 +370,15 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _logout({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           showModalBottomSheet(
-              context: context, builder: (context) => const LogoutWidget());
+            context: context,
+            builder: (context) => const LogoutWidget(),
+          );
         },
         child: Row(
           children: [
@@ -391,15 +389,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.logout,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.logout, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.logout,
               fontSize: AppFont.font_14,

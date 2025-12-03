@@ -9,18 +9,21 @@ import 'package:flutter_gail/feature/task/viewTask/presentation/page/task_page.d
 import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/presentation/page/add_tlp_survey_page.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
 
-
 class HomeHelper {
-  static Future<dynamic> fetchDrawerList(
-      {required BuildContext context}) async {
+  static Future<dynamic> fetchDrawerList({
+    required BuildContext context,
+  }) async {
     try {
       List<DrawerModel> drawerList = [];
-      drawerList.add(DrawerModel(
+      drawerList.add(
+        DrawerModel(
           widget: const DashboardPage(),
           icon: Icons.home_outlined,
           label: AppString.dashboard,
           sublist: [],
-          isSelected: true));
+          isSelected: true,
+        ),
+      );
 
       return drawerList;
     } catch (e) {
@@ -28,8 +31,9 @@ class HomeHelper {
     }
   }
 
-  static Future<dynamic> fetchAppBottomBarItems(
-      {required BuildContext context}) async {
+  static Future<dynamic> fetchAppBottomBarItems({
+    required BuildContext context,
+  }) async {
     List<BottomNavigationBarItem> bottomNavigationBarItemList = [];
     try {
       LoginDataModel userData = UserInfo.instanceInit()!.userData!;
@@ -43,84 +47,88 @@ class HomeHelper {
     try {
       LoginDataModel userData = UserInfo.instanceInit()!.userData!;
 
-      // Get the dashboard module object safely
+
       final dashboardModule = userData.modules!.firstWhere(
-            (element) => element.moduleName!.toLowerCase() == "dashboard",
-        orElse: () => Modules(moduleName: ""), // provide a default Modules object
+        (element) => element.moduleName!.toLowerCase() == "dashboard",
+        orElse: () => Modules(moduleName: ""),
       );
       final dashboardName = dashboardModule.moduleName;
 
-      // Get the pipeline_patrolling_suervielliance module object safely
+
       final taskModule = userData.modules!.firstWhere(
-            (element) => element.moduleName!.toLowerCase() == "pipeline_patrolling_suervielliance",
-        orElse: () => Modules(moduleName: ""), // provide a default Modules object
+        (element) => element.moduleName!.toLowerCase() == "pipeline_patrolling_suervielliance",
+        orElse: () => Modules(moduleName: ""),
       );
       final taskName = taskModule.moduleName;
 
-      // Get the pipeline_cp_system module object safely
+
       final tlpSurveyModule = userData.modules!.firstWhere(
-            (element) => element.moduleName!.toLowerCase() == "pipeline_cp_system",
-        orElse: () => Modules(moduleName: ""), // provide a default Modules object
+        (element) => element.moduleName!.toLowerCase() == "pipeline_cp_system",
+        orElse: () => Modules(moduleName: ""),
       );
       final tlpSurveyName = tlpSurveyModule.moduleName;
 
-      // Get the image_sharing module object safely
+
       final imageSharingModule = userData.modules!.firstWhere(
-            (element) => element.moduleName!.toLowerCase() == "image_sharing",
-        orElse: () => Modules(moduleName: ""), // provide a default Modules object
+        (element) => element.moduleName!.toLowerCase() == "image_sharing",
+        orElse: () => Modules(moduleName: ""),
       );
       final imageSharingName = imageSharingModule.moduleName;
 
-      // Get the pgis module object safely
+
       final pgisModule = userData.modules!.firstWhere(
-            (element) => element.moduleName!.toLowerCase() == "pgis",
-        orElse: () => Modules(moduleName: ""), // provide a default Modules object
+        (element) => element.moduleName!.toLowerCase() == "pgis",
+        orElse: () => Modules(moduleName: ""),
       );
       final pgisName = pgisModule.moduleName;
 
       // Dashboard
-      if(dashboardName.toString().isNotEmpty) {
+      if (dashboardName.toString().isNotEmpty) {
         pageList.add(
-          DrawerModel(widget: const DashboardPage(), label: AppString.dashboard)
+          DrawerModel(
+            widget: const DashboardPage(),
+            label: AppString.dashboard,
+          ),
         );
       }
 
       // Task
-      if(taskName.toString().isNotEmpty) {
-        bool isAssignTask =  false;
+      if (taskName.toString().isNotEmpty) {
+        bool isAssignTask = false;
         for (var permissionData in taskModule.permissionList!) {
           if (permissionData.name.toString().toLowerCase() == "write") {
             isAssignTask = permissionData.value ?? false;
           }
         }
         pageList.add(
-            DrawerModel(widget: TaskPage(isAssignTask: isAssignTask,), label: AppString.task)
+          DrawerModel(
+            widget: TaskPage(isAssignTask: isAssignTask),
+            label: AppString.task,
+          ),
         );
       }
 
       // Tlp Survey
-      if(tlpSurveyName.toString().isNotEmpty) {
+      if (tlpSurveyName.toString().isNotEmpty) {
         pageList.add(
-            DrawerModel(widget: AddTlpSurveyPage(), label: AppString.tlpSurvey)
+          DrawerModel(widget: AddTlpSurveyPage(), label: AppString.tlpSurvey),
         );
       }
 
       // image Sharing
-      if(imageSharingName.toString().isNotEmpty) {
+      if (imageSharingName.toString().isNotEmpty) {
         pageList.add(
-            DrawerModel(widget: ImageSharePage(), label: AppString.imageSharing)
+          DrawerModel(widget: ImageSharePage(), label: AppString.imageSharing),
         );
       }
 
       // pgis
-      if(pgisName.toString().isNotEmpty) {
+      if (pgisName.toString().isNotEmpty) {
         pageList.add(
-            DrawerModel(widget: DashboardPage(), label: AppString.dashboard)
+          DrawerModel(widget: DashboardPage(), label: AppString.dashboard),
         );
       }
-
     } catch (_) {}
     return pageList;
   }
-
 }

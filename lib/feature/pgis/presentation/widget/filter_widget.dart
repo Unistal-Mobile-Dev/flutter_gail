@@ -9,8 +9,7 @@ import 'TypeAheadFieldWidget.dart';
 
 class FilterWidget extends StatelessWidget {
   final ArcGISMapViewController mapViewController;
-
-  FilterWidget({super.key, required this.mapViewController});
+  const FilterWidget({super.key, required this.mapViewController});
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +31,8 @@ class FilterWidget extends StatelessWidget {
                       icon: Icon(Icons.cancel_outlined, color: Colors.red),
                       onPressed: () {
                         state.pipelineCtrl.text = "";
+                        state.sectionCtrl.text = "";
+                        state.tlpCtrl.text = "";
                       },
                     ),
                     controller: state.pipelineCtrl,
@@ -55,6 +56,7 @@ class FilterWidget extends StatelessWidget {
                       );
                     },
                   ),
+
                   const SizedBox(height: 16),
                   TypeaheadFieldWidget(
                     enabled:  state.pipelineCtrl.text.isNotEmpty ? true : false,
@@ -86,6 +88,7 @@ class FilterWidget extends StatelessWidget {
                       );
                     },
                   ),
+
                   const SizedBox(height: 16),
                   TypeaheadFieldWidget(
                     enabled:  state.pipelineCtrl.text.isNotEmpty ? true : false,

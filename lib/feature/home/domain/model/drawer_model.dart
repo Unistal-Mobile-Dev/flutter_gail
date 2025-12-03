@@ -10,14 +10,15 @@ class DrawerModel {
   Widget? actionButtonWidget;
   bool? isSublistLoader = false;
 
-  DrawerModel(
-      {required this.widget,
-      this.icon,
-      required this.label,
-      this.sublist,
-      this.isSelected =  false,
-      this.isSublistLoader,
-      this.actionButtonWidget});
+  DrawerModel({
+    required this.widget,
+    this.icon,
+    required this.label,
+    this.sublist,
+    this.isSelected = false,
+    this.isSublistLoader,
+    this.actionButtonWidget,
+  });
 }
 
 class DrawerSubModel {
@@ -26,6 +27,10 @@ class DrawerSubModel {
   Widget? widget;
   Widget? actionButtonWidget;
 
-  DrawerSubModel(
-      {this.label, this.isSelected, this.widget, this.actionButtonWidget});
+  DrawerSubModel({
+    this.label,
+    this.isSelected,
+    this.widget,
+    this.actionButtonWidget,
+  });
 }

@@ -12,9 +12,9 @@ class PgisPageLoadedEvent extends PgisEvent {
   List<Object> get props => [context];
 }
 
-class PgisMapReady extends PgisEvent {
+class PGISMapReady extends PgisEvent {
   final ArcGISMapViewController controller;
-  const PgisMapReady(this.controller);
+  const PGISMapReady(this.controller);
 
   @override
   List<Object?> get props => [controller];
@@ -76,11 +76,14 @@ class SearchRoundedEvent extends PgisEvent {
   List<Object?> get props =>[ctx,arcGISMapViewController];
 }
 
-class MuteVoiceGuidanceEvent extends PgisEvent {
+class MapLayerEvent extends PgisEvent {
+  final BuildContext ctx;
+  const MapLayerEvent({required this.ctx,});
   @override
   // TODO: implement props
-  List<Object?> get props =>[];
+  List<Object?> get props =>[ctx];
 }
+
 
 class SelectPipelineEngRouteEvent extends PgisEvent {
   final String query;
@@ -126,4 +129,13 @@ class StopNavigationEvent extends PgisEvent {
   @override
   // TODO: implement props
   List<Object?> get props => [controller];
+}
+
+
+class SelectLayerTypeEvent extends PgisEvent {
+  final String selectedLayerValue;
+ const SelectLayerTypeEvent(this.selectedLayerValue);
+
+  @override
+  List<Object?> get props => [selectedLayerValue];
 }

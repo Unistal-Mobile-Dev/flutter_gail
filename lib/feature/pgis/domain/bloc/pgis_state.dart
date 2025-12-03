@@ -26,6 +26,7 @@ class FetchPgisDataState extends PgisState {
   final bool isArcGISStreets;
   final bool isNavigating;
   final bool isMuted;
+  final String selectedLayerType;
   final TextEditingController fromController;
   final TextEditingController toController;
   final List<dynamic> fromLocationList;
@@ -41,6 +42,7 @@ class FetchPgisDataState extends PgisState {
     required this.isNavigating,
     required this.isMuted,
     required this.isArcGISStreets,
+    required this.selectedLayerType,
     required this.fromController,
     required this.toController,
     required this.fromLocationList,
@@ -57,6 +59,7 @@ class FetchPgisDataState extends PgisState {
     isNavigating,
     isMuted,
     isArcGISStreets,
+    selectedLayerType,
     fromController,
     toController,
     fromLocationList,

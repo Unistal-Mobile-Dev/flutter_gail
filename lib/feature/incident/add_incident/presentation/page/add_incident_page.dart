@@ -12,23 +12,27 @@ class AddIncidentPage extends StatefulWidget {
 }
 
 class _AddIncidentPageState extends State<AddIncidentPage> {
-
-
   @override
   void initState() {
-    BlocProvider.of<AddIncidentBloc>(context)
-        .add(AddIncidentPageLoadEvent(context: context));
+    BlocProvider.of<AddIncidentBloc>(
+      context,
+    ).add(AddIncidentPageLoadEvent(context: context));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: TextWidget("Add Incident",
-        fontSize: AppFont.font_16, color: AppColor.white,),),
+      appBar: AppBar(
+        title: TextWidget(
+          "Add Incident",
+          fontSize: AppFont.font_16,
+          color: AppColor.white,
+        ),
+      ),
       body: BlocBuilder<AddIncidentBloc, AddIncidentState>(
         builder: (context, state) {
-          if(state is FetchAddIncidentDataState){
+          if (state is FetchAddIncidentDataState) {
             return _itemBuilder(dataState: state);
           } else {
             return const Center(child: CenterLoaderWidget());
@@ -62,23 +66,29 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
   Widget _typeDropDown({required FetchAddIncidentDataState dataState}) {
     return DropDownSearchWidget(
       isRequired: true,
-      selectedItem: dataState.incidentTypeData.name != null ? dataState.incidentTypeData : null,
+      selectedItem:
+          dataState.incidentTypeData.name != null
+              ? dataState.incidentTypeData
+              : null,
       hint: AppString.type,
       items: dataState.incidentTypeList,
       itemAsString: (incidentTypeData) => incidentTypeData.name.toString(),
       onChanged: (value) {
-        BlocProvider.of<AddIncidentBloc>(context)
-            .add(AddIncidentSelectTypeEvent(incidentTypeData: value));
+        BlocProvider.of<AddIncidentBloc>(
+          context,
+        ).add(AddIncidentSelectTypeEvent(incidentTypeData: value));
       },
     );
   }
 
-  Widget _incidentReportController({required FetchAddIncidentDataState dataState}) {
+  Widget _incidentReportController({
+    required FetchAddIncidentDataState dataState,
+  }) {
     return TextFieldWidget(
       isRequired: true,
       maxLine: 5,
       labelText: AppString.reportIncident,
-      controller: dataState.incidentReportController
+      controller: dataState.incidentReportController,
     );
   }
 
@@ -87,30 +97,36 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
       children: [
         IconButton(
           onPressed: () {
-            mediaType(context: context,
-                onPressedCamera: () {
-                  BlocProvider.of<AddIncidentBloc>(context)
-                      .add(AddIncidentSelectImageEvent(context: context, mediaType: 1));
-                  Navigator.pop(context);
-                },
-                onPressedGallery:() {
-                  BlocProvider.of<AddIncidentBloc>(context)
-                      .add(AddIncidentSelectImageEvent(context: context, mediaType: 2));
-                  Navigator.pop(context);
-                }
+            mediaType(
+              context: context,
+              onPressedCamera: () {
+                BlocProvider.of<AddIncidentBloc>(context).add(
+                  AddIncidentSelectImageEvent(context: context, mediaType: 1),
+                );
+                Navigator.pop(context);
+              },
+              onPressedGallery: () {
+                BlocProvider.of<AddIncidentBloc>(context).add(
+                  AddIncidentSelectImageEvent(context: context, mediaType: 2),
+                );
+                Navigator.pop(context);
+              },
             );
-          }, icon: dataState.imageFile.path.isEmpty
-            ? Icon(Icons.camera_alt, color: AppColor.grey,)
-            : ClipOval(child: Image.file(
-          dataState.imageFile,
-          height: MediaQuery.of(context).size.width * 0.10,
-          width: MediaQuery.of(context).size.width * 0.10,
-        ),
-        ),
+          },
+          icon:
+              dataState.imageFile.path.isEmpty
+                  ? Icon(Icons.camera_alt, color: AppColor.grey)
+                  : ClipOval(
+                    child: Image.file(
+                      dataState.imageFile,
+                      height: MediaQuery.of(context).size.width * 0.10,
+                      width: MediaQuery.of(context).size.width * 0.10,
+                    ),
+                  ),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),
 
-/*        IconButton(
+        /*        IconButton(
           onPressed: () async {
             double size =  MediaQuery.of(!context.mounted ? context : context).size.height
                 - MediaQuery.of(!context.mounted ? context : context).size.width;
@@ -140,7 +156,7 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),*/
 
-/*        IconButton(
+        /*        IconButton(
           onPressed: () {
             mediaType(context: context,
                 onPressedCamera: () {
@@ -163,19 +179,19 @@ class _AddIncidentPageState extends State<AddIncidentPage> {
   }
 
   Widget _submit({required FetchAddIncidentDataState dataState}) {
-    return dataState.isLoader == false ?
-        ButtonWidget(text: AppString.submit, 
-            onPressed: () {
-             BlocProvider.of<AddIncidentBloc>(context)
-                 .add(AddIncidentSubmitEvent(context: context));
-            }
-        ) : const DottedLoaderWidget();
+    return dataState.isLoader == false
+        ? ButtonWidget(
+          text: AppString.submit,
+          onPressed: () {
+            BlocProvider.of<AddIncidentBloc>(
+              context,
+            ).add(AddIncidentSubmitEvent(context: context));
+          },
+        )
+        : const DottedLoaderWidget();
   }
 
   Widget _verticalSpace() {
-    return SizedBox(
-        height: MediaQuery.of(context).size.width * 0.05
-    );
+    return SizedBox(height: MediaQuery.of(context).size.width * 0.05);
   }
-
 }

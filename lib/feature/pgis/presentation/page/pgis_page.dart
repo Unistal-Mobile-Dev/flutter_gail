@@ -175,10 +175,11 @@ class _PgisPageState extends State<PgisPage> {
         //   shape: StadiumBorder(),
         //   elevation: 0,
         //   onPressed: () {
-        //     context.read<HomeBloc>().add(MuteVoiceGuidanceEvent());
+        //     context.read<PgisBloc>().add(
+        //       MapLayerEvent(ctx: context),
+        //     );
         //   },
-        //   child: Icon(
-        //     dataState.isMuted ? Icons.volume_off_rounded : Icons.volume_up,
+        //   child: Icon(Icons.layers,
         //     color: Colors.white,
         //   ),
         // ),
@@ -286,7 +287,7 @@ class _PgisPageState extends State<PgisPage> {
     return ArcGISMapView(
         controllerProvider: () => _mapViewController,
         onMapViewReady: () {
-          context.read<PgisBloc>().add(PgisMapReady(_mapViewController));
+          context.read<PgisBloc>().add(PGISMapReady(_mapViewController));
         },
         onTap: (details) async {
           final bloc = context.read<PgisBloc>();

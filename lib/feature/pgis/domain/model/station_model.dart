@@ -11,6 +11,6 @@ class StationModel {
 
   @override
   String toString() {
-    return '$stationName';
+    return '$engRouteName($stationName)';
   }
 }

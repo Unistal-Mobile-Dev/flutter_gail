@@ -28,7 +28,8 @@ class PGISHelper {
     required String query,
   }) async {
     Map<String, String> para = {
-      'where': "UPPER(ADMIN.PipelineLine.engroutename) LIKE '%${query.toUpperCase()}%'",
+      'where': "(UPPER(sectionName) LIKE '%${query.toUpperCase()}%' "
+          "OR UPPER(engroutename) LIKE '%${query.toUpperCase()}%')",
       'outFields': 'ADMIN.PipelineLine.engroutename,dbo.vw_Pipeline_GIS_Attributes.sectionName',
       'returnGeometry': 'false',
       'f': 'json',
@@ -87,9 +88,14 @@ class PGISHelper {
     String? pipelineNameOrCode,
   }) async {
     try {
-      String whereClause = "UPPER(stationname) LIKE '%${query.toUpperCase()}%'";
+      String whereClause =
+          "(UPPER(stationname) LIKE '%${query.toUpperCase()}%' "
+          "OR UPPER(engroutename) LIKE '%${query.toUpperCase()}%')";
+
+      // 🔍 Apply pipeline filter if selected
       if (pipelineNameOrCode != null && pipelineNameOrCode.isNotEmpty) {
-        whereClause += " AND UPPER(engroutename) = '${pipelineNameOrCode.toUpperCase()}'";
+        whereClause +=
+        " AND UPPER(engroutename) = '${pipelineNameOrCode.toUpperCase()}'";
       }
       final params = {
         'where': whereClause,
@@ -113,7 +119,7 @@ class PGISHelper {
         }).toList();
       }
     } catch (e, stack) {
-      print("❌ stationSuggestionName error: $e\n$stack");
+      print("error: $e\n$stack");
     }
     return [];
   }

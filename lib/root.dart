@@ -7,7 +7,7 @@ import 'package:flutter_gail/testing_page.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
+    FlutterLocalNotificationsPlugin();
 
 class Root extends StatefulWidget {
   final Client client;
@@ -19,7 +19,6 @@ class Root extends StatefulWidget {
 }
 
 class _RootState extends State<Root> {
-
   @override
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
@@ -32,23 +31,23 @@ class _RootState extends State<Root> {
     AppConfig.instanceInit()!.setClient(client: widget.client);
     return blocMultiProvider(
       child: MaterialApp(
-      navigatorKey: navigatorKey,
-      title: 'Gail',
-      debugShowCheckedModeBanner: false,
-      theme: appTheme(),
-      initialRoute: '/',
-      routes: {
-        '/second': (context) => const TestPage(),
-      },
-      builder: (context, child) {
-        return MediaQuery (
-          data: MediaQuery.of(context)
-              .copyWith(textScaler: const TextScaler.linear(1.0)),
-          child: child!,
-        );
-      },
-      home: const SplashScreen(),
+        navigatorKey: navigatorKey,
+        title: 'Gail',
+        debugShowCheckedModeBanner: false,
+        theme: appTheme(),
+        initialRoute: '/',
+        routes: {'/second': (context) => const TestPage()},
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: const TextScaler.linear(1.0)),
+            child: child!,
+          );
+        },
+        home: const SplashScreen(),
         // home: const LoginScreenPage(),
-    ));
+      ),
+    );
   }
 }

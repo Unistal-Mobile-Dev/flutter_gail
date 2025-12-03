@@ -13,7 +13,7 @@ class TLPModel {
 
   @override
   String toString() {
-    return '$tlpno - $tlpType';
+    return '$engRouteName($tlpno-$tlpType)';
   }
 }
 
