@@ -92,7 +92,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     _eventCompleted(emit);
     _appLogoLoader = false;
 
-    await DashboardHelper.checkAppVersion(!event.context.mounted ? event.context : event.context);
+    if(Platform.isAndroid){
+      await DashboardHelper.checkAppVersion(!event.context.mounted ? event.context : event.context);
+    }
 
     _eventCompleted(emit);
   }

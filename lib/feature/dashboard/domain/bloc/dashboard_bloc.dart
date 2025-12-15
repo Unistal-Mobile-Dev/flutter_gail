@@ -27,7 +27,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     isLoader = false;
     lengthPiggabilty = {};
 
-    await DashboardHelper.requestMandatoryLocationPermission(event.context);
+     await DashboardHelper.requestMandatoryLocationPermission(event.context);
 
     final service = FlutterBackgroundService();
     var isRunning = await service.isRunning();
