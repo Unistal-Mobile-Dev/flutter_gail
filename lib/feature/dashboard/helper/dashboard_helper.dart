@@ -3,6 +3,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PiggabilityDataModel.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineMasterModel.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/PipelineSection.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
@@ -153,46 +154,65 @@ class DashboardHelper {
 
   static Future<void> requestMandatoryLocationPermission(BuildContext context) async {
 
-    // Step 1: Request Foreground Location
-    var status = await Permission.location.status;
+    await [
+      Permission.location,
+      Permission.locationAlways,
+      Permission.locationWhenInUse
+    ].request();
 
-    if (status.isDenied) {
-      await _showReasonDialog(
-        context,
-        "Location Required",
-        "This app needs your location to function properly.",
-      );
-      status = await Permission.location.request();
+    if(Platform.isAndroid) {
+      // Step 1: Request Foreground Location
+      var status = await Permission.location.status;
+
+      if (status.isDenied) {
+        await _showReasonDialog(
+          context,
+          "Location Required",
+          "This app needs your location to function properly.",
+        );
+        status = await Permission.location.request();
+      }
+
+      if (!status.isGranted) {
+        await _showSettingsDialog(
+          context,
+          "Permission Required",
+          "You must grant location access to continue using this app.",
+        );
+        return;
+      }
+
+      // Step 2: Request Background Location
+      var bgStatus = await Permission.locationAlways.status;
+
+      if (!bgStatus.isGranted) {
+        await _showReasonDialog(
+          context,
+          "Background Location Required",
+          "To track your location even when app is closed, please enable 'Allow all the time'.",
+        );
+
+        bgStatus = await Permission.locationAlways.request();
+      }
+
+      if (!bgStatus.isGranted) {
+        await _showSettingsDialog(
+          context,
+          "Mandatory Background Permission",
+          "You need to enable 'Allow all the time' for location in app settings.",
+        );
+      }
     }
-
-    if (!status.isGranted) {
-      await _showSettingsDialog(
-        context,
-        "Permission Required",
-        "You must grant location access to continue using this app.",
-      );
-      return;
-    }
-
-    // Step 2: Request Background Location
-    var bgStatus = await Permission.locationAlways.status;
-
-    if (!bgStatus.isGranted) {
-      await _showReasonDialog(
-        context,
-        "Background Location Required",
-        "To track your location even when app is closed, please enable 'Allow all the time'.",
-      );
-
-      bgStatus = await Permission.locationAlways.request();
-    }
-
-    if (!bgStatus.isGranted) {
-      await _showSettingsDialog(
-        context,
-        "Mandatory Background Permission",
-        "You need to enable 'Allow all the time' for location in app settings.",
-      );
+    else if(Platform.isIOS){
+      LocationPermission permission =  await Geolocator.checkPermission();
+      if(permission == LocationPermission.denied){
+        await _showSettingsDialog(
+          context,
+          "Permission Required",
+          "You must grant location access to continue using this app.",
+        );
+        return;
+      }
     }
   }
 
