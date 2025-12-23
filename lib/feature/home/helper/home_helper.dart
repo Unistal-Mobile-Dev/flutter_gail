@@ -47,12 +47,11 @@ class HomeHelper {
     try {
       LoginDataModel userData = UserInfo.instanceInit()!.userData!;
 
-
-      final dashboardModule = userData.modules!.firstWhere(
-        (element) => element.moduleName!.toLowerCase() == "dashboard",
+      final pgisModule = userData.modules!.firstWhere(
+            (element) => element.moduleName!.toLowerCase() == "pgis",
         orElse: () => Modules(moduleName: ""),
       );
-      final dashboardName = dashboardModule.moduleName;
+      final pgisName = pgisModule.moduleName;
 
 
       final taskModule = userData.modules!.firstWhere(
@@ -76,19 +75,17 @@ class HomeHelper {
       final imageSharingName = imageSharingModule.moduleName;
 
 
-      final pgisModule = userData.modules!.firstWhere(
-        (element) => element.moduleName!.toLowerCase() == "pgis",
+      final dashboardModule = userData.modules!.firstWhere(
+            (element) => element.moduleName!.toLowerCase() == "dashboard",
         orElse: () => Modules(moduleName: ""),
       );
-      final pgisName = pgisModule.moduleName;
+      final dashboardName = dashboardModule.moduleName;
 
-      // Dashboard
-      if (dashboardName.toString().isNotEmpty) {
+
+      // pgis
+      if (pgisName.toString().isNotEmpty) {
         pageList.add(
-          DrawerModel(
-            widget: const DashboardPage(),
-            label: AppString.dashboard,
-          ),
+          DrawerModel(widget: PgisPage(), label: AppString.pgis),
         );
       }
 
@@ -122,12 +119,16 @@ class HomeHelper {
         );
       }
 
-      // pgis
-      if (pgisName.toString().isNotEmpty) {
+      // Dashboard
+      if (dashboardName.toString().isNotEmpty) {
         pageList.add(
-          DrawerModel(widget: DashboardPage(), label: AppString.dashboard),
+          DrawerModel(
+            widget: const DashboardPage(),
+            label: AppString.dashboard,
+          ),
         );
       }
+
     } catch (_) {}
     return pageList;
   }

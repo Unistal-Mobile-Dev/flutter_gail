@@ -1,13 +1,64 @@
 import 'dart:convert';
 
+import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/pgis/domain/model/pipeline_model.dart';
 import 'package:flutter_gail/feature/pgis/domain/model/station_model.dart';
+import 'package:flutter_gail/feature/pgis/domain/model/structure_boundary_point_model.dart';
 import 'package:flutter_gail/feature/pgis/domain/model/tlp_model.dart';
 import 'package:http/http.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PGISHelper {
+
+  static Future<Geometry> drawBuffer({
+    required ArcGISMapViewController mapController,
+    required ArcGISPoint point,
+    required double distanceMeters,
+    required GraphicsOverlay graphicsOverlay,
+  }) async {
+    graphicsOverlay.graphics.clear();
+
+    final Geometry bufferGeometry = GeometryEngine.bufferGeodetic(
+      geometry: point,
+      distance: distanceMeters,
+      distanceUnit: LinearUnit(unitId: LinearUnitId.meters),
+      curveType: GeodeticCurveType.geodesic,
+      maxDeviation: double.nan,
+    );
+
+    graphicsOverlay.graphics.addAll([
+      Graphic(
+        geometry: bufferGeometry,
+        symbol: SimpleFillSymbol(
+          style: SimpleFillSymbolStyle.solid,
+          color: Colors.blue.withOpacity(0.15),
+          outline: SimpleLineSymbol(
+            style: SimpleLineSymbolStyle.solid,
+            color: Colors.blue,
+            width: 2,
+          ),
+        ),
+      ),
+      Graphic(
+        geometry: point,
+        symbol: SimpleMarkerSymbol(
+          style: SimpleMarkerSymbolStyle.circle,
+          color: Colors.purple,
+          size: 15,
+        ),
+      ),
+    ]);
+
+    // await mapController.setViewpointCenter(
+    //   point,
+    //   scale: 3000,
+    // );
+
+    return bufferGeometry;
+  }
+
 
   static Future<List<dynamic>> searchPlaces({required String input}) async {
     final url =
@@ -44,7 +95,6 @@ class PGISHelper {
       return features.map((e) {
         final attr = e['attributes'];
         return PipelineModel(
-        //  objectId: attr['OBJECTID'] ?? 0,
           objectId: attr['ADMIN.PipelineLine.OBJECTID'] ?? 0,
           sectionName: attr['dbo.vw_Pipeline_GIS_Attributes.sectionName']?.toString() ?? '',
           engRouteName: attr['ADMIN.PipelineLine.engroutename']?.toString() ?? '',
@@ -92,10 +142,8 @@ class PGISHelper {
           "(UPPER(stationname) LIKE '%${query.toUpperCase()}%' "
           "OR UPPER(engroutename) LIKE '%${query.toUpperCase()}%')";
 
-      // 🔍 Apply pipeline filter if selected
       if (pipelineNameOrCode != null && pipelineNameOrCode.isNotEmpty) {
-        whereClause +=
-        " AND UPPER(engroutename) = '${pipelineNameOrCode.toUpperCase()}'";
+        whereClause += " AND UPPER(engroutename) = '${pipelineNameOrCode.toUpperCase()}'";
       }
       final params = {
         'where': whereClause,
@@ -245,4 +293,146 @@ class PGISHelper {
     final s = (d.inSeconds % 60).toString().padLeft(2, '0');
     return '$h:$m:$s';
   }
+
+
+  static Future<void> openGoogleMapsNavigation({
+    required double sourceLat,
+    required double sourceLng,
+    required double destLat,
+    required double destLng,
+  }) async {
+    final googleUrl =
+        "https://www.google.com/maps/dir/?api=1"
+        "&origin=$sourceLat,$sourceLng"
+        "&destination=$destLat,$destLng"
+        "&travelmode=driving&dir_action=navigate";
+
+    final uri = Uri.parse(googleUrl);
+
+    print("Google Maps URL -> $googleUrl");
+
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    if (!launched) {
+      throw Exception("❌ Could not open Google Maps");
+    }
+  }
+
+  static showLoaderDialog(BuildContext context, {String message = "Loading..."}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Flexible(child: Text(message, style: TextStyle(fontSize: 16))),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<List<StructureBoundaryFeature>>
+  structureBoundaryQuery({
+    required BuildContext context,
+    required String query,
+    required Geometry bufferGeometry,
+    required SpatialReference spatialReference,
+  }) async {
+    final params = <String, String>{
+      'where': query.isNotEmpty
+          ? "(UPPER(stationname) LIKE '%${query.toUpperCase()}%' "
+          "OR UPPER(engroutename) LIKE '%${query.toUpperCase()}%')"
+          : '1=1',
+
+      'geometry': jsonEncode(bufferGeometry.toJson()),
+      'geometryType': 'esriGeometryPolygon',
+      'spatialRel': 'esriSpatialRelIntersects',
+
+      'inSR': spatialReference.wkid.toString(),
+      'outSR': spatialReference.wkid.toString(),
+
+      'outFields':
+      'OBJECTID,stationname,engroutename,continroutename,'
+          'engm,continm,Area_SqM_Station,newType,newLevel',
+
+      'returnGeometry': 'true',
+      'f': 'json',
+    };
+
+    final queryString = Uri(queryParameters: params).query;
+
+    final res = await ServerRequest.getDataGail(
+      urlEndPoint: APIs.structureBoundaryQuery + queryString,
+    );
+
+    if (res == null || res['features'] == null) {
+      return <StructureBoundaryFeature>[];
+    }
+
+    return (res['features'] as List<dynamic>)
+        .map(
+          (e) => StructureBoundaryFeature.fromJson(
+        e as Map<String, dynamic>,
+      ),
+    )
+        .toList();
+  }
+
+
+
+//  static Future<List<StructureBoundaryPoint>?> structureBoundaryQuery({
+ //    required BuildContext context,
+ //    required String query,
+ //    required Geometry bufferGeometry,
+ //    required SpatialReference spatialReference,
+ //  }) async {
+ //    // final params = {
+ //    //   'where':
+ //    //   "(UPPER(stationname) LIKE '%${query.toUpperCase()}%' "
+ //    //       "OR UPPER(engroutename) LIKE '%${query.toUpperCase()}%')",
+ //    //   'outFields': 'stationname,engroutename,OBJECTID',
+ //    //   'returnGeometry': 'true',
+ //    //   'f': 'json',
+ //    //   'inSR': spatialReference.wkid.toString(),
+ //    //   'spatialRel': 'esriSpatialRelIntersects',
+ //    // };
+ //
+ // final params = {
+ //      'where': '1=1',
+ //      'geometry': jsonEncode(bufferGeometry.toJson()),
+ //      'geometryType': 'esriGeometryPolygon',
+ //      'spatialRel': 'esriSpatialRelIntersects',
+ //      'inSR': spatialReference.wkid.toString(),
+ //      'outFields': 'stationname,engroutename,OBJECTID',
+ //      'returnGeometry': "true",
+ //      'f': 'json',
+ //    };
+ //
+ //    final queryString = Uri(queryParameters: params).query;
+ //
+ //    final res = await ServerRequest.getDataGail(
+ //      urlEndPoint: APIs.structureBoundaryQuery + queryString,
+ //    );
+ //
+ //    if (res == null || res['features'] == null) return null;
+ //
+ //    return (res['features'] as List)
+ //        .map((e) => StructureBoundaryPoint.fromJson(e))
+ //        .toList();
+ //  }
+
+
 }
