@@ -562,9 +562,11 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
         }
       }
 
+      final viewpoint = await controller.getCurrentViewpoint(ViewpointType.centerAndScale);
+      if (viewpoint != null) {
+        controller.setViewpoint(viewpoint);
+      }
       controller.arcGISMap!.operationalLayers.addAll(_cadastralFeatureLayers);
-
-      await controller.setViewpointGeometry(indiaEnvelope, paddingInDiPs: 12);
     } catch (e, s) {
       log('❌ Error loading cadastral layer', error: e, stackTrace: s);
     }
