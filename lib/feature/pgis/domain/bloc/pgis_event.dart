@@ -20,22 +20,6 @@ class PGISMapReady extends PgisEvent {
   List<Object?> get props => [controller];
 }
 
-class SelectMapArcGISStreets extends PgisEvent {
-  final bool isArcGISStreets;
-  final ArcGISMapViewController controller;
-
-  const SelectMapArcGISStreets({
-    required this.isArcGISStreets,
-    required this.controller,
-  });
-
-  @override
-  List<Object?> get props => [
-    isArcGISStreets,
-    controller,
-  ];
-}
-
 class IdentifyFeaturesAtTapEvent extends PgisEvent {
   final BuildContext context;
   final ArcGISMapViewController controller;
@@ -63,7 +47,7 @@ class StartNavigationEvent extends PgisEvent {
 
   @override
   // TODO: implement props
-  List<Object?> get props => [PgisEvent,destination];
+  List<Object?> get props => [controller,destination];
 }
 
 class LocationEvent extends PgisEvent {
@@ -224,4 +208,17 @@ class ResetTLPEvent extends PgisEvent {
   @override
   // TODO: implement props
   List<Object?> get props => [controller];
+}
+
+class ChangeBasemapEvent extends PgisEvent {
+  final BasemapStyle basemapStyle;
+  final ArcGISMapViewController controller;
+
+  const ChangeBasemapEvent({
+    required this.basemapStyle,
+    required this.controller,
+  });
+
+  @override
+  List<Object?> get props => [basemapStyle, controller];
 }

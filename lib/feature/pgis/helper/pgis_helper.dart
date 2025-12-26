@@ -12,6 +12,127 @@ import 'package:url_launcher/url_launcher.dart';
 
 class PGISHelper {
 
+  static Future<ArcGISPoint?> startLocationDisplay({
+    required ArcGISMapViewController mapViewController,
+  }) async {
+    final locationDisplay = mapViewController.locationDisplay;
+
+    // Recenter map on user location
+    locationDisplay.autoPanMode =
+        LocationDisplayAutoPanMode.recenter;
+
+    try {
+      // MUST be awaited
+      if (!locationDisplay.started) {
+        locationDisplay.start();
+      }
+
+      // Check if location is already available
+      final location = locationDisplay.location;
+      if (location != null) {
+        final point = location.position;
+        if (point.x != 0 && point.y != 0) {
+          return point;
+        }
+      }
+
+      // Wait for first valid GPS fix
+      final completer = Completer<ArcGISPoint?>();
+
+      late final StreamSubscription sub;
+      sub = locationDisplay.onLocationChanged.listen((loc) {
+        final point = loc.position;
+        if (point.x != 0 && point.y != 0) {
+          completer.complete(point);
+          sub.cancel();
+        }
+      });
+
+      // Timeout safety
+      Future.delayed(const Duration(seconds: 8), () {
+        if (!completer.isCompleted) {
+          completer.complete(null);
+          sub.cancel();
+        }
+      });
+
+      return completer.future;
+    } catch (e) {
+      debugPrint("Failed to start location display: $e");
+      return null;
+    }
+  }
+
+
+  static Future<ArcGISPoint> startCurrentLocation() async {
+    final locationDataSource = SystemLocationDataSource();
+    final completer = Completer<ArcGISPoint>();
+
+    await locationDataSource.start();
+
+    late final StreamSubscription subscription;
+
+    subscription = locationDataSource.onLocationChanged.listen((location) {
+      final pos = location.position;
+      if (pos == null) return;
+
+      // Reject invalid GPS fixes
+      if (pos.x == 0 || pos.y == 0) return;
+
+      final point = toWgs84(
+        ArcGISPoint(
+          x: pos.x,
+          y: pos.y,
+          spatialReference: pos.spatialReference,
+        ),
+      );
+
+      if (!completer.isCompleted) {
+        completer.complete(point);
+      }
+
+      // Clean up after first valid location
+      subscription.cancel();
+      locationDataSource.stop();
+    });
+
+    return completer.future;
+  }
+
+
+  static ArcGISPoint toWgs84(ArcGISPoint point) {
+    if (point.spatialReference == SpatialReference.wgs84) {
+      return point;
+    }
+    return GeometryEngine.project(
+      point,
+      outputSpatialReference:  SpatialReference.wgs84,
+    ) as ArcGISPoint;
+  }
+
+
+ static ArcGISPoint createPoint({required double lat, required double lon}) {
+    return ArcGISPoint(
+      x: lon,
+      y: lat,
+      spatialReference: SpatialReference.wgs84,
+    );
+  }
+
+  static void drawPoint({required ArcGISPoint point,required Color color, required GraphicsOverlay graphicsOverlay}) {
+    graphicsOverlay.graphics.clear();
+    final graphic = Graphic(
+      geometry: point,
+      symbol: SimpleMarkerSymbol(
+        style: SimpleMarkerSymbolStyle.circle,
+        color: color,
+        size: 12,
+      ),
+    );
+
+    graphicsOverlay.graphics.add(graphic);
+  }
+
   static Future<Geometry> drawBuffer({
     required ArcGISMapViewController mapController,
     required ArcGISPoint point,
@@ -391,7 +512,36 @@ class PGISHelper {
         .toList();
   }
 
+  static ArcGISMap buildMapWithBasemap(PGISBasemapType type) {
+    switch (type) {
+      case PGISBasemapType.streets:
+        return ArcGISMap.withBasemapStyle(BasemapStyle.arcGISStreets);
 
+      case PGISBasemapType.satellite:
+        return ArcGISMap.withBasemapStyle(BasemapStyle.arcGISImagery);
+
+      case PGISBasemapType.topo:
+        return ArcGISMap.withBasemapStyle(BasemapStyle.arcGISTopographic);
+
+      case PGISBasemapType.lightGray:
+        return ArcGISMap.withBasemapStyle(BasemapStyle.arcGISLightGray);
+
+      case PGISBasemapType.darkGray:
+        return ArcGISMap.withBasemapStyle(BasemapStyle.arcGISDarkGray);
+
+      default:
+        return ArcGISMap.withBasemapStyle(BasemapStyle.arcGISStreets);
+    }
+  }
+
+  // static Future<void> show(BuildContext context, ArcGISMapController mapController) async {
+  //   final basemaps = [
+  //     {'name': 'Streets', 'basemap': Basemap.streets()},
+  //     {'name': 'Satellite', 'basemap': Basemap.imagery()},
+  //     {'name': 'OpenStreetMap Light', 'basemap': Basemap.openStreetMap()},
+  //     {'name': 'Terrain', 'basemap': Basemap.terrain()},
+  //     {'name': 'Navigation', 'basemap': Basemap.navigation()},
+  //   ];
 
 //  static Future<List<StructureBoundaryPoint>?> structureBoundaryQuery({
  //    required BuildContext context,

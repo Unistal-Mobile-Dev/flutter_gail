@@ -124,6 +124,7 @@ class APIs {
 
 
   static get structureBoundaryQuery  => "server/rest/services/UPIMS/MobileApp/MapServer/8/query?";
+  static get routeARCGIS  => 'https://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World';
 
 
 

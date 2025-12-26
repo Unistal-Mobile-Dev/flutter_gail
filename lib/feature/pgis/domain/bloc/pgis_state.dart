@@ -36,6 +36,10 @@ class FetchPgisDataState extends PgisState {
   final TextEditingController stationCtrl;
   final TextEditingController tlpCtrl;
   final List<StructureBoundaryFeature> stationList;
+  final ArcGISPoint curPoint;
+  final ArcGISPoint desPoint;
+  final double distanceKm;
+  final double travelTimeMin;
 
   const FetchPgisDataState({
     required this.isPageLoader,
@@ -54,6 +58,11 @@ class FetchPgisDataState extends PgisState {
     required this.stationCtrl,
     required this.tlpCtrl,
     required this.stationList,
+    required this.curPoint,
+    required this.desPoint,
+    required this.distanceKm,
+    required this.travelTimeMin,
+
   });
   @override
   List<Object> get props => [
@@ -72,6 +81,10 @@ class FetchPgisDataState extends PgisState {
     stationCtrl,
     tlpCtrl,
     stationList,
+    curPoint,
+    desPoint,
+    distanceKm,
+    travelTimeMin,
 
   ];
 }

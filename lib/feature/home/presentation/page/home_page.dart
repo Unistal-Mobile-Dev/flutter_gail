@@ -40,6 +40,7 @@ class _HomePageState extends State<HomePage> {
         }
       },
       child: Scaffold(
+        backgroundColor: Colors.white,
         extendBodyBehindAppBar: true,
         key: scaffoldKey,
         drawer: HomeDrawerWidget(),
@@ -106,28 +107,16 @@ class _HomePageState extends State<HomePage> {
             }
           },
         ),
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                // SizedBox(
-                //   height: _headerHeight,
-                //   child: HeaderWidget(_headerHeight, true, Icons.person),
-                // ),
-                Expanded(
-                  child: BlocBuilder<HomeBloc, HomeState>(
-                    builder: (context, state) {
-                      if (state is FetchHomeDataState) {
-                        return state.childWidget;
-                      } else {
-                        return const Center(child: CenterLoaderWidget());
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ],
+        body: SafeArea(
+          child: BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) {
+              if (state is FetchHomeDataState) {
+                return state.childWidget;
+              } else {
+                return const Center(child: CenterLoaderWidget());
+              }
+            },
+          ),
         ),
       ),
     );

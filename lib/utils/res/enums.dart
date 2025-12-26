@@ -20,4 +20,14 @@ enum RouteObservation {
   const RouteObservation(this.value);
 }
 
+
+enum PGISBasemapType {
+  streets,
+  satellite,
+  topo,
+  lightGray,
+  darkGray,
+}
+
+
 enum AppPermissionStatus { granted, denied, permanentlyDenied }
