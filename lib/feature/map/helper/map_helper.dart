@@ -15,6 +15,7 @@ import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
+import 'package:flutter_gail/services/background_location_service.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
 import 'package:flutter_gail/services/network_helper.dart';
@@ -292,12 +293,17 @@ class MapHelper {
       );
 
       // If server response is successful, mark all as synced
-      if (res != null) {
+      if (res != null && res['close_status'] != null && res['close_status'] != 3) {
         for (var location in box.values) {
           if (!location.isSynced) {
             location.isSynced = true;
             await location.delete();
           }
+        }
+      } else if (res != null && res['close_status'] != null && res['close_status'] == 3) {
+        final manager = BackgroundManager();
+        if(await manager.isRunning()){
+          manager.stopService();
         }
       }
     } catch (e) {

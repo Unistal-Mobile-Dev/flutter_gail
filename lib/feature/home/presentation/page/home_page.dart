@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
                   builder: (context, state) {
                     if (state is FetchHomeDataState) {
                       return TextWidget(
-                        state.title.toString(),
+                        "${state.title} (Version ${state.appVersion})",
                         fontSize: AppFont.font_16,
                         color: AppColor.white,
                         fontWeight: FontWeight.w700,
