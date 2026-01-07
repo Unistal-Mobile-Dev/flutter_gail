@@ -14,6 +14,17 @@ import 'package:arcgis_maps/arcgis_maps.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ APPLY PORTAL LICENSE FIRST
+  // await applyRuntimeStandardLicense();
+
+  // // ✅ APPLY LICENSE FIRST (before any map usage)
+  const apiKey = String.fromEnvironment('API_KEY');
+  if (apiKey.isEmpty) {
+    throw Exception('ArcGIS API key missing');
+  }
+  ArcGISEnvironment.apiKey = apiKey;
+
   await Hive.initFlutter();
 
   await FirebaseService.instance.initializeService();
@@ -86,12 +97,16 @@ Future<void> main() async {
     debugPrint("Notification Init Error: $e");
   }
 
-  var apiKey = const String.fromEnvironment('API_KEY');
-  if (apiKey.isEmpty) {
-    throw Exception('apiKey undefined');
-  } else {
-    ArcGISEnvironment.apiKey = apiKey;
-  }
+  // var apiKey = const String.fromEnvironment('API_KEY');
+  // if (apiKey.isEmpty) {
+  //   throw Exception('apiKey undefined');
+  // } else {
+  //   ArcGISEnvironment.apiKey = apiKey;
+  //   ArcGISEnvironment.setLicenseUsingKey(ArcGISEnvironment.apiKey);
+  //
+  //   debugPrint("ArcGISEnvironment.apiKey: ${ArcGISEnvironment.apiKey}");
+  //   debugPrint("ArcGISEnvironment.apiKey: ${apiKey}");
+  // }
 
   // ✅ 7. App Config
   var configuredApp = const EnvironmentConfig(
@@ -130,4 +145,17 @@ Future<void> requestNotificationPermission(
     );
     debugPrint("iOS Notification Permission: $granted");
   }
+}
+Future<void> applyRuntimeStandardLicense() async {
+  final portal = Portal(
+    Uri.parse('https://gailgis.gail.co.in/portal'),
+    connection: PortalConnection.authenticated,
+  );
+
+  await portal.load();
+
+  final result =
+  await ArcGISEnvironment.getLicense();
+
+  debugPrint('License Status: ${result}');
 }
