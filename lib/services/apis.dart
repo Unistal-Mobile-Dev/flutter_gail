@@ -114,12 +114,20 @@ class APIs {
   static get verifyOtpApi => "auth/2fa/verify-otp";
 
 
+  static get cadastralLayerUrl => "server/rest/services/UPIMS/CadastralMap/MapServer";
   static get pipelineLayerUrl => "server/rest/services/UPIMS/MobileApp/MapServer";
   static get pipelineQuery => "server/rest/services/UPIMS/MobileApp/MapServer/210052/query?";
   static get stationQuery => "server/rest/services/UPIMS/MobileApp/MapServer/910001/query?";
   static get stationObject => "server/rest/services/UPIMS/MobileApp/MapServer/910001";
   static get tlpQuery => "server/rest/services/UPIMS/MobileApp/MapServer/200052/query?";
   static get tlpObject => "server/rest/services/UPIMS/MobileApp/MapServer/200052";
+
+
+  static get structureBoundaryQuery  => "server/rest/services/UPIMS/MobileApp/MapServer/8/query?";
+  static get routeARCGIS  => 'https://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World';
+
+
+
 
   static get forgotPasswordApi => "";
 }

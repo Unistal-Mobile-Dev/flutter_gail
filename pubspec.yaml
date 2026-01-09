@@ -63,7 +63,7 @@ dependencies:
   crypto: ^3.0.6
   fl_chart: ^0.69.0
   flutter_otp_text_field: ^1.5.1+1
-  arcgis_maps: ^200.7.0+4560
+#  arcgis_maps: ^200.7.0+4560
   flutter_tts: ^4.2.3
   flutter_typeahead: ^5.2.0
   connectivity_plus: ^7.0.0
@@ -74,6 +74,8 @@ dependencies:
   android_intent_plus: ^6.0.0
   dio: ^5.9.0
   install_plugin: ^2.1.0
+  arcgis_maps: ^200.7.0+4560
+
 
 dev_dependencies:
   flutter_test:

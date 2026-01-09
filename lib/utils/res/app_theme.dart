@@ -51,7 +51,6 @@ ThemeData appTheme() {
       color: Colors.white,
       surfaceTintColor: Colors.white,
     ),
-    dialogBackgroundColor: AppColor.white,
     dialogTheme: DialogTheme(
       backgroundColor: AppColor.white,
       surfaceTintColor: AppColor.white,

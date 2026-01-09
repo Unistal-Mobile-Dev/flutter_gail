@@ -155,8 +155,10 @@ class ServerRequest {
     return null;
   }
 
-  static Future<dynamic> postData(
-      {required var urlEndPoint, required var body, required BuildContext context}) async {
+  static Future<dynamic> postData({
+    required var urlEndPoint,
+    required var body,
+    required BuildContext context}) async {
     try {
       String url = APIs.baseUrl + urlEndPoint;
       log(url);
