@@ -173,7 +173,16 @@ class LoginHelper {
   static Future<dynamic> checkLogin({required BuildContext context}) async {
     try {
       if (await isInternetConnected() == true) {
+        String userId = await SharedPreferencesUtils.getString(key: PreferencesName.userId);
+        String password = await SharedPreferencesUtils.getString(key: PreferencesName.password);
+        String otpVerified = await SharedPreferencesUtils.getString(key: PreferencesName.otpVerified);
         var json = {};
+        if(otpVerified.toString() == "1"){
+          json = {
+            "login_id": userId,
+            "password": password
+          };
+        }
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString("baseUrl", APIs.baseUrl);
 

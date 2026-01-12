@@ -14,17 +14,6 @@ import 'package:arcgis_maps/arcgis_maps.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // ✅ APPLY PORTAL LICENSE FIRST
-  // await applyRuntimeStandardLicense();
-
-  // // ✅ APPLY LICENSE FIRST (before any map usage)
-  const apiKey = String.fromEnvironment('API_KEY');
-  if (apiKey.isEmpty) {
-    throw Exception('ArcGIS API key missing');
-  }
-  ArcGISEnvironment.apiKey = apiKey;
-
   await Hive.initFlutter();
 
   await FirebaseService.instance.initializeService();
@@ -97,7 +86,7 @@ Future<void> main() async {
     debugPrint("Notification Init Error: $e");
   }
 
-  var apiKey = const String.fromEnvironment('API_KEY');
+  var apiKey = Platform.isAndroid ?  const String.fromEnvironment('API_KEY') : "AAPK61287a314f53402d91bb41dffde6de9c_BFuvT1vTFyCyRq4Cx46fgTaP_ax8er0gNXa1ZR-_Tnw4xmBJj6GDtrrxad7rfzL";
   if (apiKey.isEmpty) {
     throw Exception('apiKey undefined');
   } else {
