@@ -23,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
   pageOpen() async {
     await AppConfig.instanceInit()!.getPackageInfo();
     String token =
-        await SharedPreferencesUtils.getString(key: PreferencesName.token);
+        await SharedPreferencesUtils.getString(key: PreferencesName.userId);
     if(kReleaseMode){
       if(await LoginHelper.isDeveloperModeEnabled() == true){
         if(await _onWillPop() == true){

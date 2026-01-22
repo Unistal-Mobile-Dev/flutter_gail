@@ -94,6 +94,11 @@ Future<void> main() async {
     ArcGISEnvironment.apiKey = apiKey;
   }
 
+  var licenseKey = Platform.isAndroid ?  const String.fromEnvironment('License_Key') : "runtimelite,1000,rud8814547710,none,TRB3LNBHPBJL6XCFK216";
+  ArcGISEnvironment.setLicenseUsingKey(
+    licenseKey,
+  );
+
 
   // ✅ 7. App Config
   var configuredApp = const EnvironmentConfig(
