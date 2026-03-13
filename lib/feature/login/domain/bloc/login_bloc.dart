@@ -111,6 +111,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       _isLoader = true;
       _eventCompleted(emit);
 
+
         var otpRes = await LoginHelper.sendOtp(
             emailId: email,
             password: password,
@@ -121,20 +122,44 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           _eventCompleted(emit);
             return ;
         }
+
+      // This is correct code
+      // _isLoader = false;
+      // _eventCompleted(emit);
+      //   userId =  otpRes;
+      //   Navigator.push(
+      //       !event.context.mounted ? event.context : event.context,
+      //       MaterialPageRoute(
+      //           builder: (_) => OtpPage(
+      //             emailId: email,
+      //             password: password,
+      //           )
+      //       )
+      //   );
+
+
+      // This is temprary solution
+      userId =  otpRes;
+      var res = await LoginHelper.getLoginOTPData(
+          userId: userId,
+          otp: "123456",
+          loginType: loginType,
+          context: event.context.mounted ? event.context : event.context);
       _isLoader = false;
       _eventCompleted(emit);
-        userId =  otpRes;
-        Navigator.push(
+      if (res != null) {
+        LoginDataModel _loginData = LoginDataModel();
+        _loginData = loginResponse(res);
+        UserInfo.instanceInit()?.userData = _loginData;
+        await SharedPreferencesUtils.setString(key: PreferencesName.token, value: UserInfo.instanceInit()!.userData!.tokens!.access.toString());
+        Navigator.pushAndRemoveUntil(
             !event.context.mounted ? event.context : event.context,
-            MaterialPageRoute(
-                builder: (_) => OtpPage(
-                  emailId: email,
-                  password: password,
-                )
-            )
-        );
+            MaterialPageRoute(builder: (_) => const HomePage()),
+                (route) => false);
+      }
 
     }
+
   }
 
   _loginCheck(LoginCheckEvent event, emit) async {
