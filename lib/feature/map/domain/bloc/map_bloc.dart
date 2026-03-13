@@ -191,11 +191,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (taskData.taskStatus == TaskStatus.started ||
         taskData.taskStatus == TaskStatus.resume) {
       if( ! await manager.isRunning()){
-         manager.startService();
+        add(MapPageUpdateTaskEvent(context: event.context.mounted ? event.context :  event.context,
+              taskStatus: taskData.taskStatus!));
       }
-      add(
-        StartTracking(!event.context.mounted ? event.context : event.context),
-      );
     } else {
       add(StopTracking());
     }
@@ -241,17 +239,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       isStartPatrolling = isBufferZone;
       isEndPatrolling = isBufferZone;
       _eventComplete(emit);
-    }
-
-    if (taskData.taskStatus == TaskStatus.started ||
-        taskData.taskStatus == TaskStatus.resume) {
-      // await MapHelper.locationSave(
-      //   context: !context.mounted ? context : context,
-      //   lastPoint: lastPoint,
-      //   speed: speed,
-      //   verticalAccuracy: verticalAccuracy,
-      //   taskData: taskData,
-      // );
     }
 
     lastPoint = PointsModel(x: points.longitude, y: points.latitude);

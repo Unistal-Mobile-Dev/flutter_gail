@@ -49,7 +49,7 @@ Future<void> main() async {
 
     // ✅ 4. Create Android Notification Channel
     const channel = AndroidNotificationChannel(
-      'my_foreground',
+      'my_foreground_oil',
       'Background Service Channel',
       description: 'Used for background location updates',
       importance: Importance.high,
