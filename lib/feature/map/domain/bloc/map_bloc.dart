@@ -14,6 +14,7 @@ import 'package:flutter_gail/services/background_location_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'dart:math';
 part 'map_event.dart';
 
 part 'map_state.dart';
@@ -104,20 +105,19 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           !event.context.mounted ? event.context : event.context,
         ).taskData;
 
-    if (groupRoles?.moduleName?.toString() != "MDPE Line Patrolling") {
-      var resConfiguration = await MapHelper.fetchConfiguration();
-      if (resConfiguration != null) {
-        configurationData = resConfiguration;
-      }
+    var resConfiguration = await MapHelper.fetchConfiguration(appModule: groupRoles!.appModule);
+    if (resConfiguration != null) {
+      configurationData = resConfiguration;
     }
+
     var routeRes = await MapHelper.fetchRoutes(
-      moduleName: groupRoles!.moduleName.toString() == "MDPE Line Patrolling"
+      moduleName: groupRoles?.appModule == AppModule.mdpLinePatrolling
               ? "patrollman-route-mdpe"
               : "patrollman-route",
       routeId: taskData.patrollRouteId.toString(),
+      appModule: groupRoles!.appModule,
     );
     if (routeRes != null) {
-      mapData = routeRes;
       mapData = routeRes;
       mapData.buffer =
           configurationData.buffer != null
@@ -132,20 +132,47 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       await prefs.setString("timeInterval", mapData.timeInterval.toString());
 
       if (mapData.data != null) {
+        print("Total Data: ${mapData.data!.length}");
+
         for (var data in mapData.data!) {
           List<PointsModel> list = [];
           final geometryData = data.geometry;
           if (geometryData != null) {
-            list.addAll(
-              geometryData.coordinates.map(
-                (coord) => PointsModel(
-                  y: coord.latitude,
-                  x: coord.longitude,
-                  m: 0.0,
-                  z: 0.0,
+
+            if(groupRoles.appModule == AppModule.mdpLinePatrolling) {
+              for (var coord in geometryData.coordinates) {
+
+                // ✅ Convert EPSG -> LatLng
+                LatLng latLng = convertEPSG3857ToLatLng(
+                  coord.longitude, // X
+                  coord.latitude,  // Y
+                );
+
+                print("Raw: ${coord.longitude}, ${coord.latitude}");
+                print("Converted: ${latLng.latitude}, ${latLng.longitude}");
+
+                list.add(
+                  PointsModel(
+                    y: latLng.latitude,
+                    x: latLng.longitude,
+                    m: 0.0,
+                    z: 0.0,
+                  ),
+                );
+              }
+
+            } else {
+              list.addAll(
+                geometryData.coordinates.map(
+                      (coord) => PointsModel(
+                    y: coord.latitude,
+                    x: coord.longitude,
+                    m: 0.0,
+                    z: 0.0,
+                  ),
                 ),
-              ),
-            );
+              );
+            }
             routeLength++;
           }
           routes.add(list);
@@ -173,7 +200,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (mapData.data != null) {
       for (var sectionData in mapData.data!) {
         var routePointRes = await MapHelper.fetchPointsDetails(
-          sectionCode: groupRoles.moduleName.toString() == "MDPE Line Patrolling"
+          sectionCode: groupRoles?.appModule == AppModule.mdpLinePatrolling
               ? sectionData.chargeAreaId
               : sectionData.sectionCode,
         );
@@ -207,6 +234,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     _eventComplete(emit);
   }
 
+  LatLng convertEPSG3857ToLatLng(double x, double y) {
+    double lng = (x / 20037508.34) * 180;
+
+    double lat = (y / 20037508.34) * 180;
+    lat = 180 / pi * (2 * atan(exp(lat * pi / 180)) - pi / 2);
+
+    return LatLng(lat, lng);
+  }
+
   _selectMapType(SelectMapArcGISStreets event, emit) {
     isArcGISStreets = event.isArcGISStreets;
     _eventComplete(emit);
@@ -237,11 +273,18 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             : double.tryParse(mapData.buffer.toString()) ?? 100.0;
 
     if (isStartPatrolling == false) {
-      bool isBufferZone = await MapHelper.getNearestLocation(
+      final groupRoles = AppConfig.instanceInit()?.groupRoles;
+      bool isBufferZone =
+          groupRoles?.appModule == AppModule.mdpLinePatrolling ?
+
+       MapHelper.isUserInsidePolygon(
         currentLocation: points,
         routes: routes,
-        bufferZone: buffer,
-      );
+      ) :  await MapHelper.getNearestLocation(
+            currentLocation: points,
+            routes: routes,
+            bufferZone: buffer,
+          );
       isStartPatrolling = isBufferZone;
       isEndPatrolling = isBufferZone;
       _eventComplete(emit);

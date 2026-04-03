@@ -12,6 +12,8 @@ class TaskItemBoxWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final groupRoles = AppConfig.instanceInit()?.groupRoles;
+
     DateFormat formatter = DateFormat('yyyy-MM-dd');
     DateTime _assignedDateFromate = formatter.parse(
       taskData.assignedDate.toString().isNotEmpty
@@ -94,24 +96,30 @@ class TaskItemBoxWidget extends StatelessWidget {
                 )
                 : const SizedBox.shrink(),
 
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
-              child: Row(
-                children: [
-                  TextWidget(
-                    AppString.maintenanceBase + " : ",
-                    fontSize: AppFont.font_11,
-                    fontWeight: FontWeight.w700,
+            groupRoles!.appModule == AppModule.steelLinePatrolling
+                ? Padding(
+                  padding: const EdgeInsets.only(
+                    left: 8.0,
+                    right: 8.0,
+                    top: 8.0,
                   ),
-                  Expanded(
-                    child: TextWidget(
-                      taskData.maintenanceBase.toString(),
-                      fontSize: AppFont.font_11,
-                    ),
+                  child: Row(
+                    children: [
+                      TextWidget(
+                        AppString.maintenanceBase + " : ",
+                        fontSize: AppFont.font_11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      Expanded(
+                        child: TextWidget(
+                          taskData.maintenanceBase.toString(),
+                          fontSize: AppFont.font_11,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                )
+                : const SizedBox.shrink(),
 
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
@@ -137,7 +145,8 @@ class TaskItemBoxWidget extends StatelessWidget {
               child: Row(
                 children: [
                   TextWidget(
-                    AppString.sectionName + " : ",
+                    groupRoles.appModule == AppModule.steelLinePatrolling
+                        ? AppString.sectionName + " : " : AppString.chargeArea + " : ",
                     fontSize: AppFont.font_11,
                     fontWeight: FontWeight.w700,
                   ),
@@ -170,7 +179,8 @@ class TaskItemBoxWidget extends StatelessWidget {
               ),
             ),
 
-            Padding(
+            groupRoles.appModule == AppModule.steelLinePatrolling
+                ?  Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
               child: Row(
                 children: [
@@ -187,7 +197,7 @@ class TaskItemBoxWidget extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
+            ) : const SizedBox.shrink(),
 
             taskData.assignedDate.toString().isNotEmpty
                 ? Padding(

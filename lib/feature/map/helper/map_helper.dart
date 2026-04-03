@@ -19,6 +19,7 @@ import 'package:flutter_gail/utils/commonWidgets/gps_alert_pop_widget.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'dart:math';
 
 class MapHelper {
   // StreamController and Subscription
@@ -76,20 +77,26 @@ class MapHelper {
   }
 
   /// Fetch routes from server
-  static Future<MapModel?> fetchRoutes({required String routeId,required String moduleName}) async {
-   try {
+  static Future<dynamic> fetchRoutes({
+    required String routeId,
+    required String moduleName,
+    required AppModule appModule,
+  }) async {
+    try {
       String url = APIs.getRouteApi(moduleName: moduleName) + routeId;
       var res = await ServerRequest.getData(urlEndPoint: url);
       if (res != null) {
         return MapModel.fromJson(res);
-      };
+      }
+      ;
     } catch (_) {}
     return null;
   }
+
   /// Fetch configuration from server
-  static Future<ConfigurationModel?> fetchConfiguration() async {
+  static Future<ConfigurationModel?> fetchConfiguration({required AppModule appModule}) async {
     try {
-      String url = APIs.getConfigurationApi;
+      String url = APIs.getConfigurationApi+"?type=${appModule == AppModule.mdpLinePatrolling ? "mdpe" : ""}";
       var res = await ServerRequest.getData(urlEndPoint: url);
       if (res != null && res['success'] == true && res['config'] != null) {
         return ConfigurationModel.fromJson(res['config']);
@@ -163,12 +170,11 @@ class MapHelper {
   static Future<RoutePointsModel?> fetchPointsDetails({
     required String sectionCode,
   }) async {
-    final moduleName = AppConfig.instanceInit()?.groupRoles.moduleName.toString();
+    final moduleName =
+        AppConfig.instanceInit()?.groupRoles.moduleName.toString();
     try {
-      String url = "${APIs.getMarkerCrossingInidentTypePointsApi(
-        moduleName: moduleName == "MDPE Line Patrolling"
-          ? "route-observer-mdpe"
-          : "route-observer",)}?sectionCode=$sectionCode";
+      String url =
+          "${APIs.getMarkerCrossingInidentTypePointsApi(moduleName: moduleName == "MDPE Line Patrolling" ? "route-observer-mdpe" : "route-observer")}?sectionCode=$sectionCode";
       var res = await ServerRequest.getData(urlEndPoint: url);
       if (res != null) return RoutePointsModel.fromJson(res, sectionCode);
     } catch (e) {
@@ -201,6 +207,52 @@ class MapHelper {
       }
     }
     return false;
+  }
+
+  static bool isUserInsidePolygon({
+    required LatLng currentLocation,
+    required List<List<PointsModel>> routes,
+  }) {
+    for (var polygon in routes) {
+      if (polygon.length < 3) continue;
+
+      final polygonPoints = polygon
+          .map((p) => LatLng(p.y ?? 0.0, p.x ?? 0.0))
+          .toList();
+
+      if (_isPointInsidePolygon(currentLocation, polygonPoints)) {
+        return true; // kisi bhi polygon ke andar
+      }
+    }
+
+    return false; // sabke bahar
+  }
+
+  static bool _isPointInsidePolygon(LatLng point, List<LatLng> polygon) {
+    int intersectCount = 0;
+
+    for (int i = 0; i < polygon.length; i++) {
+      final j = (i + 1) % polygon.length;
+
+      if (_rayCastIntersect(point, polygon[i], polygon[j])) {
+        intersectCount++;
+      }
+    }
+
+    return (intersectCount % 2) == 1;
+  }
+
+  static bool _rayCastIntersect(LatLng point, LatLng a, LatLng b) {
+    if (a.latitude > point.latitude && b.latitude > point.latitude) return false;
+    if (a.latitude < point.latitude && b.latitude < point.latitude) return false;
+    if (a.longitude < point.longitude && b.longitude < point.longitude) return false;
+
+    double intersectLng = a.longitude +
+        (point.latitude - a.latitude) *
+            (b.longitude - a.longitude) /
+            (b.latitude - a.latitude);
+
+    return intersectLng > point.longitude;
   }
 
   /// Save location data for a task
@@ -238,8 +290,9 @@ class MapHelper {
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String taskId = prefs.getString("taskId") ?? "";
-      String schema = AppConfig.instanceInit()?.userData.schema.toString() ?? "";
-     // String schema = prefs.getString(PreferencesName.schema) ?? "";
+      String schema =
+          AppConfig.instanceInit()?.userData.schema.toString() ?? "";
+      // String schema = prefs.getString(PreferencesName.schema) ?? "";
       print("--------------------Task Id $taskId");
       if (taskId.isEmpty) {
         return {"status": "error", "message": ""};
@@ -322,8 +375,6 @@ class MapHelper {
         urlEndPoint: APIs.saveLocationDataApi,
         body: jsonEncode(payload),
       );
-      log("saveLocationDataApi-- >  ${APIs.saveLocationDataApi}");
-      log("payload-- >  ${jsonEncode(payload)}");
       // If server response is successful, mark all as synced
       if (res != null) {
         for (var location in box.values) {
@@ -336,5 +387,79 @@ class MapHelper {
     } catch (e) {
       print("Batch sync failed: $e");
     }
+  }
+
+  /// ✅ Create 5m buffer polygon with rounded corners
+  static List<LatLng> createBufferPolygon(
+      List<LatLng> polyline,
+      double bufferMeters,
+      ) {
+    if (polyline.length < 2) return [];
+
+    final List<LatLng> leftOffsets = [];
+    final List<LatLng> rightOffsets = [];
+
+    for (int i = 0; i < polyline.length - 1; i++) {
+      final p1 = polyline[i];
+      final p2 = polyline[i + 1];
+      final bearing = _bearingBetween(p1, p2);
+
+      leftOffsets.add(_offsetPoint(p1, bearing - 90, bufferMeters));
+      rightOffsets.add(_offsetPoint(p1, bearing + 90, bufferMeters));
+
+      if (i == polyline.length - 2) {
+        leftOffsets.add(_offsetPoint(p2, bearing - 90, bufferMeters));
+        rightOffsets.add(_offsetPoint(p2, bearing + 90, bufferMeters));
+      }
+    }
+
+    // Rounded start and end caps
+    final start = polyline.first;
+    final end = polyline.last;
+    final startBearing = _bearingBetween(start, polyline[1]);
+    final endBearing = _bearingBetween(polyline[polyline.length - 2], end);
+
+    final List<LatLng> startArc = [];
+    final List<LatLng> endArc = [];
+    for (double angle = 90; angle <= 270; angle += 10) {
+      startArc.add(_offsetPoint(start, startBearing + angle, bufferMeters));
+    }
+    for (double angle = -90; angle <= 90; angle += 10) {
+      endArc.add(_offsetPoint(end, endBearing + angle, bufferMeters));
+    }
+
+    return [...startArc, ...leftOffsets, ...endArc, ...rightOffsets.reversed];
+  }
+
+  static LatLng _offsetPoint(LatLng point, double bearing, double distanceMeters) {
+    const double earthRadius = 6378137.0;
+    final double bearingRad = bearing * pi / 180.0;
+    final double lat1 = point.latitude * pi / 180.0;
+    final double lon1 = point.longitude * pi / 180.0;
+
+    final double lat2 = asin(
+      sin(lat1) * cos(distanceMeters / earthRadius) +
+          cos(lat1) * sin(distanceMeters / earthRadius) * cos(bearingRad),
+    );
+    final double lon2 =
+        lon1 +
+            atan2(
+              sin(bearingRad) * sin(distanceMeters / earthRadius) * cos(lat1),
+              cos(distanceMeters / earthRadius) - sin(lat1) * sin(lat2),
+            );
+
+    return LatLng(lat2 * 180.0 / pi, lon2 * 180.0 / pi);
+  }
+
+  static double _bearingBetween(LatLng start, LatLng end) {
+    final double lat1 = start.latitude * pi / 180.0;
+    final double lon1 = start.longitude * pi / 180.0;
+    final double lat2 = end.latitude * pi / 180.0;
+    final double lon2 = end.longitude * pi / 180.0;
+
+    final double dLon = lon2 - lon1;
+    final double y = sin(dLon) * cos(lat2);
+    final double x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
+    return (atan2(y, x) * 180.0 / pi + 360.0) % 360.0;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter_gail/ExportFile/app_export_file.dart';
 
 LoginDataModel loginResponse(Map<String, dynamic> json) {
   return LoginDataModel.fromJson(json);
@@ -33,14 +34,14 @@ class LoginDataModel {
       success: json['success'] ?? "",
       users: json['users'] != null ? Users.fromJson(json['users']) : null,
       role: json['role'] ?? "",
-      userType: json['user_type'] != null
-          ? List<String>.from(json['user_type'])
-          : [],
-      groupRoles: json['group_roles'] != null
-          ? (json['group_roles'] as List)
-          .map((v) => GroupRoles.fromJson(v))
-          .toList()
-          : [],
+      userType:
+          json['user_type'] != null ? List<String>.from(json['user_type']) : [],
+      groupRoles:
+          json['group_roles'] != null
+              ? (json['group_roles'] as List)
+                  .map((v) => GroupRoles.fromJson(v))
+                  .toList()
+              : [],
       gid: json['gid'] ?? "",
       schema: json['schema'] ?? "",
       gaLatitude: json['ga_latitude'] ?? "",
@@ -104,6 +105,7 @@ class GroupRoles {
   final List<Permissions>? permissions;
   final List<dynamic>? subModules;
   final List<dynamic>? groups;
+  final AppModule appModule;
 
   GroupRoles({
     this.moduleId,
@@ -114,9 +116,10 @@ class GroupRoles {
     this.dashboardReportIcon,
     this.displayOrder,
     this.active,
-     this.permissions,
-     this.subModules,
-     this.groups,
+    this.permissions,
+    this.subModules,
+    this.groups,
+    this.appModule = AppModule.steelLinePatrolling,
   });
 
   factory GroupRoles.fromJson(Map<String, dynamic> json) {
@@ -129,18 +132,28 @@ class GroupRoles {
       dashboardReportIcon: json['dashboard_report_icon'] ?? "",
       displayOrder: json['display_order'] ?? "",
       active: json['active'] ?? "",
-      permissions: json['permissions'] != null
-          ? (json['permissions'] as List)
-          .map((v) => Permissions.fromJson(v))
-          .toList()
-          : [],
-      subModules: json['subModules'] != null
-          ? List<dynamic>.from(json['subModules'])
-          : [],
-      groups: json['groups'] != null
-          ? List<dynamic>.from(json['groups'])
-          : [],
+      appModule: getAppModule(json['module_name'] ?? ""),
+      permissions:
+          json['permissions'] != null
+              ? (json['permissions'] as List)
+                  .map((v) => Permissions.fromJson(v))
+                  .toList()
+              : [],
+      subModules:
+          json['subModules'] != null
+              ? List<dynamic>.from(json['subModules'])
+              : [],
+      groups: json['groups'] != null ? List<dynamic>.from(json['groups']) : [],
     );
+  }
+
+  static AppModule getAppModule(String appModule) {
+    switch (appModule) {
+      case "MDPE Line Patrolling":
+        return AppModule.mdpLinePatrolling;
+      default:
+        return AppModule.steelLinePatrolling;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -167,17 +180,11 @@ class Permissions {
   Permissions({this.name, this.value});
 
   factory Permissions.fromJson(Map<String, dynamic> json) {
-    return Permissions(
-      name: json['name'] ?? "",
-      value: json['value'] ?? "",
-    );
+    return Permissions(name: json['name'] ?? "", value: json['value'] ?? "");
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'value': value,
-    };
+    return {'name': name, 'value': value};
   }
 }
 
@@ -195,10 +202,7 @@ class Tokens {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'access': access,
-      'expiresIn': expiresIn,
-    };
+    return {'access': access, 'expiresIn': expiresIn};
   }
 }
 
@@ -333,13 +337,13 @@ class LoginScreenRequestModel {
   final String deviceId;
   final String loginType;
 
-  LoginScreenRequestModel(
-      {required this.userEmailId,
-      required this.password,
-      required this.firebaseId,
-      required this.deviceId,
-      required this.loginType,
-      });
+  LoginScreenRequestModel({
+    required this.userEmailId,
+    required this.password,
+    required this.firebaseId,
+    required this.deviceId,
+    required this.loginType,
+  });
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
@@ -349,7 +353,7 @@ class LoginScreenRequestModel {
         "browserName": "",
         "browserVersion": "",
         "userAgent": "",
-        "platform": "android"
+        "platform": "android",
       },
       "ipAddress": "",
       "location": {
@@ -360,7 +364,7 @@ class LoginScreenRequestModel {
         "latitude": 0,
         "longitude": 0,
       },
-      "userType": loginType == "1" ? "internal" :"external"
+      "userType": loginType == "1" ? "internal" : "external",
     };
     return map;
   }
@@ -373,13 +377,13 @@ class LoginOTPScreenRequestModel {
   final String deviceId;
   final String loginType;
 
-  LoginOTPScreenRequestModel(
-      {required this.userId,
-        required this.otp,
-        required this.firebaseId,
-        required this.deviceId,
-        required this.loginType,
-      });
+  LoginOTPScreenRequestModel({
+    required this.userId,
+    required this.otp,
+    required this.firebaseId,
+    required this.deviceId,
+    required this.loginType,
+  });
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
@@ -389,7 +393,7 @@ class LoginOTPScreenRequestModel {
         "browserName": "",
         "browserVersion": "",
         "userAgent": "",
-        "platform": "android"
+        "platform": "android",
       },
       "ipAddress": "",
       "location": {
@@ -400,9 +404,8 @@ class LoginOTPScreenRequestModel {
         "latitude": 0,
         "longitude": 0,
       },
-      "userType": loginType == "1" ? "internal" :"external"
+      "userType": loginType == "1" ? "internal" : "external",
     };
     return map;
   }
 }
-

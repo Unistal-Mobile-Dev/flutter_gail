@@ -21,3 +21,6 @@ enum RouteObservation {
 }
 
 enum AppPermissionStatus { granted, denied, permanentlyDenied }
+
+
+enum AppModule {mdpLinePatrolling, steelLinePatrolling}

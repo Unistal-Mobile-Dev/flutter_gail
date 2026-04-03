@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:math';
+
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +7,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
 import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
+import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
 import 'package:flutter_gail/feature/task/addCrossing/presentation/page/add_crossing_page.dart';
 import 'package:flutter_gail/feature/task/addEncroachment/domain/bloc/encroachment_bloc.dart';
@@ -362,8 +363,7 @@ class MapSampleState extends State<MapSample> {
                       }).toSet(),
 
                   /// ✅ Draw rounded buffer polygons (5m)
-                  polygons: AppConfig.instanceInit()?.groupRoles.moduleName?.toString() == "MDPE Line Patrolling" ? {} :
-                      state.routes.asMap().entries.map((entry) {
+                  polygons: state.routes.asMap().entries.map((entry) {
                         final index = entry.key;
                         final route = entry.value;
                         final polylinePoints =
@@ -373,7 +373,7 @@ class MapSampleState extends State<MapSample> {
                         final double buffer = (mapData.buffer is num)
                                 ? mapData.buffer.toDouble()
                                 : double.tryParse(mapData.buffer.toString()) ?? 0.0;
-                        final polygonPoints = _createBufferPolygon(
+                        final polygonPoints = MapHelper.createBufferPolygon(
                           polylinePoints,
                           buffer,
                         );
@@ -770,77 +770,5 @@ class MapSampleState extends State<MapSample> {
     );
   }
 
-  /// ✅ Create 5m buffer polygon with rounded corners
-  List<LatLng> _createBufferPolygon(
-    List<LatLng> polyline,
-    double bufferMeters,
-  ) {
-    if (polyline.length < 2) return [];
 
-    final List<LatLng> leftOffsets = [];
-    final List<LatLng> rightOffsets = [];
-
-    for (int i = 0; i < polyline.length - 1; i++) {
-      final p1 = polyline[i];
-      final p2 = polyline[i + 1];
-      final bearing = _bearingBetween(p1, p2);
-
-      leftOffsets.add(_offsetPoint(p1, bearing - 90, bufferMeters));
-      rightOffsets.add(_offsetPoint(p1, bearing + 90, bufferMeters));
-
-      if (i == polyline.length - 2) {
-        leftOffsets.add(_offsetPoint(p2, bearing - 90, bufferMeters));
-        rightOffsets.add(_offsetPoint(p2, bearing + 90, bufferMeters));
-      }
-    }
-
-    // Rounded start and end caps
-    final start = polyline.first;
-    final end = polyline.last;
-    final startBearing = _bearingBetween(start, polyline[1]);
-    final endBearing = _bearingBetween(polyline[polyline.length - 2], end);
-
-    final List<LatLng> startArc = [];
-    final List<LatLng> endArc = [];
-    for (double angle = 90; angle <= 270; angle += 10) {
-      startArc.add(_offsetPoint(start, startBearing + angle, bufferMeters));
-    }
-    for (double angle = -90; angle <= 90; angle += 10) {
-      endArc.add(_offsetPoint(end, endBearing + angle, bufferMeters));
-    }
-
-    return [...startArc, ...leftOffsets, ...endArc, ...rightOffsets.reversed];
-  }
-
-  LatLng _offsetPoint(LatLng point, double bearing, double distanceMeters) {
-    const double earthRadius = 6378137.0;
-    final double bearingRad = bearing * pi / 180.0;
-    final double lat1 = point.latitude * pi / 180.0;
-    final double lon1 = point.longitude * pi / 180.0;
-
-    final double lat2 = asin(
-      sin(lat1) * cos(distanceMeters / earthRadius) +
-          cos(lat1) * sin(distanceMeters / earthRadius) * cos(bearingRad),
-    );
-    final double lon2 =
-        lon1 +
-        atan2(
-          sin(bearingRad) * sin(distanceMeters / earthRadius) * cos(lat1),
-          cos(distanceMeters / earthRadius) - sin(lat1) * sin(lat2),
-        );
-
-    return LatLng(lat2 * 180.0 / pi, lon2 * 180.0 / pi);
-  }
-
-  double _bearingBetween(LatLng start, LatLng end) {
-    final double lat1 = start.latitude * pi / 180.0;
-    final double lon1 = start.longitude * pi / 180.0;
-    final double lat2 = end.latitude * pi / 180.0;
-    final double lon2 = end.longitude * pi / 180.0;
-
-    final double dLon = lon2 - lon1;
-    final double y = sin(dLon) * cos(lat2);
-    final double x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
-    return (atan2(y, x) * 180.0 / pi + 360.0) % 360.0;
-  }
 }

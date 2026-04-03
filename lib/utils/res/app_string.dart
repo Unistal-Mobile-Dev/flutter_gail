@@ -139,6 +139,8 @@ class AppString {
 
   static get sectionName => "Section Name";
 
+  static get chargeArea => "Charge Area";
+
   static get stationName => "Station Name";
 
   static get sectionLength => "Section Length(m)";
