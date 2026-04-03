@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/hpoil_dashboard/domain/bloc/hpOil_dashboard_bloc.dart';
 import 'package:flutter_gail/feature/imageShare/domain/bloc/image_share_bloc.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
@@ -19,6 +20,7 @@ MultiProvider blocMultiProvider({required Widget child}) {
   return MultiProvider(
     providers: [
       BlocProvider(create: (BuildContext context) => LoginBloc()),
+      BlocProvider(create: (BuildContext context) => HpOilDashboardBloc()),
       BlocProvider(create: (BuildContext context) => DashboardBloc()),
       BlocProvider(create: (BuildContext context) => HomeBloc()),
       BlocProvider(create: (BuildContext context) => MapBloc()),

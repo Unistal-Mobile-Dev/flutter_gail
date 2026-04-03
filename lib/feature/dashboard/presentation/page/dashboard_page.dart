@@ -1,4 +1,3 @@
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,11 +13,11 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-
-
   @override
   void initState() {
-    BlocProvider.of<DashboardBloc>(context,).add(DashboardPageLoadEvent(context: context));
+    BlocProvider.of<DashboardBloc>(
+      context,
+    ).add(DashboardPageLoadEvent(context: context));
     super.initState();
   }
 
@@ -29,7 +28,6 @@ class _DashboardPageState extends State<DashboardPage> {
     Colors.purple,
     Colors.blueGrey,
   ];
-
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +43,6 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildLayout({required FetchDashboardDataState dataState}) {
-
     int totalCpUnderProtection = 0;
     int totalShortedCasingElectrical = 0;
     int totalAcInterference = 0;
@@ -89,7 +86,6 @@ class _DashboardPageState extends State<DashboardPage> {
       totalAcInterference += data.acInterference;
       totalCpOverProtection += data.cpOverProtection;
       totalShortedIJ += data.shortedIj;
-
     }
 
     return ListView(
@@ -111,7 +107,9 @@ class _DashboardPageState extends State<DashboardPage> {
                     final total = dataMap.values.fold(0.0, (a, b) => a + b);
                     return Card(
                       elevation: 4,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       margin: const EdgeInsets.all(8),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
@@ -138,25 +136,38 @@ class _DashboardPageState extends State<DashboardPage> {
                             Expanded(
                               child: LayoutBuilder(
                                 builder: (context, constraints) {
-                                  final chartRadius = constraints.maxWidth * 0.30;
+                                  final chartRadius =
+                                      constraints.maxWidth * 0.30;
                                   return PieChart(
                                     PieChartData(
                                       sectionsSpace: 0,
                                       centerSpaceRadius: chartRadius * 0.1,
-                                      sections: dataMap.entries.toList().asMap().entries.map((entry) {
-                                        final i = entry.key;
-                                        final label = entry.value.key;
-                                        final value = entry.value.value;
+                                      sections:
+                                          dataMap.entries
+                                              .toList()
+                                              .asMap()
+                                              .entries
+                                              .map((entry) {
+                                                final i = entry.key;
+                                                final label = entry.value.key;
+                                                final value = entry.value.value;
 
-                                        return PieChartSectionData(
-                                          color: colorList[i % colorList.length],
-                                          value: value,
-                                          title: '${value.toStringAsFixed(0)} km',
-                                          titleStyle: const TextStyle(fontSize: 8), // Ensure it's hidden
-                                          radius: chartRadius,
-                                          showTitle: true,
-                                        );
-                                      }).toList(),
+                                                return PieChartSectionData(
+                                                  color:
+                                                      colorList[i %
+                                                          colorList.length],
+                                                  value: value,
+                                                  title:
+                                                      '${value.toStringAsFixed(0)} km',
+                                                  titleStyle: const TextStyle(
+                                                    fontSize: 8,
+                                                  ),
+                                                  // Ensure it's hidden
+                                                  radius: chartRadius,
+                                                  showTitle: true,
+                                                );
+                                              })
+                                              .toList(),
                                     ),
                                   );
                                 },
@@ -166,27 +177,40 @@ class _DashboardPageState extends State<DashboardPage> {
                             const SizedBox(height: 16),
                             Wrap(
                               alignment: WrapAlignment.start,
-                              children: dataMap.entries.toList().asMap().entries.map((entry) {
-                                final i = entry.key;
-                                final label = entry.value.key;
-                                final value = entry.value.value;
-                                return Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: 12,
-                                      height: 12,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: colorList[i % colorList.length],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    chartTitle == "Piggability" ? Flexible(child: TextWidget('$label: ${value.toStringAsFixed(0)}, Length: ${dataState.lengthPiggabilty[label]} km')):
-                                    Flexible(child: TextWidget('$label: ${value.toStringAsFixed(0)} km')),
-                                  ],
-                                );
-                              }).toList(),
+                              children:
+                                  dataMap.entries.toList().asMap().entries.map((
+                                    entry,
+                                  ) {
+                                    final i = entry.key;
+                                    final label = entry.value.key;
+                                    final value = entry.value.value;
+                                    return Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          width: 12,
+                                          height: 12,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color:
+                                                colorList[i % colorList.length],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        chartTitle == "Piggability"
+                                            ? Flexible(
+                                              child: TextWidget(
+                                                '$label: ${value.toStringAsFixed(0)}, Length: ${dataState.lengthPiggabilty[label]} km',
+                                              ),
+                                            )
+                                            : Flexible(
+                                              child: TextWidget(
+                                                '$label: ${value.toStringAsFixed(0)} km',
+                                              ),
+                                            ),
+                                      ],
+                                    );
+                                  }).toList(),
                             ),
                           ],
                         ),

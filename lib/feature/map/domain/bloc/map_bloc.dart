@@ -1,10 +1,6 @@
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/map/domain/model/configuration_model.dart';
-import 'package:flutter_gail/feature/map/domain/model/coordinates_model.dart';
-import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/marker_point_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
@@ -15,14 +11,11 @@ import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/helper/task_helper.dart';
 import 'package:flutter_gail/services/background_location_service.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 part 'map_event.dart';
+
 part 'map_state.dart';
 
 PointsModel lastPoint = PointsModel();
@@ -85,7 +78,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     configurationData = ConfigurationModel();
     // Initialize in main()
     await manager.initializeService();
-
+    final groupRoles = AppConfig.instanceInit()?.groupRoles;
     // 🔹 Request permission before starting service
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied ||
@@ -102,28 +95,38 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       }
     });
 
-    taskList = BlocProvider.of<TaskBloc>(!event.context.mounted ? event.context : event.context).searchTaskList;
-    taskData = BlocProvider.of<TaskBloc>(!event.context.mounted ? event.context : event.context).taskData;
+    taskList =
+        BlocProvider.of<TaskBloc>(
+          !event.context.mounted ? event.context : event.context,
+        ).searchTaskList;
+    taskData =
+        BlocProvider.of<TaskBloc>(
+          !event.context.mounted ? event.context : event.context,
+        ).taskData;
 
-    var resConfiguration = await MapHelper.fetchConfiguration();
-    if (resConfiguration != null) {
-      configurationData = resConfiguration;
+    if (groupRoles?.moduleName?.toString() != "MDPE Line Patrolling") {
+      var resConfiguration = await MapHelper.fetchConfiguration();
+      if (resConfiguration != null) {
+        configurationData = resConfiguration;
+      }
     }
-
     var routeRes = await MapHelper.fetchRoutes(
+      moduleName: groupRoles!.moduleName.toString() == "MDPE Line Patrolling"
+              ? "patrollman-route-mdpe"
+              : "patrollman-route",
       routeId: taskData.patrollRouteId.toString(),
     );
     if (routeRes != null) {
       mapData = routeRes;
       mapData = routeRes;
       mapData.buffer =
-      configurationData.buffer != null
-          ? double.parse(configurationData.buffer.toString())
-          : mapData.buffer;
+          configurationData.buffer != null
+              ? double.parse(configurationData.buffer.toString())
+              : mapData.buffer;
       mapData.timeInterval =
-      configurationData.timeInterval != null
-          ? int.parse(configurationData.timeInterval.toString())
-          : mapData.timeInterval;
+          configurationData.timeInterval != null
+              ? int.parse(configurationData.timeInterval.toString())
+              : mapData.timeInterval;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("timeInterval", mapData.timeInterval.toString());
@@ -135,7 +138,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           if (geometryData != null) {
             list.addAll(
               geometryData.coordinates.map(
-                    (coord) => PointsModel(
+                (coord) => PointsModel(
                   y: coord.latitude,
                   x: coord.longitude,
                   m: 0.0,
@@ -170,7 +173,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (mapData.data != null) {
       for (var sectionData in mapData.data!) {
         var routePointRes = await MapHelper.fetchPointsDetails(
-          sectionCode: sectionData.sectionCode,
+          sectionCode: groupRoles.moduleName.toString() == "MDPE Line Patrolling"
+              ? sectionData.chargeAreaId
+              : sectionData.sectionCode,
         );
         if (routePointRes != null) {
           routePointsList.add(routePointRes);
@@ -190,8 +195,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     if (taskData.taskStatus == TaskStatus.started ||
         taskData.taskStatus == TaskStatus.resume) {
-      if( ! await manager.isRunning()){
-         manager.startService();
+      if (!await manager.isRunning()) {
+        manager.startService();
       }
       add(
         StartTracking(!event.context.mounted ? event.context : event.context),
@@ -202,12 +207,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     _eventComplete(emit);
   }
 
-
   _selectMapType(SelectMapArcGISStreets event, emit) {
     isArcGISStreets = event.isArcGISStreets;
     _eventComplete(emit);
   }
-
 
   _locationCheck(MapRouteLocationCheck event, emit) async {
     BuildContext context = event.context;
@@ -221,22 +224,23 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (taskData.taskStatus == TaskStatus.started ||
         taskData.taskStatus == TaskStatus.resume ||
         taskData.taskStatus == TaskStatus.pause) {
-        isStartPatrolling = true;
-        isEndPatrolling = true;
+      isStartPatrolling = true;
+      isEndPatrolling = true;
     } else {
       isStartPatrolling = false;
       isEndPatrolling = false;
     }
 
-    final double buffer = (mapData.buffer is num)
-        ? mapData.buffer.toDouble()
-        : double.tryParse(mapData.buffer.toString()) ?? 100.0;
+    final double buffer =
+        (mapData.buffer is num)
+            ? mapData.buffer.toDouble()
+            : double.tryParse(mapData.buffer.toString()) ?? 100.0;
 
     if (isStartPatrolling == false) {
       bool isBufferZone = await MapHelper.getNearestLocation(
         currentLocation: points,
         routes: routes,
-        bufferZone : buffer,
+        bufferZone: buffer,
       );
       isStartPatrolling = isBufferZone;
       isEndPatrolling = isBufferZone;
@@ -272,10 +276,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     );
 
     final List<TaskModel> tempList =
-    taskList.where((data) {
-      return data.taskStatus == TaskStatus.started &&
-          taskData.subTaskId != data.subTaskId;
-    }).toList();
+        taskList.where((data) {
+          return data.taskStatus == TaskStatus.started && taskData.subTaskId != data.subTaskId;
+        }).toList();
 
     if (dt1.compareTo(dt2) < 0) {
       SnackBarErrorWidget(
@@ -294,7 +297,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     } else if (tempList.isNotEmpty) {
       SnackBarErrorWidget(event.context).show(
         message:
-        "Your already start another task.So please complete first old task then start.",
+            "Your already start another task.So please complete first old task then start.",
       );
       isLoader = false;
       _eventComplete(emit);
@@ -319,29 +322,25 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (taskStatus == TaskStatus.started) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "1");
-      if( ! await manager.isRunning()){
+      if (!await manager.isRunning()) {
         manager.startService();
       }
-
-    }
-    else if (taskStatus == TaskStatus.pause) {
+    } else if (taskStatus == TaskStatus.pause) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "2");
-      if(await manager.isRunning()){
-         manager.stopService();
+      if (await manager.isRunning()) {
+        manager.stopService();
       }
-    }
-    else if (taskStatus == TaskStatus.resume) {
+    } else if (taskStatus == TaskStatus.resume) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "5");
-      if( ! await manager.isRunning()){
+      if (!await manager.isRunning()) {
         manager.startService();
       }
-    }
-    else if (taskStatus == TaskStatus.completed) {
+    } else if (taskStatus == TaskStatus.completed) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "3");
-      if(await manager.isRunning()){
+      if (await manager.isRunning()) {
         manager.stopService();
       }
     }
@@ -349,15 +348,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     var res = await TaskHelper.updateTask(
       taskData: taskData,
       taskStatus:
-      taskStatus == TaskStatus.started
-          ? 1
-          : taskStatus == TaskStatus.pause
-          ? 2
-          : taskStatus == TaskStatus.resume
-          ? 5
-          : taskStatus == TaskStatus.completed
-          ? 3
-          : 0,
+          taskStatus == TaskStatus.started
+              ? 1
+              : taskStatus == TaskStatus.pause
+              ? 2
+              : taskStatus == TaskStatus.resume
+              ? 5
+              : taskStatus == TaskStatus.completed
+              ? 3
+              : 0,
       context: event.context,
       pointsCount: routeLength,
     );
@@ -365,12 +364,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       taskData.taskStatus = taskStatus;
       isTaskStatusChange = true;
       isStartPatrolling = true;
-      isEndPatrolling =
-      (taskStatus == TaskStatus.pause ||
-          taskStatus == TaskStatus.started ||
-          taskStatus == TaskStatus.resume)
-          ? true
-          : false;
+      isEndPatrolling = (taskStatus == TaskStatus.pause
+          || taskStatus == TaskStatus.started
+          || taskStatus == TaskStatus.resume)
+              ? true
+              : false;
       BlocProvider.of<TaskBloc>(
         !event.context.mounted ? event.context : event.context,
       ).add(

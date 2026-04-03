@@ -28,7 +28,8 @@ class MapSample extends StatefulWidget {
 }
 
 class MapSampleState extends State<MapSample> {
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
   CameraPosition? _initialCameraPosition;
   LatLng? _currentLatLng;
 
@@ -59,13 +60,17 @@ class MapSampleState extends State<MapSample> {
 
   /// ✅ Load custom marker icon
   Future<void> _loadCustomMarker() async {
-    final ByteData data = await rootBundle.load('assets/ic_location_person.png');
+    final ByteData data = await rootBundle.load(
+      'assets/ic_location_person.png',
+    );
     final ui.Codec codec = await ui.instantiateImageCodec(
       data.buffer.asUint8List(),
       targetWidth: 80,
     );
     final ui.FrameInfo fi = await codec.getNextFrame();
-    final ByteData? bytes = await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    final ByteData? bytes = await fi.image.toByteData(
+      format: ui.ImageByteFormat.png,
+    );
     _personIcon = BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 
@@ -77,7 +82,9 @@ class MapSampleState extends State<MapSample> {
       targetWidth: 50,
     );
     final ui.FrameInfo fi = await codec.getNextFrame();
-    final ByteData? bytes = await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    final ByteData? bytes = await fi.image.toByteData(
+      format: ui.ImageByteFormat.png,
+    );
     _directionIcon = BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 
@@ -89,7 +96,9 @@ class MapSampleState extends State<MapSample> {
       targetWidth: 50,
     );
     final ui.FrameInfo fi = await codec.getNextFrame();
-    final ByteData? bytes = await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    final ByteData? bytes = await fi.image.toByteData(
+      format: ui.ImageByteFormat.png,
+    );
     _bpIcon = BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 
@@ -101,7 +110,9 @@ class MapSampleState extends State<MapSample> {
       targetWidth: 50,
     );
     final ui.FrameInfo fi = await codec.getNextFrame();
-    final ByteData? bytes = await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    final ByteData? bytes = await fi.image.toByteData(
+      format: ui.ImageByteFormat.png,
+    );
     _kmIcon = BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 
@@ -113,10 +124,11 @@ class MapSampleState extends State<MapSample> {
       targetWidth: 50,
     );
     final ui.FrameInfo fi = await codec.getNextFrame();
-    final ByteData? bytes = await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    final ByteData? bytes = await fi.image.toByteData(
+      format: ui.ImageByteFormat.png,
+    );
     _wmIcon = BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
-
 
   /// ✅ Get current location + listen to updates
   Future<void> _getCurrentLocation() async {
@@ -125,7 +137,9 @@ class MapSampleState extends State<MapSample> {
 
     Position position = await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high, distanceFilter: 5),
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 5,
+      ),
     );
 
     final latLng = LatLng(position.latitude, position.longitude);
@@ -155,14 +169,16 @@ class MapSampleState extends State<MapSample> {
       //   return;
       // }
 
-      context.read<MapBloc>().add(MapRouteLocationCheck(
+      context.read<MapBloc>().add(
+        MapRouteLocationCheck(
           context: !context.mounted ? context : context,
           currentPoint: LatLng(newPos.latitude, newPos.longitude),
           speed: newPos.speed,
-          verticalAccuracy: newPos.speedAccuracy
-      ));
+          verticalAccuracy: newPos.speedAccuracy,
+        ),
+      );
 
-/*      DateTime _lastLocationUpdate = DateTime.now();
+      /*      DateTime _lastLocationUpdate = DateTime.now();
       final mapData = BlocProvider.of<MapBloc>(context).mapData;
       final double buffer = (mapData.buffer is num)
           ? mapData.buffer.toDouble()
@@ -188,7 +204,10 @@ class MapSampleState extends State<MapSample> {
   }
 
   /// ✅ Update marker + camera follow
-  Future<void> _updateMarkerPosition(Position pos, {bool moveCamera = false}) async {
+  Future<void> _updateMarkerPosition(
+    Position pos, {
+    bool moveCamera = false,
+  }) async {
     final newLatLng = LatLng(pos.latitude, pos.longitude);
     final controller = await _controller.future;
 
@@ -227,11 +246,7 @@ class MapSampleState extends State<MapSample> {
     setState(() => _isAutoFollow = true);
     await controller.animateCamera(
       CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: _currentLatLng!,
-          zoom: 18.5,
-          tilt: 45,
-        ),
+        CameraPosition(target: _currentLatLng!, zoom: 18.5, tilt: 45),
       ),
     );
   }
@@ -245,9 +260,7 @@ class MapSampleState extends State<MapSample> {
   @override
   Widget build(BuildContext context) {
     if (_initialCameraPosition == null) {
-      return const Scaffold(
-        body: Center(child: CenterLoaderWidget()),
-      );
+      return const Scaffold(body: Center(child: CenterLoaderWidget()));
     }
 
     return Scaffold(
@@ -268,33 +281,62 @@ class MapSampleState extends State<MapSample> {
                       // 🟦 Marker Points
                       final markerPoints = route.markerList.map((marker) {
                         return Marker(
-                          markerId: MarkerId('marker_${marker.gpsy.toString()}'),
-                          position: LatLng(double.parse(marker.gpsy.toString()), double.parse(marker.gpsx.toString())),
-                          infoWindow: InfoWindow(title: marker.markerName ?? "Marker"),
-                          icon: marker.markerType.toString() == "1" ? _bpIcon ?? BitmapDescriptor.defaultMarker
-                               : marker.markerType.toString() == "12" ? _kmIcon ?? BitmapDescriptor.defaultMarker
-                               : marker.markerType.toString() == "15" ? _wmIcon ?? BitmapDescriptor.defaultMarker
-                               : marker.markerType.toString() == "8" ? _directionIcon ?? BitmapDescriptor.defaultMarker
-                              : BitmapDescriptor.defaultMarker,
+                          markerId: MarkerId(
+                            'marker_${marker.gpsy.toString()}',
+                          ),
+                          position: LatLng(
+                            double.parse(marker.gpsy.toString()),
+                            double.parse(marker.gpsx.toString()),
+                          ),
+                          infoWindow: InfoWindow(
+                            title: marker.markerName ?? "Marker",
+                          ),
+                          icon:
+                              marker.markerType.toString() == "1"
+                                  ? _bpIcon ?? BitmapDescriptor.defaultMarker
+                                  : marker.markerType.toString() == "12"
+                                  ? _kmIcon ?? BitmapDescriptor.defaultMarker
+                                  : marker.markerType.toString() == "15"
+                                  ? _wmIcon ?? BitmapDescriptor.defaultMarker
+                                  : marker.markerType.toString() == "8"
+                                  ? _directionIcon ??
+                                      BitmapDescriptor.defaultMarker
+                                  : BitmapDescriptor.defaultMarker,
                         );
                       });
 
                       // 🟢 TLPs
-                      final tlpMarkers = route.tlpList
-                          .where((tlp) => tlp.id != null && tlp.gpsx != null && tlp.gpsy != null)
-                          .map((tlp) => Marker(
-                        markerId: MarkerId('tlp_${route.sectionCode}_${tlp.id}'),
-                        position: LatLng(tlp.gpsy!, tlp.gpsx!), // Note: Check if gpsx = longitude, gpsy = latitude
-                        infoWindow: InfoWindow(title: tlp.type ?? "TLP"),
-                        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-                      )).toList();
+                      final tlpMarkers =
+                          route.tlpList
+                              .where(
+                                (tlp) =>
+                                    tlp.id != null &&
+                                    tlp.gpsx != null &&
+                                    tlp.gpsy != null,
+                              )
+                              .map(
+                                (tlp) => Marker(
+                                  markerId: MarkerId(
+                                    'tlp_${route.sectionCode}_${tlp.id}',
+                                  ),
+                                  position: LatLng(tlp.gpsy!, tlp.gpsx!),
+                                  // Note: Check if gpsx = longitude, gpsy = latitude
+                                  infoWindow: InfoWindow(
+                                    title: tlp.type ?? "TLP",
+                                  ),
+                                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                                    BitmapDescriptor.hueGreen,
+                                  ),
+                                ),
+                              )
+                              .toList();
 
-                      return [...markerPoints,  ...tlpMarkers];
+                      return [...markerPoints, ...tlpMarkers];
                     }),
-
                   },
                   onMapCreated: (GoogleMapController controller) {
-                    if (!_controller.isCompleted) _controller.complete(controller);
+                    if (!_controller.isCompleted)
+                      _controller.complete(controller);
                   },
                   onCameraMoveStarted: () {
                     // 👇 Stop auto-follow when user moves camera
@@ -302,41 +344,48 @@ class MapSampleState extends State<MapSample> {
                   },
 
                   /// ✅ Draw multiple colored polylines
-                  polylines: state.routes.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final route = entry.value;
-                    final polylinePoints =
-                    route.map((p) => LatLng(p.y ?? 0.0, p.x ?? 0.0)).toList();
+                  polylines:
+                      state.routes.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final route = entry.value;
+                        final polylinePoints =
+                            route
+                                .map((p) => LatLng(p.y ?? 0.0, p.x ?? 0.0))
+                                .toList();
 
-                    return Polyline(
-                      polylineId: PolylineId('route_$index'),
-                      points: polylinePoints,
-                      color: Colors.primaries[index % Colors.primaries.length],
-                      width: 4,
-                    );
-                  }).toSet(),
+                        return Polyline(
+                          polylineId: PolylineId('route_$index'),
+                          points: polylinePoints,
+                          color:   Colors.primaries[index % Colors.primaries.length],
+                          width: 4,
+                        );
+                      }).toSet(),
 
                   /// ✅ Draw rounded buffer polygons (5m)
-                  polygons: state.routes.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final route = entry.value;
-                    final polylinePoints =
-                    route.map((p) => LatLng(p.y ?? 0.0, p.x ?? 0.0)).toList();
-                    final mapData = BlocProvider.of<MapBloc>(context).mapData;
-                    final double buffer = (mapData.buffer is num)
-                        ? mapData.buffer.toDouble()
-                        : double.tryParse(mapData.buffer.toString()) ?? 0.0;
-                    final polygonPoints = _createBufferPolygon(polylinePoints, buffer);
+                  polygons: AppConfig.instanceInit()?.groupRoles.moduleName?.toString() == "MDPE Line Patrolling" ? {} :
+                      state.routes.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final route = entry.value;
+                        final polylinePoints =
+                            route.map((p) => LatLng(p.y ?? 0.0, p.x ?? 0.0)).toList();
+                        final mapData = BlocProvider.of<MapBloc>(context).mapData;
+                        final link = AppConfig.instanceInit()?.groupRoles.link;
+                        final double buffer = (mapData.buffer is num)
+                                ? mapData.buffer.toDouble()
+                                : double.tryParse(mapData.buffer.toString()) ?? 0.0;
+                        final polygonPoints = _createBufferPolygon(
+                          polylinePoints,
+                          buffer,
+                        );
 
-                    return Polygon(
-                      polygonId: PolygonId('buffer_$index'),
-                      points: polygonPoints,
-                      fillColor: Colors.primaries[index % Colors.primaries.length]
-                          .withOpacity(0.25),
-                      strokeColor: Colors.transparent,
-                      strokeWidth: 0,
-                    );
-                  }).toSet(),
+                        return Polygon(
+                          polygonId: PolygonId('buffer_$index'),
+                          points: polygonPoints,
+                          fillColor: Colors.primaries[index % Colors.primaries.length].withOpacity(0.25),
+                          strokeColor: Colors.transparent,
+                          strokeWidth: 0,
+                        );
+                      }).toSet(),
                 ),
                 _actionButtons(dataState: state),
               ],
@@ -350,97 +399,102 @@ class MapSampleState extends State<MapSample> {
   }
 
   /// ✅ Recenter + action buttons
-  Widget _actionButtons({required FetchMapPageDataState dataState}){
+  Widget _actionButtons({required FetchMapPageDataState dataState}) {
     return Positioned(
       top: 50,
       left: 10,
-      child: dataState.isLoader == false ?
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _backButton(),
+      child:
+          dataState.isLoader == false
+              ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _backButton(),
 
-          dataState.isStartPatrolling == true ?
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ) : const SizedBox.shrink(),
+                  dataState.isStartPatrolling == true
+                      ? SizedBox(
+                        height: MediaQuery.of(context).size.width * 0.03,
+                      )
+                      : const SizedBox.shrink(),
 
-          dataState.isStartPatrolling == true ?
-          _statusButton(dataSate: dataState)
-              : const SizedBox.shrink(),
+                  dataState.isStartPatrolling == true
+                      ? _statusButton(dataSate: dataState)
+                      : const SizedBox.shrink(),
+                  dataState.taskData.taskStatus != TaskStatus.notStarted && dataState.taskData.taskStatus != TaskStatus.completed
+                      ? SizedBox(
+                        height: MediaQuery.of(context).size.width * 0.03,
+                      )
+                      : const SizedBox.shrink(),
 
-          dataState.taskData.taskStatus != TaskStatus.notStarted
-              && dataState.taskData.taskStatus != TaskStatus.completed ?
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ) : const SizedBox.shrink(),
+                  dataState.taskData.taskStatus != TaskStatus.notStarted && dataState.taskData.taskStatus != TaskStatus.completed
+                      ? _endPatrollingButton(dataSate: dataState)
+                      : const SizedBox.shrink(),
 
-          dataState.taskData.taskStatus != TaskStatus.notStarted
-              && dataState.taskData.taskStatus != TaskStatus.completed ?
-          _endPatrollingButton(dataSate: dataState)
-              : const SizedBox.shrink(),
+                  dataState.isStartPatrolling == false &&
+                          dataState.isEndPatrolling == false
+                      ? SizedBox(
+                        height: MediaQuery.of(context).size.width * 0.03,
+                      )
+                      : const SizedBox.shrink(),
 
-          dataState.isStartPatrolling == false &&
-              dataState.isEndPatrolling == false ?
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ) : const SizedBox.shrink(),
+                  //  dataState.isStartPatrolling == false &&
+                  //      dataState.isEndPatrolling == false ?
+                  // _navigationButton(dataState: dataState)
+                  //      : const SizedBox.shrink(),
+                  SizedBox(height: MediaQuery.of(context).size.width * 0.03),
+                  _recentButton(),
+                  SizedBox(height: MediaQuery.of(context).size.width * 0.03),
+                  dataState.taskData.taskStatus == TaskStatus.started ||
+                          dataState.taskData.taskStatus == TaskStatus.resume
+                      ? _addMarkerButton()
+                      : const SizedBox.shrink(),
+                  dataState.taskData.taskStatus == TaskStatus.started ||
+                          dataState.taskData.taskStatus == TaskStatus.resume
+                      ? SizedBox(
+                        height: MediaQuery.of(context).size.width * 0.03,
+                      )
+                      : const SizedBox.shrink(),
 
-          //  dataState.isStartPatrolling == false &&
-          //      dataState.isEndPatrolling == false ?
-          // _navigationButton(dataState: dataState)
-          //      : const SizedBox.shrink(),
+                  dataState.taskData.taskStatus == TaskStatus.started ||
+                          dataState.taskData.taskStatus == TaskStatus.resume
+                      ? _addCrossingButton()
+                      : const SizedBox.shrink(),
+                  dataState.taskData.taskStatus == TaskStatus.started ||
+                          dataState.taskData.taskStatus == TaskStatus.resume
+                      ? SizedBox(
+                        height: MediaQuery.of(context).size.width * 0.03,
+                      )
+                      : const SizedBox.shrink(),
 
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ),
-          _recentButton(),
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ),
-          dataState.taskData.taskStatus == TaskStatus.started
-              || dataState.taskData.taskStatus == TaskStatus.resume ?
-          _addMarkerButton()
-              : const SizedBox.shrink(),
-          dataState.taskData.taskStatus == TaskStatus.started
-              || dataState.taskData.taskStatus == TaskStatus.resume ?
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ): const SizedBox.shrink(),
+                  dataState.taskData.taskStatus == TaskStatus.started ||
+                          dataState.taskData.taskStatus == TaskStatus.resume
+                      ? _addIncidentButton()
+                      : const SizedBox.shrink(),
+                  dataState.taskData.taskStatus == TaskStatus.started ||
+                          dataState.taskData.taskStatus == TaskStatus.resume
+                      ? SizedBox(
+                        height: MediaQuery.of(context).size.width * 0.03,
+                      )
+                      : const SizedBox.shrink(),
 
-          dataState.taskData.taskStatus == TaskStatus.started
-              || dataState.taskData.taskStatus == TaskStatus.resume ?
-          _addCrossingButton() : const SizedBox.shrink(),
-          dataState.taskData.taskStatus == TaskStatus.started
-              || dataState.taskData.taskStatus == TaskStatus.resume ?
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ): const SizedBox.shrink(),
+                  dataState.taskData.taskStatus == TaskStatus.started ||
+                          dataState.taskData.taskStatus == TaskStatus.resume
+                      ? _addEncroachmentButton()
+                      : const SizedBox.shrink(),
 
-          dataState.taskData.taskStatus == TaskStatus.started
-              || dataState.taskData.taskStatus == TaskStatus.resume ?
-          _addIncidentButton() : const SizedBox.shrink(),
-          dataState.taskData.taskStatus == TaskStatus.started
-              || dataState.taskData.taskStatus == TaskStatus.resume ?
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ): const SizedBox.shrink(),
+                  dataState.taskData.taskStatus == TaskStatus.started ||
+                          dataState.taskData.taskStatus == TaskStatus.resume
+                      ? SizedBox(
+                        height: MediaQuery.of(context).size.width * 0.03,
+                      )
+                      : const SizedBox.shrink(),
 
-          dataState.taskData.taskStatus == TaskStatus.started
-              || dataState.taskData.taskStatus == TaskStatus.resume ?
-          _addEncroachmentButton(): const SizedBox.shrink(),
-
-          dataState.taskData.taskStatus == TaskStatus.started
-              || dataState.taskData.taskStatus == TaskStatus.resume ?
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.03,
-          ): const SizedBox.shrink(),
-
-          dataState.taskData.taskStatus == TaskStatus.started
-              || dataState.taskData.taskStatus == TaskStatus.resume ?
-          _addDeviationButton() : const SizedBox.shrink(),
-        ],
-      ) : const DottedLoaderWidget(),
+                  dataState.taskData.taskStatus == TaskStatus.started ||
+                          dataState.taskData.taskStatus == TaskStatus.resume
+                      ? _addDeviationButton()
+                      : const SizedBox.shrink(),
+                ],
+              )
+              : const DottedLoaderWidget(),
     );
   }
 
@@ -452,64 +506,78 @@ class MapSampleState extends State<MapSample> {
   }
 
   Widget _statusButton({required FetchMapPageDataState dataSate}) {
-    return dataSate.taskData.taskStatus  != TaskStatus.completed
+    return dataSate.taskData.taskStatus != TaskStatus.completed
         ? SizedBox(
-      height: MediaQuery.of(context).size.width * 0.10,
-      child: TextButton.icon(
-        label: TextWidget(
-          dataSate.taskData.taskStatus == TaskStatus.notStarted ? AppString.start
-              : dataSate.taskData.taskStatus == TaskStatus.started ? AppString.pause
-              : dataSate.taskData.taskStatus == TaskStatus.pause ? AppString.resume
-              : dataSate.taskData.taskStatus == TaskStatus.resume ? AppString.pause : AppString.completed,
-          color: AppColor.black,
-          fontSize: AppFont.font_11,),
-        icon: Icon(Icons.task_outlined, color: AppColor.themeColor,
-          size: MediaQuery.of(context).size.width * 0.05,),
-        onPressed: () {
-
-          TaskStatus taskStatus =  TaskStatus.notStarted;
-          if(dataSate.taskData.taskStatus == TaskStatus.notStarted){
-            taskStatus =  TaskStatus.started;
-          }
-          else if(dataSate.taskData.taskStatus == TaskStatus.started) {
-            taskStatus =  TaskStatus.pause;
-          }
-          else if(dataSate.taskData.taskStatus == TaskStatus.pause) {
-            taskStatus =  TaskStatus.resume;
-          }
-          else if(dataSate.taskData.taskStatus == TaskStatus.resume) {
-            taskStatus =  TaskStatus.pause;
-          }
-          BlocProvider.of<MapBloc>(context).add(MapPageUpdateTaskEvent(
-              context: context,
-              taskStatus: taskStatus
-          ));
-        },
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          elevation: WidgetStateProperty.all<double>(3.0),
-          shadowColor: WidgetStateProperty.all<Color>(Colors.black),
-        ),
-      ),
-    ) : const SizedBox.shrink();
+          height: MediaQuery.of(context).size.width * 0.10,
+          child: TextButton.icon(
+            label: TextWidget(
+              dataSate.taskData.taskStatus == TaskStatus.notStarted
+                  ? AppString.start
+                  : dataSate.taskData.taskStatus == TaskStatus.started
+                  ? AppString.pause
+                  : dataSate.taskData.taskStatus == TaskStatus.pause
+                  ? AppString.resume
+                  : dataSate.taskData.taskStatus == TaskStatus.resume
+                  ? AppString.pause
+                  : AppString.completed,
+              color: AppColor.black,
+              fontSize: AppFont.font_11,
+            ),
+            icon: Icon(
+              Icons.task_outlined,
+              color: AppColor.themeColor,
+              size: MediaQuery.of(context).size.width * 0.05,
+            ),
+            onPressed: () {
+              TaskStatus taskStatus = TaskStatus.notStarted;
+              if (dataSate.taskData.taskStatus == TaskStatus.notStarted) {
+                taskStatus = TaskStatus.started;
+              } else if (dataSate.taskData.taskStatus == TaskStatus.started) {
+                taskStatus = TaskStatus.pause;
+              } else if (dataSate.taskData.taskStatus == TaskStatus.pause) {
+                taskStatus = TaskStatus.resume;
+              } else if (dataSate.taskData.taskStatus == TaskStatus.resume) {
+                taskStatus = TaskStatus.pause;
+              }
+              BlocProvider.of<MapBloc>(context).add(
+                MapPageUpdateTaskEvent(
+                  context: context,
+                  taskStatus: taskStatus,
+                ),
+              );
+            },
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
+              foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+              elevation: WidgetStateProperty.all<double>(3.0),
+              shadowColor: WidgetStateProperty.all<Color>(Colors.black),
+            ),
+          ),
+        )
+        : const SizedBox.shrink();
   }
-
 
   Widget _endPatrollingButton({required FetchMapPageDataState dataSate}) {
     return SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
-        label: TextWidget(AppString.end,
+        label: TextWidget(
+          AppString.end,
           color: AppColor.black,
-          fontSize: AppFont.font_11,),
-        icon: Icon(Icons.task_outlined, color: AppColor.themeColor,
-          size: MediaQuery.of(context).size.width * 0.05,),
+          fontSize: AppFont.font_11,
+        ),
+        icon: Icon(
+          Icons.task_outlined,
+          color: AppColor.themeColor,
+          size: MediaQuery.of(context).size.width * 0.05,
+        ),
         onPressed: () {
-          BlocProvider.of<MapBloc>(context).add(MapPageUpdateTaskEvent(
+          BlocProvider.of<MapBloc>(context).add(
+            MapPageUpdateTaskEvent(
               context: context,
-              taskStatus: TaskStatus.completed
-          ));
+              taskStatus: TaskStatus.completed,
+            ),
+          );
         },
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
@@ -525,17 +593,23 @@ class MapSampleState extends State<MapSample> {
     return SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
-        label: TextWidget('Marker',
+        label: TextWidget(
+          'Marker',
           color: AppColor.black,
-          fontSize: AppFont.font_11,),
-        icon: Icon(Icons.location_searching_sharp, color: AppColor.themeColor,
-          size: MediaQuery.of(context).size.width * 0.05,),
+          fontSize: AppFont.font_11,
+        ),
+        icon: Icon(
+          Icons.location_searching_sharp,
+          color: AppColor.themeColor,
+          size: MediaQuery.of(context).size.width * 0.05,
+        ),
         onPressed: () {
-          BlocProvider.of<AddMarkerBloc>(context).add(AddMarkerPageLoadEvent(context: context, data: ""));
+          BlocProvider.of<AddMarkerBloc>(
+            context,
+          ).add(AddMarkerPageLoadEvent(context: context, data: ""));
           Navigator.push(
             !context.mounted ? context : context,
-            FadeRoute(
-                page: const AddMarkerPage()),
+            FadeRoute(page: const AddMarkerPage()),
           );
         },
         style: ButtonStyle(
@@ -552,18 +626,23 @@ class MapSampleState extends State<MapSample> {
     return SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
-        label: TextWidget('Crossing',
+        label: TextWidget(
+          'Crossing',
           color: AppColor.black,
-          fontSize: AppFont.font_11,),
-        icon: Icon(Icons.transgender_outlined, color: AppColor.themeColor,
-          size: MediaQuery.of(context).size.width * 0.05,),
+          fontSize: AppFont.font_11,
+        ),
+        icon: Icon(
+          Icons.transgender_outlined,
+          color: AppColor.themeColor,
+          size: MediaQuery.of(context).size.width * 0.05,
+        ),
         onPressed: () {
-          BlocProvider.of<AddCrossingBloc>(context)
-              .add(AddCrossingPageLoadEvent(context: context));
+          BlocProvider.of<AddCrossingBloc>(
+            context,
+          ).add(AddCrossingPageLoadEvent(context: context));
           Navigator.push(
             !context.mounted ? context : context,
-            FadeRoute(
-                page: const AddCrossingPage()),
+            FadeRoute(page: const AddCrossingPage()),
           );
         },
         style: ButtonStyle(
@@ -580,17 +659,23 @@ class MapSampleState extends State<MapSample> {
     return SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
-        label: TextWidget('Add Incident',
+        label: TextWidget(
+          'Add Incident',
           color: AppColor.black,
-          fontSize: AppFont.font_11,),
-        icon: Icon(Icons.gpp_maybe_sharp, color: AppColor.cardBlue,
-          size: MediaQuery.of(context).size.width * 0.05,),
+          fontSize: AppFont.font_11,
+        ),
+        icon: Icon(
+          Icons.gpp_maybe_sharp,
+          color: AppColor.cardBlue,
+          size: MediaQuery.of(context).size.width * 0.05,
+        ),
         onPressed: () async {
-          BlocProvider.of<AddIncidentBloc>(context).add(AddIncidentPageLoadEvent(context: context));
+          BlocProvider.of<AddIncidentBloc>(
+            context,
+          ).add(AddIncidentPageLoadEvent(context: context));
           Navigator.push(
             !context.mounted ? context : context,
-            FadeRoute(
-                page: const AddIncidentPage()),
+            FadeRoute(page: const AddIncidentPage()),
           );
         },
         style: ButtonStyle(
@@ -607,17 +692,23 @@ class MapSampleState extends State<MapSample> {
     return SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
-        label: TextWidget('Add Structures',
+        label: TextWidget(
+          'Add Structures',
           color: AppColor.black,
-          fontSize: AppFont.font_11,),
-        icon: Icon(Icons.fence_rounded, color: AppColor.themeColor,
-          size: MediaQuery.of(context).size.width * 0.05,),
+          fontSize: AppFont.font_11,
+        ),
+        icon: Icon(
+          Icons.fence_rounded,
+          color: AppColor.themeColor,
+          size: MediaQuery.of(context).size.width * 0.05,
+        ),
         onPressed: () async {
-          BlocProvider.of<EncroachmentBloc>(context).add(PageLoadEvent(context: context));
+          BlocProvider.of<EncroachmentBloc>(
+            context,
+          ).add(PageLoadEvent(context: context));
           Navigator.push(
             !context.mounted ? context : context,
-            FadeRoute(
-                page: const EncroachmentPage()),
+            FadeRoute(page: const EncroachmentPage()),
           );
         },
         style: ButtonStyle(
@@ -634,17 +725,23 @@ class MapSampleState extends State<MapSample> {
     return SizedBox(
       height: MediaQuery.of(context).size.width * 0.10,
       child: TextButton.icon(
-        label: TextWidget('Add Deviation',
+        label: TextWidget(
+          'Add Deviation',
           color: AppColor.black,
-          fontSize: AppFont.font_11,),
-        icon: Icon(Icons.developer_board, color: AppColor.themeColor,
-          size: MediaQuery.of(context).size.width * 0.05,),
+          fontSize: AppFont.font_11,
+        ),
+        icon: Icon(
+          Icons.developer_board,
+          color: AppColor.themeColor,
+          size: MediaQuery.of(context).size.width * 0.05,
+        ),
         onPressed: () async {
-          BlocProvider.of<DeviationBloc>(context).add(DeviationPageLoadEvent(context: context));
+          BlocProvider.of<DeviationBloc>(
+            context,
+          ).add(DeviationPageLoadEvent(context: context));
           Navigator.push(
             !context.mounted ? context : context,
-            FadeRoute(
-                page: const DeviationPage()),
+            FadeRoute(page: const DeviationPage()),
           );
         },
         style: ButtonStyle(
@@ -656,7 +753,6 @@ class MapSampleState extends State<MapSample> {
       ),
     );
   }
-
 
   Widget _recentButton() {
     return SizedBox(
@@ -674,10 +770,11 @@ class MapSampleState extends State<MapSample> {
     );
   }
 
-
-
   /// ✅ Create 5m buffer polygon with rounded corners
-  List<LatLng> _createBufferPolygon(List<LatLng> polyline, double bufferMeters) {
+  List<LatLng> _createBufferPolygon(
+    List<LatLng> polyline,
+    double bufferMeters,
+  ) {
     if (polyline.length < 2) return [];
 
     final List<LatLng> leftOffsets = [];
@@ -721,9 +818,12 @@ class MapSampleState extends State<MapSample> {
     final double lat1 = point.latitude * pi / 180.0;
     final double lon1 = point.longitude * pi / 180.0;
 
-    final double lat2 = asin(sin(lat1) * cos(distanceMeters / earthRadius) +
-        cos(lat1) * sin(distanceMeters / earthRadius) * cos(bearingRad));
-    final double lon2 = lon1 +
+    final double lat2 = asin(
+      sin(lat1) * cos(distanceMeters / earthRadius) +
+          cos(lat1) * sin(distanceMeters / earthRadius) * cos(bearingRad),
+    );
+    final double lon2 =
+        lon1 +
         atan2(
           sin(bearingRad) * sin(distanceMeters / earthRadius) * cos(lat1),
           cos(distanceMeters / earthRadius) - sin(lat1) * sin(lat2),
@@ -740,8 +840,7 @@ class MapSampleState extends State<MapSample> {
 
     final double dLon = lon2 - lon1;
     final double y = sin(dLon) * cos(lat2);
-    final double x =
-        cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
+    final double x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
     return (atan2(y, x) * 180.0 / pi + 360.0) % 360.0;
   }
 }

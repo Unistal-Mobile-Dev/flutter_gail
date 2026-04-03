@@ -1,3 +1,4 @@
+/*
 import 'package:flutter_gail/feature/login/domain/models/login_model.dart';
 
 class UserInfo {
@@ -14,3 +15,4 @@ class UserInfo {
     userData = useData;
   }
 }
+*/

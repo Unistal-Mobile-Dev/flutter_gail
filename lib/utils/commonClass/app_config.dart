@@ -7,6 +7,9 @@ class AppConfig {
   RoleType? roleType;
   Client? client;
   String? appVersion;
+  LoginDataModel userData = LoginDataModel();
+  GroupRoles groupRoles = GroupRoles();
+
 
   static AppConfig? instanceInit() {
     instance ??= AppConfig();
@@ -15,6 +18,14 @@ class AppConfig {
 
   setClient({required Client client}) {
     this.client = client;
+  }
+
+  setUserInfo({required LoginDataModel newData}) {
+    this.userData = newData;
+  }
+
+  setGroupRoles({required GroupRoles newVal}) {
+    this.groupRoles = newVal;
   }
 
   Future<dynamic> getPackageInfo() async {

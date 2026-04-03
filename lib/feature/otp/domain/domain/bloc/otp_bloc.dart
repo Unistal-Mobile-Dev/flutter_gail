@@ -1,9 +1,8 @@
-import 'package:bloc/bloc.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/home/presentation/page/home_page.dart';
 import 'package:flutter_gail/feature/login/helper/login_helper.dart';
-import 'package:flutter_gail/utils/commonClass/user_info.dart';
 
 part 'otp_event.dart';
 
@@ -138,8 +137,13 @@ class OtpBloc extends Bloc<OtpEvent, OtpState> {
     if (res != null) {
         LoginDataModel _loginData = LoginDataModel();
         _loginData = loginResponse(res);
-        UserInfo.instanceInit()?.userData = _loginData;
-        await SharedPreferencesUtils.setString(key: PreferencesName.token, value: UserInfo.instanceInit()!.userData!.tokens!.access.toString());
+        AppConfig.instanceInit()!.userData = _loginData;
+       /* await SharedPreferencesUtils.setString(key: PreferencesName.token,
+            value: AppConfig.instanceInit()!.userData.tokens!.access.toString());
+        await SharedPreferencesUtils.setString(
+          key: PreferencesName.schema,
+          value: AppConfig.instanceInit()!.userData.schema!.toString(),
+        );*/
         Navigator.pushAndRemoveUntil(
             !event.context.mounted ? event.context : event.context,
             MaterialPageRoute(builder: (_) => const HomePage()),

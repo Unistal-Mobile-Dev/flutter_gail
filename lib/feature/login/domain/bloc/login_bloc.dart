@@ -1,12 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/home/presentation/page/home_page.dart';
 import 'package:flutter_gail/feature/login/helper/login_helper.dart';
 import 'package:flutter_gail/feature/login/presentations/pages/login_screen_page.dart';
-import 'package:flutter_gail/feature/otp/presentation/page/otp_page.dart';
 import 'package:flutter_gail/utils/commonClass/connectivity_helper.dart';
-import 'package:flutter_gail/utils/commonClass/user_info.dart';
-
 import 'login_event.dart';
 import 'login_state.dart';
 
@@ -24,33 +23,16 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   String email = "";
   String password = "";
 
-  bool _isLoader = false;
+  bool isLoader = false;
+  bool isPassword = true;
+  bool appLogoLoader = false;
 
-  bool get isLoader => _isLoader;
-
-  bool _isPassword = true;
-
-  bool get isPassword => _isPassword;
-
-  bool _appLogoLoader = false;
-
-  bool get appLogoLoader => _appLogoLoader;
-
-  String _appLogo = "";
-
-  String get appLogo => _appLogo;
-
-  LoginDataModel _loginData = LoginDataModel();
-
-  LoginDataModel get loginData => _loginData;
+  LoginDataModel loginData = LoginDataModel();
 
   TextEditingController userNameTextFiledController = TextEditingController();
   TextEditingController passwordTextFieldController = TextEditingController();
 
-  String _appVersion = "";
-
-  String get appVersion => _appVersion;
-
+  String appVersion = "";
   String loginType = "1";
   String userId = "";
 
@@ -68,30 +50,23 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   _passwordHideShow(LoginPasswordHideShowEvent event, emit) {
-    _isPassword = event.isPassword;
+    isPassword = event.isPassword;
     _eventCompleted(emit);
   }
 
   _pageLoad(LoginPageLoadingEvent event, emit) async {
     email = "";
     password = "";
-    _isPassword = true;
-    _isLoader = false;
-    _appLogoLoader = true;
+    isPassword = true;
+    isLoader = false;
+    appLogoLoader = true;
     loginType = "1";
     userId = "";
-    _appLogo =
-        "https://unistal.hrmmitra.in/uploads/logo/signin/signin_logo_1569825597.png";
     userNameTextFiledController.text = "";
     passwordTextFieldController.text = "";
-
     await AppConfig.instanceInit()!.getPackageInfo();
-
-    _appVersion = AppConfig.instanceInit()!.appVersion!;
-
-    _eventCompleted(emit);
-    _appLogoLoader = false;
-
+    appVersion = AppConfig.instanceInit()!.appVersion!;
+    appLogoLoader = false;
     _eventCompleted(emit);
   }
 
@@ -101,74 +76,79 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       return;
     }
     userId = "";
-    _loginData = LoginDataModel();
+    loginData = LoginDataModel();
     var textFieldValidationCheck = await LoginHelper.textFieldValidation(
+      emilId: email,
+      password: password,
+      loginType: loginType,
+      context: event.context.mounted ? event.context : event.context,
+    );
+    if (textFieldValidationCheck == true) {
+      var res = await LoginHelper.getLoginData(
         emilId: email,
         password: password,
         loginType: loginType,
-        context: event.context.mounted ? event.context : event.context);
-    if (textFieldValidationCheck == true) {
-      _isLoader = true;
-      _eventCompleted(emit);
+        context: event.context,
+      );
+      if (res != null) {
+        isLoader = false;
+        _eventCompleted(emit);
+        loginData = loginResponse(res);
+        await AppConfig.instanceInit()?.setUserInfo(newData: loginData);
 
-        var otpRes = await LoginHelper.sendOtp(
-            emailId: email,
-            password: password,
-            loginType: loginType,
-            context: !event.context.mounted ? event.context : event.context);
-        if (otpRes == null) {
-          _isLoader = false;
-          _eventCompleted(emit);
-            return ;
-        }
-      _isLoader = false;
-      _eventCompleted(emit);
-        userId =  otpRes;
-        Navigator.push(
-            !event.context.mounted ? event.context : event.context,
-            MaterialPageRoute(
-                builder: (_) => OtpPage(
-                  emailId: email,
-                  password: password,
-                )
-            )
+        String userJson = jsonEncode(res);
+        SharedPreferencesUtils.setString(key: PreferencesName.userInfo, value : userJson);
+     //   await SharedPreferencesUtils.setString(key: PreferencesName.token, value:loginData.tokens!.access.toString());
+        Navigator.pushAndRemoveUntil(
+          !event.context.mounted ? event.context : event.context,
+           MaterialPageRoute(builder: (_) => const HomePage()),
+         // MaterialPageRoute(builder: (_) => const HpOilDashboardPage()),
+          (route) => false,
         );
-
+      } else {
+        Navigator.pushAndRemoveUntil(
+          !event.context.mounted ? event.context : event.context,
+          MaterialPageRoute(builder: (_) => const LoginScreenPage()),
+          (route) => false,
+        );
+      }
+      isLoader = false;
+      _eventCompleted(emit);
     }
   }
 
   _loginCheck(LoginCheckEvent event, emit) async {
     var res =  await LoginHelper.checkLogin(context: event.context);
     if(res != null){
-      LoginDataModel _loginData = LoginDataModel();
-      _loginData = loginResponse(res);
-      UserInfo.instanceInit()?.userData = _loginData;
-      await SharedPreferencesUtils.setString(key: PreferencesName.token, value: UserInfo.instanceInit()!.userData!.tokens!.access.toString());
-      Navigator.pushAndRemoveUntil(
-          !event.context.mounted ? event.context : event.context,
-          MaterialPageRoute(builder: (_) => const HomePage()),
-              (route) => false);
-    }
-    else
-    {
-      Navigator.pushAndRemoveUntil(
-          !event.context.mounted ? event.context : event.context,
-          MaterialPageRoute(builder: (_) => const LoginScreenPage()),
-              (route) => false);
-    }
 
+      loginData = loginResponse(res);
+    //  await SharedPreferencesUtils.setString(key: PreferencesName.token, value:loginData.tokens!.access.toString());
+      Navigator.pushAndRemoveUntil(
+        !event.context.mounted ? event.context : event.context,
+          MaterialPageRoute(builder: (_) => const HomePage()),
+      //  MaterialPageRoute(builder: (_) => const HpOilDashboardPage()),
+        (route) => false,
+      );
+    } else {
+      Navigator.pushAndRemoveUntil(
+        !event.context.mounted ? event.context : event.context,
+        MaterialPageRoute(builder: (_) => const LoginScreenPage()),
+        (route) => false,
+      );
+    }
   }
 
   _eventCompleted(Emitter<LoginState> emit) {
-    emit(FetchLoginStateData(
-      isLoader: isLoader,
-      isPassword: isPassword,
-      appLogoLoader: appLogoLoader,
-      appLogo: appLogo,
-      userNameTextFiledController: userNameTextFiledController,
-      passwordTextFieldController: passwordTextFieldController,
-      appVersion: appVersion,
-      loginType: loginType,
-    ));
+    emit(
+      FetchLoginStateData(
+        isLoader: isLoader,
+        isPassword: isPassword,
+        appLogoLoader: appLogoLoader,
+        userNameTextFiledController: userNameTextFiledController,
+        passwordTextFieldController: passwordTextFieldController,
+        appVersion: appVersion,
+        loginType: loginType,
+      ),
+    );
   }
 }

@@ -1,13 +1,7 @@
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
-import 'package:flutter_gail/feature/login/domain/models/permissions_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/helper/task_helper.dart';
-import 'package:flutter_gail/utils/commonClass/user_info.dart';
-
 part 'task_event.dart';
 part 'task_state.dart';
 
@@ -44,11 +38,11 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     startDate = DateTime.now().subtract(const Duration(days: 7));
     endDate =  DateTime.now();
     await DashboardHelper.requestMandatoryLocationPermission(event.context);
-    userData =  UserInfo.instance!.userData!;
-    if(userData.modules != null){
-      for(var moduleData in userData.modules!) {
-        if(moduleData.permissionList != null){
-          for(var permissionData in moduleData.permissionList!){
+    userData =  AppConfig.instanceInit()!.userData;
+    if(userData.groupRoles != null){
+      for(var moduleData in userData.groupRoles!) {
+        if(moduleData.permissions != null){
+          for(var permissionData in moduleData.permissions!){
             if(permissionData.name.toString().toLowerCase() == "write"){
               isAssignTask =  permissionData.value ?? false;
             }
@@ -115,7 +109,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
           || taskData.taskStatus == TaskStatus.pause  || taskData.taskStatus == TaskStatus.resume).toList();
     }
     else if(tabIndex == 2){
-      taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed  ).toList();
+      taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed).toList();
     }
     _eventComplete(emit);
   }

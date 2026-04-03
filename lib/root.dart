@@ -33,9 +33,9 @@ class _RootState extends State<Root> {
     return blocMultiProvider(
       child: MaterialApp(
       navigatorKey: navigatorKey,
-      title: 'Oil',
+      title: 'Line Patrolling',
       debugShowCheckedModeBanner: false,
-      theme: appTheme(),
+        theme: AppTheme.lightTheme,
       initialRoute: '/',
       routes: {
         '/second': (context) => const TestPage(),

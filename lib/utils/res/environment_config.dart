@@ -21,22 +21,24 @@ class EnvironmentConfig extends InheritedWidget {
 
   String get generalUrlBaseOnFlavour {
     switch (flavours) {
-      case EnvironmentFlavours.productionIglCng:
-        return "https://upims.gail.co.in:8000/";
-      case EnvironmentFlavours.developmentIglCng:
-        return "https://tpimsdev.smartgasnet.com/";
+      case EnvironmentFlavours.productionHPOIL:
+       // return "https://upims.gail.co.in:8000/";
+        return "https://hpoil.smartgasnet.com/";
+      case EnvironmentFlavours.developmentHPOIL:
+     //   return "https://tpimsdev.smartgasnet.com/";
+        return "https://hpoil.smartgasnet.com/";
     }
   }
 
   String get generalGailUrlBaseOnFlavour {
     switch (flavours) {
-      case EnvironmentFlavours.productionIglCng:
+      case EnvironmentFlavours.productionHPOIL:
         return "https://gailgis.gail.co.in/";
-      case EnvironmentFlavours.developmentIglCng:
+      case EnvironmentFlavours.developmentHPOIL:
         // return "http://115.241.54.252:8000/";
         return "https://gailgis.gail.co.in/";
     }
   }
 }
 
-enum EnvironmentFlavours { productionIglCng, developmentIglCng }
+enum EnvironmentFlavours { productionHPOIL, developmentHPOIL }

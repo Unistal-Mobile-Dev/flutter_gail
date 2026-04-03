@@ -185,9 +185,9 @@ class _OtpPageState extends State<OtpPage> {
     return Hero(
       tag: 'logo',
       child: Image.asset(
-        AppConfig.instanceInit()!.client == Client.oil
-            ? AppIcon.oilLogo
-            : AppIcon.oilLogo,
+        AppConfig.instanceInit()!.client == Client.hpoil
+            ? AppIcon.hpOILLogo
+            : AppIcon.hpOILLogo,
          height: 100,
       ),
     );

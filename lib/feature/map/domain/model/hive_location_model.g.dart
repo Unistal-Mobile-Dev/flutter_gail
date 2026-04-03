@@ -17,6 +17,7 @@ class HiveLocationModelAdapter extends TypeAdapter<HiveLocationModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return HiveLocationModel(
+      schema: fields[11] as String,
       taskId: fields[0] as String,
       subTaskId: fields[1] as String,
       gpsX: fields[2] as double,
@@ -34,7 +35,7 @@ class HiveLocationModelAdapter extends TypeAdapter<HiveLocationModel> {
   @override
   void write(BinaryWriter writer, HiveLocationModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.taskId)
       ..writeByte(1)
@@ -56,7 +57,9 @@ class HiveLocationModelAdapter extends TypeAdapter<HiveLocationModel> {
       ..writeByte(9)
       ..write(obj.inspectedDateTime)
       ..writeByte(10)
-      ..write(obj.isSynced);
+      ..write(obj.isSynced)
+      ..writeByte(11)
+      ..write(obj.schema);
   }
 
   @override

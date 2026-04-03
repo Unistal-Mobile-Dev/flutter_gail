@@ -20,7 +20,7 @@
 
     <application
         android:name="${applicationName}"
-        android:label="OIL"
+        android:label="Line Patrolling"
         android:icon="@mipmap/ic_launcher_oil"
         android:requestLegacyExternalStorage="true">
 

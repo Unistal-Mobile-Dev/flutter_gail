@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
-import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
@@ -11,6 +10,12 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final Widget? tabBar;
 
+  /// NEW: allow custom title widget (for Bloc)
+  final Widget? titleWidget;
+
+  /// NEW: enable gradient
+  final bool isGradient;
+
   const AppBarWidget({
     Key? key,
     this.title,
@@ -18,6 +23,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.boolLeading,
     this.actions,
     this.tabBar,
+    this.titleWidget,
+    this.isGradient = false,
   }) : super(key: key);
 
   @override
@@ -26,26 +33,54 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      automaticallyImplyLeading: (boolLeading ?? true) && leadingWidget == null,
-      systemOverlayStyle: SystemUiOverlayStyle(
-        statusBarColor: AppColor.themeColor,
-      ),
-      iconTheme: const IconThemeData(
-        color: Colors.white,
-      ),
-      backgroundColor: AppColor.themeColor,
+      automaticallyImplyLeading:
+      (boolLeading ?? true) && leadingWidget == null,
+      leading: leadingWidget,
       elevation: 0,
       centerTitle: true,
-      leading: leadingWidget,
-      title: Padding(
-        padding: const EdgeInsets.only(top: 0.0),
-        child: Text(
-          title ?? "",
-          textAlign: TextAlign.center,
-        ),
+
+      /// STATUS BAR
+      systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
       ),
+
+      /// ICON COLOR
+      iconTheme: const IconThemeData(color: Colors.white),
+
+      /// BACKGROUND (fallback if gradient = false)
+      backgroundColor: isGradient ? Colors.transparent : AppColor.themeColor,
+
+      /// TITLE
+      title: titleWidget ??
+          Text(
+            title ?? "",
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.white),
+          ),
+
+      /// ACTIONS
       actions: actions ?? [],
-      flexibleSpace: Container(
+
+      /// GRADIENT
+      flexibleSpace: isGradient
+          ? Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColor.themeLightColor,
+              AppColor.themeColor,
+            ],
+          ),
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(8),
+            bottomRight: Radius.circular(8),
+          ),
+        ),
+      )
+          : Container(
         decoration: BoxDecoration(
           color: AppColor.themeColor,
           borderRadius: const BorderRadius.only(
@@ -54,6 +89,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
+
+      /// TAB BAR
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(20.0),
         child: tabBar ?? Container(),

@@ -1,4 +1,4 @@
-package unistal.app.gail.flutter_gail
+package unistal.app.hpoil
 
 import android.content.Intent
 import android.net.Uri

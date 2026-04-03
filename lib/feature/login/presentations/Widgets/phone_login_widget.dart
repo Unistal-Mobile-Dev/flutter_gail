@@ -25,7 +25,7 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
       children: [
         Flexible(
           child: SizedBox(
-            height: 190,
+           // height: 190,
             child: Stack(
               children: [
                 SizedBox(
@@ -59,36 +59,26 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
             Align(
               alignment: Alignment.topLeft,
               child: TextWidget(
-                "OIL Login",
+                "HPOIL Login",
                 fontSize: AppFont.font_22,
                 fontWeight: FontWeight.w800,
                 color: AppColor.themeColor,
               ),
             ),
             _verticalSpace(),
-            _loginTypeWidget(context: context, loginType: dataState.loginType),
             _verticalSpace(),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFieldWidget(
-                    controller: dataState.userNameTextFiledController,
-                    isBoardRemove: false,
-                    labelText: AppString.userName,
-                    onChanged: (value) {
-                      BlocProvider.of<LoginBloc>(context)
-                          .add(LoginSetEmailEvent(emailId: value));
-                    },
-                  ),
+           /* _loginTypeWidget(context: context, loginType: dataState.loginType),
+            _verticalSpace(),*/
+
+                TextFieldWidget(
+                  controller: dataState.userNameTextFiledController,
+                  isBoardRemove: false,
+                  labelText: AppString.userName,
+                  onChanged: (value) {
+                    BlocProvider.of<LoginBloc>(context)
+                        .add(LoginSetEmailEvent(emailId: value));
+                  },
                 ),
-                const SizedBox(width: 5),
-                dataState.loginType == "1" ?
-                Center(
-                  child: TextWidget("@oil.co.in",
-                      color: AppColor.black, fontSize: AppFont.font_11),
-                ) : const SizedBox.shrink(),
-              ],
-            ),
             _verticalSpace(),
             TextFieldPasswordWidget(
               textEditingController: dataState.passwordTextFieldController,
@@ -169,9 +159,9 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
     return Hero(
       tag: 'logo',
       child: Image.asset(
-        AppConfig.instanceInit()!.client == Client.oil
-            ? AppIcon.oilLogo
-            : AppIcon.oilLogo,
+        AppConfig.instanceInit()!.client == Client.hpoil
+            ? AppIcon.hpOILLogo
+            : AppIcon.hpOILLogo,
       ),
     );
   }

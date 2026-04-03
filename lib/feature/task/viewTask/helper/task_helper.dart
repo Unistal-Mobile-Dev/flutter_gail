@@ -1,13 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
-import 'package:flutter_gail/services/firebase/notification_service.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
-import 'package:flutter_gail/utils/commonClass/user_info.dart';
 
 class TaskHelper {
   static Future<dynamic> fetchTask(
@@ -23,8 +20,9 @@ class TaskHelper {
   static Future<dynamic> fetchDailyTask(
       {required String startDate, required String endDate}) async {
     try {
-      LoginDataModel userData = UserInfo.instance!.userData!;
-      String url = APIs.getDailyTaskTrackingApi;
+      LoginDataModel userData = AppConfig.instanceInit()!.userData;
+      final link = AppConfig.instanceInit()?.groupRoles.link;
+      String url = APIs.getDailyTaskTrackingApi(moduleName: link.toString());
       var res = await ServerRequest.getData(urlEndPoint: url);
       if (res != null && res['data'] != null) {
         return taskListResponse(res['data']);
@@ -51,10 +49,9 @@ class TaskHelper {
       if (location != null) {
         locationModel = location;
       }
-      final String currentTime =
-          "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
-      String url =
-          APIs.updateTaskApi;
+      final link = AppConfig.instanceInit()?.groupRoles.link;
+      final String currentTime = "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
+      String url = APIs.updateTaskApi(moduleName: link.toString());
       var json = {"data" : [{
         "patrollman_status": taskStatus,
         "task_id" : taskData.taskId.toString(),

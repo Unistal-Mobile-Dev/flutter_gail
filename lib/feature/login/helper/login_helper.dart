@@ -71,10 +71,11 @@ class LoginHelper {
     return null;
   }
 
-  static Future<dynamic> getLoginData(
-      {required String emilId,
-      required String password,
-      required BuildContext context}) async {
+  static Future<dynamic> getLoginData({
+    required String emilId,
+    required String password,
+    required String loginType,
+    required BuildContext context}) async {
     var deviceId = await getUniqueDeviceId();
     String? firebaseToken;
     try {
@@ -85,7 +86,6 @@ class LoginHelper {
     } catch (_) {
       firebaseToken = "";
     }
-
     try {
       if (await isInternetConnected() == true) {
         var json = LoginScreenRequestModel(
@@ -93,12 +93,11 @@ class LoginHelper {
           password: password,
           firebaseId: firebaseToken.toString(),
           deviceId: deviceId,
+            loginType: loginType
         ).toJson();
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString("baseUrl", APIs.baseUrl);
-
-        print("Fetch Base Url =  ${prefs.getString("baseUrl")}");
 
         String url = APIs.login;
         var res = await ServerRequest.postData(
@@ -121,11 +120,11 @@ class LoginHelper {
     }
   }
 
-  static Future<dynamic> getLoginOTPData(
-      {required String userId,
-        required String otp,
-        required String loginType,
-        required BuildContext context}) async {
+  static Future<dynamic> getLoginOTPData({
+    required String userId,
+    required String otp,
+    required String loginType,
+    required BuildContext context}) async {
     var deviceId = await getUniqueDeviceId();
     String? firebaseToken;
     try {
@@ -136,7 +135,6 @@ class LoginHelper {
     } catch (_) {
       firebaseToken = "";
     }
-
     try {
       if (await isInternetConnected() == true) {
         var json = LoginOTPScreenRequestModel(
@@ -198,8 +196,7 @@ class LoginHelper {
     }
  }
 
-  static Future<dynamic> addDevice(
-      {required String userId, required BuildContext context}) async {
+  static Future<dynamic> addDevice({required String userId,required String schema, required BuildContext context}) async {
     try {
       final deviceInfo = DeviceInfoPlugin();
       var deviceId = await getUniqueDeviceId();
@@ -216,14 +213,16 @@ class LoginHelper {
       }
       String url = APIs.addDeviceApi;
       var json = {
-        "user_id": userId,
-        "device_id": deviceId.toString(),
         "device_name": model,
+        "device_id": deviceId.toString(),
         "device_platform": deviceType,
         "device_brand": brand,
         "device_version": deviceVersion,
-        "device_status": "Active"
+        "user_id": userId,
+        "schema": schema,
       };
+      log("url ===> ${url}");
+      log("json ===> ${json}");
       await ServerRequest.postData(
           urlEndPoint: url,
           body: jsonEncode(json),

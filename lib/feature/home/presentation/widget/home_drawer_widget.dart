@@ -12,7 +12,7 @@ import 'package:flutter_gail/utils/commonClass/user_info.dart';
 class HomeDrawerWidget extends StatelessWidget {
   HomeDrawerWidget({super.key});
 
-  final LoginDataModel _userData = UserInfo.instance!.userData!;
+  final LoginDataModel _userData = AppConfig.instanceInit()!.userData;
 
   LoginDataModel get userData => _userData;
 
@@ -20,13 +20,13 @@ class HomeDrawerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LoginDataModel userData = UserInfo.instanceInit()!.userData!;
-    if (userData.modules != null) {
-      for (var moduleData in userData.modules!) {
-        if (moduleData.permissionList != null &&
+    LoginDataModel userData = AppConfig.instanceInit()!.userData;
+    if (userData.groupRoles != null) {
+      for (var moduleData in userData.groupRoles!) {
+        if (moduleData.permissions != null &&
             moduleData.moduleName.toString() ==
                 "pipeline_patrolling_suervielliance") {
-          for (var permissionData in moduleData.permissionList!) {
+          for (var permissionData in moduleData.permissions!) {
             if (permissionData.name.toString().toLowerCase() == "write") {
               isAssignTask = permissionData.value ?? false;
             }
@@ -35,38 +35,40 @@ class HomeDrawerWidget extends StatelessWidget {
       }
     }
 
-// Get the dashboard module object safely
-    final dashboardModule = userData.modules!.firstWhere(
-          (element) => element.moduleName!.toLowerCase() == "dashboard",
-      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+    // Get the dashboard module object safely
+    final dashboardModule = userData.groupRoles!.firstWhere(
+      (element) => element.moduleName!.toLowerCase() == "dashboard",
+      orElse: () => GroupRoles(moduleName: ""), // provide a default Modules object
     );
     final dashboardName = dashboardModule.moduleName;
 
     // Get the pipeline_patrolling_suervielliance module object safely
-    final taskModule = userData.modules!.firstWhere(
-          (element) => element.moduleName!.toLowerCase() == "pipeline_patrolling_suervielliance",
-      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+    final taskModule = userData.groupRoles!.firstWhere(
+      (element) =>
+          element.moduleName!.toLowerCase() ==
+          "pipeline_patrolling_suervielliance",
+      orElse: () => GroupRoles(moduleName: ""), // provide a default Modules object
     );
     final taskName = taskModule.moduleName;
 
     // Get the pipeline_cp_system module object safely
-    final tlpSurveyModule = userData.modules!.firstWhere(
-          (element) => element.moduleName!.toLowerCase() == "pipeline_cp_system",
-      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+    final tlpSurveyModule = userData.groupRoles!.firstWhere(
+      (element) => element.moduleName!.toLowerCase() == "pipeline_cp_system",
+      orElse: () => GroupRoles(moduleName: ""), // provide a default Modules object
     );
     final tlpSurveyName = tlpSurveyModule.moduleName;
 
     // Get the image_sharing module object safely
-    final imageSharingModule = userData.modules!.firstWhere(
-          (element) => element.moduleName!.toLowerCase() == "image_sharing",
-      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+    final imageSharingModule = userData.groupRoles!.firstWhere(
+      (element) => element.moduleName!.toLowerCase() == "image_sharing",
+      orElse: () => GroupRoles(moduleName: ""), // provide a default Modules object
     );
     final imageSharingName = imageSharingModule.moduleName;
 
     // Get the pgis module object safely
-    final pgisModule = userData.modules!.firstWhere(
-          (element) => element.moduleName!.toLowerCase() == "pgis",
-      orElse: () => Modules(moduleName: ""), // provide a default Modules object
+    final pgisModule = userData.groupRoles!.firstWhere(
+      (element) => element.moduleName!.toLowerCase() == "pgis",
+      orElse: () => GroupRoles(moduleName: ""), // provide a default Modules object
     );
     final pgisName = pgisModule.moduleName;
 
@@ -83,9 +85,12 @@ class HomeDrawerWidget extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color.fromARGB(255, 230, 55, 70),
-                    Color.fromARGB(230, 216, 77, 89),
-                    Color.fromARGB(255, 230, 55, 70),
+                    Color.fromARGB(255, 67, 160, 71), // green 600
+                    Color.fromARGB(255, 12, 142, 30), // green 700
+                    Color.fromARGB(255, 46, 125, 50), // green 800
+                    // Color.fromARGB(255, 230, 55, 70),
+                    // Color.fromARGB(230, 216, 77, 89),
+                    // Color.fromARGB(255, 230, 55, 70),
                   ],
                 ),
               ),
@@ -93,17 +98,18 @@ class HomeDrawerWidget extends StatelessWidget {
               child: ListView(
                 children: [
                   _header(context: context),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.width * 0.10,
-                  ),
-                  dashboardName.toString().isNotEmpty?
-                  _dashboard(context: context) : const SizedBox.shrink(),
+                  SizedBox(height: MediaQuery.of(context).size.width * 0.10),
+                  dashboardName.toString().isNotEmpty
+                      ? _dashboard(context: context)
+                      : const SizedBox.shrink(),
 
-                  taskName.toString().isNotEmpty ?
-                  _task(context: context) :  const SizedBox.shrink(),
+                  taskName.toString().isNotEmpty
+                      ? _task(context: context)
+                      : const SizedBox.shrink(),
 
-                  tlpSurveyName.toString().isNotEmpty ?
-                  _tlpSurvey(context: context) : const SizedBox.shrink(),
+                  tlpSurveyName.toString().isNotEmpty
+                      ? _tlpSurvey(context: context)
+                      : const SizedBox.shrink(),
 
                   imageSharingName.toString().isNotEmpty
                       ? _imageSharing(context: context)
@@ -114,9 +120,7 @@ class HomeDrawerWidget extends StatelessWidget {
             ),
           );
         } else {
-          return const Center(
-            child: CenterLoaderWidget(),
-          );
+          return const Center(child: CenterLoaderWidget());
         }
       },
     );
@@ -128,33 +132,31 @@ class HomeDrawerWidget extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: Image.asset(
-            AppConfig.instanceInit()!.client == Client.oil
-                ? AppIcon.gailLogo
-                : AppIcon.gailLogo,
+            AppConfig.instanceInit()!.client == Client.hpoil
+                ? AppIcon.hpOILLogo
+                : AppIcon.hpOILLogo,
             height: MediaQuery.of(context).size.width * 0.15,
             width: MediaQuery.of(context).size.width * 0.15,
           ),
         ),
-        SizedBox(
-          width: MediaQuery.of(context).size.width * 0.03,
-        ),
+        SizedBox(width: MediaQuery.of(context).size.width * 0.03),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextWidget(
-                "${userData.users!.firstName.toString()} ${userData.users!.surName.toString()}",
+                "${userData.users!.fullName.toString()}}",
                 fontSize: AppFont.font_14,
                 color: AppColor.white,
               ),
               TextWidget(
-                userData.users!.emailId.toString(),
+                userData.users!.email.toString(),
                 color: AppColor.white,
                 fontSize: AppFont.font_12,
               ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
@@ -162,13 +164,18 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _dashboard({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          BlocProvider.of<HomeBloc>(context)
-              .add(SelectWidgetHomeEvent(widget: const DashboardPage(), title: AppString.dashboard));
+          BlocProvider.of<HomeBloc>(context).add(
+            SelectWidgetHomeEvent(
+              widget: const DashboardPage(),
+              title: AppString.dashboard,
+            ),
+          );
         },
         child: Row(
           children: [
@@ -179,15 +186,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.home_outlined,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.home_outlined, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.dashboard,
               fontSize: AppFont.font_14,
@@ -202,13 +204,18 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _task({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
-              widget: TaskPage(isAssignTask: isAssignTask), title: AppString.task));
+          BlocProvider.of<HomeBloc>(context).add(
+            SelectWidgetHomeEvent(
+              widget: TaskPage(isAssignTask: isAssignTask),
+              title: AppString.task,
+            ),
+          );
         },
         child: Row(
           children: [
@@ -219,15 +226,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.task_outlined,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.task_outlined, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.task,
               fontSize: AppFont.font_14,
@@ -242,13 +244,18 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _tlpSurvey({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
-              widget: const AddTlpSurveyPage(), title: AppString.tlpSurvey));
+          BlocProvider.of<HomeBloc>(context).add(
+            SelectWidgetHomeEvent(
+              widget: const AddTlpSurveyPage(),
+              title: AppString.tlpSurvey,
+            ),
+          );
         },
         child: Row(
           children: [
@@ -259,15 +266,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.add_chart,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.add_chart, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.tlpSurvey,
               fontSize: AppFont.font_14,
@@ -279,17 +281,21 @@ class HomeDrawerWidget extends StatelessWidget {
     );
   }
 
-
   Widget _imageSharing({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context);
-          BlocProvider.of<HomeBloc>(context).add(SelectWidgetHomeEvent(
-              widget: const ImageSharePage(), title: AppString.imageSharing));
+          BlocProvider.of<HomeBloc>(context).add(
+            SelectWidgetHomeEvent(
+              widget: const ImageSharePage(),
+              title: AppString.imageSharing,
+            ),
+          );
         },
         child: Row(
           children: [
@@ -300,15 +306,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.image_aspect_ratio,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.image_aspect_ratio, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.imageSharing,
               fontSize: AppFont.font_14,
@@ -323,8 +324,9 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _pgis({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           // Navigator.push(
@@ -341,15 +343,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.gps_fixed_sharp,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.gps_fixed_sharp, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.pgis,
               fontSize: AppFont.font_14,
@@ -364,12 +361,15 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _logout({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.width * 0.02,
-          bottom: MediaQuery.of(context).size.width * 0.02),
+        top: MediaQuery.of(context).size.width * 0.02,
+        bottom: MediaQuery.of(context).size.width * 0.02,
+      ),
       child: GestureDetector(
         onTap: () {
           showModalBottomSheet(
-              context: context, builder: (context) => const LogoutWidget());
+            context: context,
+            builder: (context) => const LogoutWidget(),
+          );
         },
         child: Row(
           children: [
@@ -380,15 +380,10 @@ class HomeDrawerWidget extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
-                child: Icon(
-                  Icons.logout,
-                  color: AppColor.white,
-                ),
+                child: Icon(Icons.logout, color: AppColor.white),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
-            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
             TextWidget(
               AppString.logout,
               fontSize: AppFont.font_14,

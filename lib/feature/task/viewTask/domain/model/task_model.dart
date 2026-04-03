@@ -86,8 +86,10 @@ class TaskModel {
     region = json['region'] ?? "";
     noOfPoints = json['noOfPoints'] ?? "";
     shapeData =  json['shape'] != null ? ShapeModel.fromJson(json['shape']) :  ShapeModel();
-    taskStatus =  json['patrollman_status'] != null ? getTaskStatus(json['patrollman_status'].toString())
-        :  json['status'] != null ? getTaskStatus(json['status'].toString())
+    taskStatus =  json['patrollman_status'] != null
+        ? getTaskStatus(json['patrollman_status'].toString())
+        :  json['status'] != null
+        ? getTaskStatus(json['status'].toString())
         :  TaskStatus.notStarted;
   }
 

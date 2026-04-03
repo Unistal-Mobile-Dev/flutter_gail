@@ -9,8 +9,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 
 class BackgroundManager {
-  static const _channelId = 'my_foreground_oil';
-  static const _notificationId = 941678999;
+  static const _channelId = 'link_walker_hpoil';
+  static const _notificationId = 987654321;
+  // static const _channelId = 'my_foreground_oil';
+  // static const _notificationId = 941678999;
 
   /// 🔄 Stream to notify app when service starts/stops
   static final ValueNotifier<bool> isServiceRunning = ValueNotifier(false);
@@ -231,7 +233,7 @@ void onStart(ServiceInstance service) async {
               "Lat: ${pos.latitude}, Lng: ${pos.longitude}",
               const NotificationDetails(
                 android: AndroidNotificationDetails(
-                  'my_foreground',
+                  'link_walker_hpoil',
                   'Foreground Service',
                   channelDescription: 'Used for background location tracking',
                   ongoing: true,

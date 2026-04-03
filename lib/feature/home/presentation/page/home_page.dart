@@ -27,7 +27,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -41,105 +40,108 @@ class _HomePageState extends State<HomePage> {
         }
       },
       child: Scaffold(
-          extendBodyBehindAppBar: true,
-          key: scaffoldKey,
-          drawer: HomeDrawerWidget(),
-          appBar: AppBar(
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: <Color>[
-                    AppColor.themeLightColor,
-                    AppColor.themeColor,
-                  ])),
+        extendBodyBehindAppBar: true,
+        key: scaffoldKey,
+        drawer: HomeDrawerWidget(),
+        appBar: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: <Color>[AppColor.themeLightColor, AppColor.themeColor],
+              ),
             ),
-            elevation: 0,
-            title: Theme(
-                data: ThemeData().copyWith(
-                  brightness: Brightness.light,
-                ),
-                child: BlocBuilder<HomeBloc, HomeState>(
-                  builder: (context, state) {
-                    if (state is FetchHomeDataState) {
-                      return TextWidget(
-                        state.title.toString(),
-                        fontSize: AppFont.font_16,
-                        color: AppColor.white,
-                        fontWeight: FontWeight.w700,
-                      );
-                    }
-                    return TextWidget(
-                      "Patrolling",
-                      fontSize: AppFont.font_16,
-                      color: AppColor.white,
-                      fontWeight: FontWeight.w700,
-                    );
-                  },
-                )),
-            actions: [
-              Image.asset(
-                AppIcon.oilLogo,
-                height: MediaQuery.of(context).size.width * 0.08,
-              ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.03,
-              ),
-            ],
           ),
-          bottomNavigationBar:
-              BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
+          elevation: 0,
+          title: Theme(
+            data: ThemeData().copyWith(brightness: Brightness.light),
+            child: BlocBuilder<HomeBloc, HomeState>(
+              builder: (context, state) {
+                if (state is FetchHomeDataState) {
+                  return TextWidget(
+                    state.title.toString(),
+                    fontSize: AppFont.font_16,
+                    color: AppColor.white,
+                    fontWeight: FontWeight.w700,
+                  );
+                }
+                return TextWidget(
+                  "Patrolling",
+                  fontSize: AppFont.font_16,
+                  color: AppColor.white,
+                  fontWeight: FontWeight.w700,
+                );
+              },
+            ),
+          ),
+          actions: [
+            Image.asset(
+              AppIcon.hpOILLogo,
+              height: MediaQuery.of(context).size.width * 0.08,
+            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.03),
+          ],
+        ),
+        bottomNavigationBar: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
             if (state is FetchHomeDataState) {
               return state.bottomNavigationBarItemList.isNotEmpty
                   ? BottomNavigationBar(
-                      currentIndex: state.bottomTabIndex,
-                      onTap: (index) {
-                        BlocProvider.of<HomeBloc>(context).add(
-                            HomeChangeBottomNavigationItemEvent(
-                                index: index, context: context));
-                      },
-                      items: state.bottomNavigationBarItemList,
-                    )
+                    currentIndex: state.bottomTabIndex,
+                    onTap: (index) {
+                      BlocProvider.of<HomeBloc>(context).add(
+                        HomeChangeBottomNavigationItemEvent(
+                          index: index,
+                          context: context,
+                        ),
+                      );
+                    },
+                    items: state.bottomNavigationBarItemList,
+                  )
                   : const SizedBox.shrink();
             } else {
               return const SizedBox.shrink();
             }
-          }),
-          body: Stack(
-            children: [
-              Column(
-                children: [
-                  SizedBox(
-                    height: _headerHeight,
-                    child: HeaderWidget(_headerHeight, true, Icons.person),
-                  ),
-                  Expanded(
-                    child: BlocBuilder<HomeBloc, HomeState>(
-                        builder: (context, state) {
+          },
+        ),
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                SizedBox(
+                  height: _headerHeight,
+                  child: HeaderWidget(_headerHeight, true, Icons.person),
+                ),
+                Expanded(
+                  child: BlocBuilder<HomeBloc, HomeState>(
+                    builder: (context, state) {
                       if (state is FetchHomeDataState) {
                         return state.childWidget;
                       } else {
-                        return const Center(
-                          child: CenterLoaderWidget(),
-                        );
+                        return const Center(child: CenterLoaderWidget());
                       }
-                    }),
+                    },
                   ),
-                ],
-              ),
-            ],
-          )),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Future<bool> _onWillPop() async {
     return (await showDialog(
-            context: context,
-            builder: (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
+          context: context,
+          builder:
+              (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
                 message: "Do you want to exit an App?",
                 okButtonText: "Exit",
-                onPressed: () => Navigator.of(context).pop(true)))) ??
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+        )) ??
         false;
   }
 }

@@ -155,17 +155,15 @@ class ServerRequest {
     return null;
   }
 
-  static Future<dynamic> postData(
-      {required var urlEndPoint, required var body, required BuildContext context}) async {
+  static Future<dynamic> postData({required var urlEndPoint, required var body, required BuildContext context}) async {
     try {
       String url = APIs.baseUrl + urlEndPoint;
       log(url);
       await addToken();
-      print(body);
-      log(header.toString());
-      final response = await post(Uri.parse(url), headers: header, body: body)
-          .timeout(const Duration(minutes: 1));
-      log(response.body);
+      log("body -- > ${body}");
+      log("header -- > ${header.toString()}");
+      final response = await post(Uri.parse(url), headers: header, body: body).timeout(const Duration(minutes: 1));
+      log("response.body -- > ${response.body}");
       if (response.statusCode == 200) {
         updateCookie(response);
         return jsonDecode(response.body);
@@ -383,9 +381,9 @@ class ServerRequest {
 
   static addToken() async {
     try{
-      String token = await SharedPreferencesUtils.getString(key: PreferencesName.token);
+     // String token = await SharedPreferencesUtils.getString(key: PreferencesName.token);
+      String token = AppConfig.instanceInit()?.userData.tokens!.access.toString() ?? "";
       header["X-Auth-Token"] = token;
-      // header["Authorization"] = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjk2LCJlbWFpbCI6Im5hdXNoYWRhQHVuaXN0YWwuY29tIiwiaWF0IjoxNzU4MjYxMDQ2LCJleHAiOjE3NTgzNDc0NDZ9.TpdpfpLcTx92j2O9DwX603EtKE7KWPdlcV8IkjxdkaU";
     } catch(_){
       header["X-Auth-Token"] = "";
     }

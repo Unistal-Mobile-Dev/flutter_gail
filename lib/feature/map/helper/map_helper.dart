@@ -2,26 +2,22 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 import 'package:battery_plus/battery_plus.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
 import 'package:flutter_gail/feature/map/domain/model/configuration_model.dart';
-import 'package:flutter_gail/feature/map/domain/model/google_route_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/hive_location_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/marker_point_model.dart';
 import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
-import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
 import 'package:flutter_gail/services/network_helper.dart';
 import 'package:flutter_gail/utils/commonWidgets/gps_alert_pop_widget.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 
 class MapHelper {
@@ -43,10 +39,7 @@ class MapHelper {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       if (!context.mounted) return;
-      showDialog(
-        context: context,
-        builder: (_) => const GPSAlertPopWidget(),
-      );
+      showDialog(context: context, builder: (_) => const GPSAlertPopWidget());
       return;
     }
 
@@ -68,7 +61,6 @@ class MapHelper {
     });
   }
 
-
   /// Stop GPS tracking
   Future<void> stopTracking() async {
     await _positionSubscription?.cancel();
@@ -84,44 +76,49 @@ class MapHelper {
   }
 
   /// Fetch routes from server
-  static Future<MapModel?> fetchRoutes({required String routeId}) async {
-    try {
-      String url = APIs.getRouteApi + routeId;
+  static Future<MapModel?> fetchRoutes({required String routeId,required String moduleName}) async {
+   try {
+      String url = APIs.getRouteApi(moduleName: moduleName) + routeId;
       var res = await ServerRequest.getData(urlEndPoint: url);
-      if (res != null) return MapModel.fromJson(res);
+      if (res != null) {
+        return MapModel.fromJson(res);
+      };
     } catch (_) {}
     return null;
   }
-
   /// Fetch configuration from server
   static Future<ConfigurationModel?> fetchConfiguration() async {
     try {
       String url = APIs.getConfigurationApi;
       var res = await ServerRequest.getData(urlEndPoint: url);
-      if (res != null &&
-          res['success'] == true &&
-          res['config'] != null) {
+      if (res != null && res['success'] == true && res['config'] != null) {
         return ConfigurationModel.fromJson(res['config']);
       }
     } catch (_) {}
     return null;
   }
 
-
-  static Future<List<MarkerPointsModel>> fetchMovingPath({required String taskId}) async {
+  static Future<List<MarkerPointsModel>> fetchMovingPath({
+    required String taskId,
+  }) async {
     List<MarkerPointsModel> directionList = [];
-      try {
-        String url = APIs.getMovingPointApi + "?task_id=$taskId";
-        var res = await ServerRequest.getData(urlEndPoint: url);
-        if (res != null && res['success'] != null && res['success'] == true && res['data'] != null){
-          return markerPointListResponse(res['data']);
-        }
-      }catch(_){}
+    try {
+      String url = APIs.getMovingPointApi + "?task_id=$taskId";
+      var res = await ServerRequest.getData(urlEndPoint: url);
+      if (res != null &&
+          res['success'] != null &&
+          res['success'] == true &&
+          res['data'] != null) {
+        return markerPointListResponse(res['data']);
+      }
+    } catch (_) {}
     return directionList;
   }
 
   /// Fetch markers for a section
-  static Future<List<MarkerModel>?> fetchMarkerList({required String sectionCode}) async {
+  static Future<List<MarkerModel>?> fetchMarkerList({
+    required String sectionCode,
+  }) async {
     try {
       String url = APIs.getMarkerApi + "?sectionCode=$sectionCode";
       var res = await ServerRequest.getData(urlEndPoint: url);
@@ -130,7 +127,6 @@ class MapHelper {
     return null;
   }
 
-
   /// Calculate distance in meters
   static double calculateDistance(lat1, lon1, lat2, lon2) {
     // const R = 6371000.0; // meters
@@ -138,9 +134,12 @@ class MapHelper {
     double dLat = toRadians(lat2 - lat1);
     double dLon = toRadians(lon2 - lon1);
 
-    double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
-        math.cos(toRadians(lat1)) * math.cos(toRadians(lat2)) *
-            math.sin(dLon / 2) * math.sin(dLon / 2);
+    double a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(toRadians(lat1)) *
+            math.cos(toRadians(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
     double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
     return R * c;
   }
@@ -148,18 +147,28 @@ class MapHelper {
   static double calculateBearing(lat1, lon1, lat2, lon2) {
     final deltaLon = toRadians(lon2 - lon1);
     final y = math.sin(deltaLon) * math.cos(toRadians(lat2));
-    final x = math.cos(toRadians(lat1)) * math.sin(toRadians(lat2)) -
-        math.sin(toRadians(lat1)) * math.cos(toRadians(lat2)) * math.cos(deltaLon);
+    final x =
+        math.cos(toRadians(lat1)) * math.sin(toRadians(lat2)) -
+        math.sin(toRadians(lat1)) *
+            math.cos(toRadians(lat2)) *
+            math.cos(deltaLon);
     return (toDegrees(math.atan2(y, x)) + 360) % 360;
   }
 
   static double toRadians(double deg) => deg * (math.pi / 180.0);
+
   static double toDegrees(double rad) => rad * (180.0 / math.pi);
 
   /// Fetch section points details
-  static Future<RoutePointsModel?> fetchPointsDetails({required String sectionCode}) async {
+  static Future<RoutePointsModel?> fetchPointsDetails({
+    required String sectionCode,
+  }) async {
+    final moduleName = AppConfig.instanceInit()?.groupRoles.moduleName.toString();
     try {
-      String url = APIs.getMarkerCrossingInidentTypePointsApi + "?sectionCode=$sectionCode";
+      String url = "${APIs.getMarkerCrossingInidentTypePointsApi(
+        moduleName: moduleName == "MDPE Line Patrolling"
+          ? "route-observer-mdpe"
+          : "route-observer",)}?sectionCode=$sectionCode";
       var res = await ServerRequest.getData(urlEndPoint: url);
       if (res != null) return RoutePointsModel.fromJson(res, sectionCode);
     } catch (e) {
@@ -179,7 +188,12 @@ class MapHelper {
 
     for (var routeData in routes) {
       for (var points in routeData) {
-        double distance = calculateDistance(currentLocation.latitude, currentLocation.longitude, points.y, points.x);
+        double distance = calculateDistance(
+          currentLocation.latitude,
+          currentLocation.longitude,
+          points.y,
+          points.x,
+        );
         if (distance < shortestDistance) {
           shortestDistance = distance;
           return true;
@@ -200,8 +214,20 @@ class MapHelper {
       double distance = 0;
       double bearing = 0;
       if (lastPoint.y != null) {
-        distance = calculateDistance(lastPoint.y, lastPoint.x, locationData.lat, locationData.long) * 1000;
-        bearing = calculateBearing(locationData.lat, locationData.long, lastPoint.y, lastPoint.x);
+        distance =
+            calculateDistance(
+              lastPoint.y,
+              lastPoint.x,
+              locationData.lat,
+              locationData.long,
+            ) *
+            1000;
+        bearing = calculateBearing(
+          locationData.lat,
+          locationData.long,
+          lastPoint.y,
+          lastPoint.x,
+        );
       }
 
       lastPoint = PointsModel(x: locationData.long, y: locationData.lat);
@@ -211,23 +237,30 @@ class MapHelper {
       int batteryPercentage = await battery.batteryLevel;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      String taskId =  prefs.getString("taskId") ?? "";
+      String taskId = prefs.getString("taskId") ?? "";
+      String schema = AppConfig.instanceInit()?.userData.schema.toString() ?? "";
+     // String schema = prefs.getString(PreferencesName.schema) ?? "";
       print("--------------------Task Id $taskId");
-      if(taskId.isEmpty){
+      if (taskId.isEmpty) {
         return {"status": "error", "message": ""};
       }
-      String subTaskId =  prefs.getString("subTaskId") ?? "";
+      String subTaskId = prefs.getString("subTaskId") ?? "";
 
       // 4. Create Hive model
       HiveLocationModel hiveLocation = HiveLocationModel(
         taskId: taskId,
+        schema: schema,
         subTaskId: subTaskId,
         gpsX: locationData.long ?? 0.0,
         gpsY: locationData.lat ?? 0.0,
         distance: distance,
         bearing: bearing,
         speed: double.parse(locationData.speed ?? "0.0"),
-        gpsAccuracy: double.parse(locationData.accuracy.toString().isEmpty ? "0.0" : locationData.accuracy.toString()),
+        gpsAccuracy: double.parse(
+          locationData.accuracy.toString().isEmpty
+              ? "0.0"
+              : locationData.accuracy.toString(),
+        ),
         battery: batteryPercentage,
         inspectedDateTime: DateTime.now(),
       );
@@ -266,7 +299,6 @@ class MapHelper {
     }
   }
 
-
   static Future<void> syncOfflineLocations() async {
     var box = Hive.box<HiveLocationModel>('location_box');
     bool connected = await NetworkHelper.isConnected();
@@ -290,7 +322,8 @@ class MapHelper {
         urlEndPoint: APIs.saveLocationDataApi,
         body: jsonEncode(payload),
       );
-
+      log("saveLocationDataApi-- >  ${APIs.saveLocationDataApi}");
+      log("payload-- >  ${jsonEncode(payload)}");
       // If server response is successful, mark all as synced
       if (res != null) {
         for (var location in box.values) {
@@ -304,6 +337,4 @@ class MapHelper {
       print("Batch sync failed: $e");
     }
   }
-
-
 }

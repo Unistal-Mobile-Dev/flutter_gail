@@ -37,7 +37,11 @@ class HiveLocationModel extends HiveObject {
   @HiveField(10)
   bool isSynced;
 
+  @HiveField(11)
+  String schema;
+
   HiveLocationModel({
+    required this.schema,
     required this.taskId,
     required this.subTaskId,
     required this.gpsX,
@@ -54,6 +58,7 @@ class HiveLocationModel extends HiveObject {
   Map<String, dynamic> toServerJson() => {
     "task_id": taskId,
     "subtask_id": subTaskId,
+    "schema": schema,
     "locations": [
       {
         "gpsx": gpsX.toString(),

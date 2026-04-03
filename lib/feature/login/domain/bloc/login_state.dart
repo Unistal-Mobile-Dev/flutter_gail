@@ -14,7 +14,6 @@ class FetchLoginStateData extends LoginStateInit {
   final bool appLogoLoader;
   final TextEditingController userNameTextFiledController;
   final TextEditingController passwordTextFieldController;
-  final String appLogo;
   final String appVersion;
   final  String loginType;
 
@@ -22,7 +21,6 @@ class FetchLoginStateData extends LoginStateInit {
     required this.isLoader,
     required this.isPassword,
     required this.appLogoLoader,
-    required this.appLogo,
     required this.userNameTextFiledController,
     required this.passwordTextFieldController,
     required this.appVersion,
@@ -34,7 +32,6 @@ class FetchLoginStateData extends LoginStateInit {
         isLoader,
         isPassword,
         appLogoLoader,
-        appLogo,
         userNameTextFiledController,
         passwordTextFieldController,
         appVersion,
