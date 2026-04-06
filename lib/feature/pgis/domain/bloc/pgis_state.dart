@@ -22,52 +22,69 @@ class PgisMapReadyState extends PgisState {
 
 class FetchPgisDataState extends PgisState {
   final bool isPageLoader;
-  final bool isDetailsLoader;
   final bool isArcGISStreets;
-  final bool isNavigating;
-  final bool isMuted;
-  final String selectedLayerType;
-  final TextEditingController fromController;
-  final TextEditingController toController;
-  final List<dynamic> fromLocationList;
-  final List<dynamic> toLocationList;
+  final bool isPipelineDeviceCheck;
+  final bool isStructureCheck;
+  final bool isPipelineCheck;
+  final bool isContinuousCheck;
+  final bool isEngineeringCheck;
+  final bool isStructureBoundaryCheck;
+  final bool isServiceCheck;
+  final bool isCadastralCheck;
   final TextEditingController pipelineCtrl;
   final TextEditingController sectionCtrl;
   final TextEditingController stationCtrl;
   final TextEditingController tlpCtrl;
+  final List<StructureBoundaryFeature> stationList;
+  final ArcGISPoint curPoint;
+  final ArcGISPoint desPoint;
+  final double distanceKm;
+  final double travelTimeMin;
 
-  FetchPgisDataState({
+  const FetchPgisDataState({
     required this.isPageLoader,
-    required this.isDetailsLoader,
-    required this.isNavigating,
-    required this.isMuted,
+    required this.isPipelineDeviceCheck,
+    required this.isStructureCheck,
+    required this.isPipelineCheck,
+    required this.isContinuousCheck,
+    required this.isEngineeringCheck,
+    required this.isStructureBoundaryCheck,
+    required this.isServiceCheck,
+    required this.isCadastralCheck,
+
     required this.isArcGISStreets,
-    required this.selectedLayerType,
-    required this.fromController,
-    required this.toController,
-    required this.fromLocationList,
-    required this.toLocationList,
     required this.pipelineCtrl,
     required this.sectionCtrl,
     required this.stationCtrl,
     required this.tlpCtrl,
+    required this.stationList,
+    required this.curPoint,
+    required this.desPoint,
+    required this.distanceKm,
+    required this.travelTimeMin,
+
   });
   @override
   List<Object> get props => [
     isPageLoader,
-    isDetailsLoader,
-    isNavigating,
-    isMuted,
+    isPipelineDeviceCheck,
+    isStructureCheck,
+    isPipelineCheck,
+    isContinuousCheck,
+    isEngineeringCheck,
+    isStructureBoundaryCheck,
+    isServiceCheck,
+    isCadastralCheck,
     isArcGISStreets,
-    selectedLayerType,
-    fromController,
-    toController,
-    fromLocationList,
-    toLocationList,
     pipelineCtrl,
     sectionCtrl,
     stationCtrl,
     tlpCtrl,
+    stationList,
+    curPoint,
+    desPoint,
+    distanceKm,
+    travelTimeMin,
 
   ];
 }

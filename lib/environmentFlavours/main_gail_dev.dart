@@ -86,12 +86,19 @@ Future<void> main() async {
     debugPrint("Notification Init Error: $e");
   }
 
+
   var apiKey = Platform.isAndroid ?  const String.fromEnvironment('API_KEY') : "AAPK61287a314f53402d91bb41dffde6de9c_BFuvT1vTFyCyRq4Cx46fgTaP_ax8er0gNXa1ZR-_Tnw4xmBJj6GDtrrxad7rfzL";
   if (apiKey.isEmpty) {
     throw Exception('apiKey undefined');
   } else {
     ArcGISEnvironment.apiKey = apiKey;
   }
+
+  var licenseKey = Platform.isAndroid ?  const String.fromEnvironment('License_Key') : "runtimelite,1000,rud8814547710,none,TRB3LNBHPBJL6XCFK216";
+  ArcGISEnvironment.setLicenseUsingKey(
+    licenseKey,
+  );
+
 
   // ✅ 7. App Config
   var configuredApp = const EnvironmentConfig(

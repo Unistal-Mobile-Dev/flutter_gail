@@ -18,4 +18,6 @@ class PreferencesName {
   static get notificationSilent => "notificationSilent";
 
   static get token => "token";
+
+  static get otpVerified => "otpVerified";
 }

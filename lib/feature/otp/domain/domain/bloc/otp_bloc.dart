@@ -140,6 +140,7 @@ class OtpBloc extends Bloc<OtpEvent, OtpState> {
       _loginData = loginResponse(res);
       UserInfo.instanceInit()?.userData = _loginData;
       await SharedPreferencesUtils.setString(key: PreferencesName.token, value: UserInfo.instanceInit()!.userData!.tokens!.access.toString());
+      await SharedPreferencesUtils.setString(key: PreferencesName.otpVerified, value: "1");
       Navigator.pushAndRemoveUntil(
           !event.context.mounted ? event.context : event.context,
           MaterialPageRoute(builder: (_) => const HomePage()),

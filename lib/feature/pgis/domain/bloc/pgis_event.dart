@@ -20,15 +20,6 @@ class PGISMapReady extends PgisEvent {
   List<Object?> get props => [controller];
 }
 
-class SelectMapArcGISStreets extends PgisEvent {
-  final bool isArcGISStreets;
-  const SelectMapArcGISStreets({required this.isArcGISStreets});
-
-  @override
-  List<Object?> get props => [
-    isArcGISStreets
-  ];
-}
 class IdentifyFeaturesAtTapEvent extends PgisEvent {
   final BuildContext context;
   final ArcGISMapViewController controller;
@@ -56,7 +47,7 @@ class StartNavigationEvent extends PgisEvent {
 
   @override
   // TODO: implement props
-  List<Object?> get props => [PgisEvent,destination];
+  List<Object?> get props => [controller,destination];
 }
 
 class LocationEvent extends PgisEvent {
@@ -77,11 +68,12 @@ class SearchRoundedEvent extends PgisEvent {
 }
 
 class MapLayerEvent extends PgisEvent {
+  final ArcGISMapViewController controller;
   final BuildContext ctx;
-  const MapLayerEvent({required this.ctx,});
+  const MapLayerEvent({required this.ctx, required this.controller});
   @override
   // TODO: implement props
-  List<Object?> get props =>[ctx];
+  List<Object?> get props =>[ctx, controller];
 }
 
 
@@ -113,15 +105,7 @@ class SelectTLPEvent extends PgisEvent {
 }
 
 
-class TrackingStatusUpdatedEvent extends PgisEvent {
-  final TrackingStatus status;
-  final ArcGISMapViewController controller;
-  const TrackingStatusUpdatedEvent({required this.status, required this.controller});
 
-  @override
-  // TODO: implement props
-  List<Object?> get props => [status, controller];
-}
 
 class StopNavigationEvent extends PgisEvent {
   final ArcGISMapViewController controller;
@@ -132,10 +116,109 @@ class StopNavigationEvent extends PgisEvent {
 }
 
 
-class SelectLayerTypeEvent extends PgisEvent {
-  final String selectedLayerValue;
- const SelectLayerTypeEvent(this.selectedLayerValue);
+class TogglePipelineDeviceEvent extends PgisEvent {
+  final ArcGISMapViewController controller;
+  const TogglePipelineDeviceEvent({required this.controller});
+  @override
+  // TODO: implement props
+  List<Object?> get props => [controller];
+}
+
+class ToggleStructureEvent extends PgisEvent {
+  final ArcGISMapViewController controller;
+  const ToggleStructureEvent({required this.controller});
+  @override
+  // TODO: implement props
+  List<Object?> get props => [controller];
+}
+
+class TogglePipelineEvent extends PgisEvent {
+  final ArcGISMapViewController controller;
+  const TogglePipelineEvent({required this.controller});
+  @override
+  // TODO: implement props
+  List<Object?> get props => [controller];
+}
+
+class ToggleContinuousEvent extends PgisEvent {
+  final ArcGISMapViewController controller;
+  const ToggleContinuousEvent({required this.controller});
+  @override
+  // TODO: implement props
+  List<Object?> get props => [controller];
+}
+
+class ToggleEngineeringEvent  extends PgisEvent {
+  final ArcGISMapViewController controller;
+  const ToggleEngineeringEvent({required this.controller});
+  @override
+  // TODO: implement props
+  List<Object?> get props => [controller];
+}
+
+class ToggleStructureBoundaryEvent  extends PgisEvent {
+  final ArcGISMapViewController controller;
+  const ToggleStructureBoundaryEvent({required this.controller});
+  @override
+  // TODO: implement props
+  List<Object?> get props => [controller];
+}
+
+class ToggleServiceEvent  extends PgisEvent {
+  final ArcGISMapViewController controller;
+  const ToggleServiceEvent({required this.controller});
+  @override
+  // TODO: implement props
+  List<Object?> get props => [controller];
+}
+
+class ToggleCadastralEvent  extends PgisEvent {
+  final ArcGISMapViewController controller;
+  const ToggleCadastralEvent({required this.controller,});
+  @override
+  // TODO: implement props
+  List<Object?> get props => [controller,];
+}
+
+class ResetPipelineEvent extends PgisEvent {
+  final ArcGISMapViewController controller;
+
+  const ResetPipelineEvent({required this.controller});
 
   @override
-  List<Object?> get props => [selectedLayerValue];
+  // TODO: implement props
+  List<Object?> get props => [controller];
+}
+
+class ResetStationEvent extends PgisEvent {
+  final ArcGISMapViewController controller;
+
+  const ResetStationEvent({required this.controller});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [controller];
+}
+
+class ResetTLPEvent extends PgisEvent {
+  final ArcGISMapViewController controller;
+
+ const ResetTLPEvent({required this.controller});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [controller];
+}
+
+class ChangeBasemapEvent extends PgisEvent {
+  final BasemapStyle basemapStyle;
+  final ArcGISMapViewController controller;
+
+  const ChangeBasemapEvent({
+    required this.basemapStyle,
+    required this.controller,
+  });
+
+  @override
+  List<Object?> get props => [basemapStyle, controller];
 }

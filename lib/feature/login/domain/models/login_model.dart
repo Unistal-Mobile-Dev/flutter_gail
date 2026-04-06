@@ -192,7 +192,7 @@ class Tokens {
 
   Tokens.fromJson(Map<String, dynamic> json) {
     access = json['access'] ?? "";
-    expiresIn = json['expiresIn'] ?? "";
+    expiresIn = json['expiresIn'] ?? 8;
   }
 
   Map<String, dynamic> toJson() {

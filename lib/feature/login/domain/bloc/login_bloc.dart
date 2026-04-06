@@ -128,7 +128,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       _isLoader = false;
       _eventCompleted(emit);
         userId =  otpRes;
-        Navigator.push(
+      await SharedPreferencesUtils.setString(key: PreferencesName.userId, value: email);
+      await SharedPreferencesUtils.setString(key: PreferencesName.password, value: password);
+      Navigator.push(
             !event.context.mounted ? event.context : event.context,
             MaterialPageRoute(
                 builder: (_) => OtpPage(

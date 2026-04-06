@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gail/feature/pgis/domain/bloc/pgis_bloc.dart';
 import 'package:flutter_gail/feature/pgis/helper/pgis_helper.dart';
 import 'package:flutter_gail/utils/commonWidgets/SpinLoader.dart';
+import 'package:flutter_gail/utils/res/app_color.dart';
 
 import 'TypeAheadFieldWidget.dart';
 
@@ -30,9 +31,12 @@ class FilterWidget extends StatelessWidget {
                     suffix: IconButton(
                       icon: Icon(Icons.cancel_outlined, color: Colors.red),
                       onPressed: () {
-                        state.pipelineCtrl.text = "";
-                        state.sectionCtrl.text = "";
-                        state.tlpCtrl.text = "";
+                        Navigator.pop(context);
+                        context.read<PgisBloc>().add(
+                          ResetPipelineEvent(
+                            controller: mapViewController,
+                          ),
+                        );
                       },
                     ),
                     controller: state.pipelineCtrl,
@@ -59,13 +63,18 @@ class FilterWidget extends StatelessWidget {
 
                   const SizedBox(height: 16),
                   TypeaheadFieldWidget(
-                    enabled:  state.pipelineCtrl.text.isNotEmpty ? true : false,
+                   // enabled:  state.pipelineCtrl.text.isNotEmpty ? true : false,
                     label: "Search Station Name",
                     controller: state.sectionCtrl,
                     suffix: IconButton(
                       icon: Icon(Icons.cancel_outlined, color: Colors.red),
                       onPressed: () {
-                        state.sectionCtrl.text = "";
+                        Navigator.pop(context);
+                        context.read<PgisBloc>().add(
+                          ResetStationEvent(
+                            controller: mapViewController,
+                          ),
+                        );
                       },
                     ),
                     suggestionsCallback: (val) async {
@@ -91,12 +100,17 @@ class FilterWidget extends StatelessWidget {
 
                   const SizedBox(height: 16),
                   TypeaheadFieldWidget(
-                    enabled:  state.pipelineCtrl.text.isNotEmpty ? true : false,
+                  //  enabled:  state.pipelineCtrl.text.isNotEmpty ? true : false,
                     label: "Search TLP Name",
                     suffix: IconButton(
                       icon: Icon(Icons.cancel_outlined, color: Colors.red),
                       onPressed: () {
-                        state.tlpCtrl.text = "";
+                        Navigator.pop(context);
+                        context.read<PgisBloc>().add(
+                          ResetTLPEvent(
+                            controller: mapViewController,
+                          ),
+                        );
                       },
                     ),
                     controller: state.tlpCtrl,
@@ -126,7 +140,7 @@ class FilterWidget extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text("Cancel"),
+                      child: Text("Cancel",style: TextStyle(color: AppColor.themeColor,),),
                     ),
                   ),
                 ],

@@ -98,9 +98,12 @@ class HomeDrawerWidget extends StatelessWidget {
                 children: [
                   _header(context: context),
                   SizedBox(height: MediaQuery.of(context).size.width * 0.10),
-                  dashboardName.toString().isNotEmpty
-                      ? _dashboard(context: context)
+
+                  pgisName.toString().isNotEmpty
+                      ? _pgis(context: context)
                       : const SizedBox.shrink(),
+
+
 
                   taskName.toString().isNotEmpty
                       ? _task(context: context)
@@ -114,8 +117,8 @@ class HomeDrawerWidget extends StatelessWidget {
                       ? _imageSharing(context: context)
                       : const SizedBox.shrink(),
 
-                  pgisName.toString().isNotEmpty
-                      ? _pgis(context: context)
+                  dashboardName.toString().isNotEmpty
+                      ? _dashboard(context: context)
                       : const SizedBox.shrink(),
 
                   _logout(context: context),
