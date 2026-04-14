@@ -19,7 +19,6 @@ import 'package:flutter_gail/feature/task/deviation/presentation/page/deviation_
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class MapSample extends StatefulWidget {
   const MapSample({super.key});
@@ -133,24 +132,48 @@ class MapSampleState extends State<MapSample> {
 
   /// ✅ Get current location + listen to updates
   Future<void> _getCurrentLocation() async {
-    var status = await Permission.location.request();
-    if (!status.isGranted) return;
+    try {
+      // Check if location service is enabled
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        _setFallbackPosition();
+        return;
+      }
 
-    Position position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 5,
-      ),
-    );
+      // Check permission (already requested at dashboard level)
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        _setFallbackPosition();
+        return;
+      }
 
-    final latLng = LatLng(position.latitude, position.longitude);
-    setState(() {
-      _currentLatLng = latLng;
-      _initialCameraPosition = CameraPosition(target: latLng, zoom: 18.5);
-    });
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 5,
+        ),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception("Location timeout"),
+      );
 
-    // Update marker and center camera on start
-    await _updateMarkerPosition(position, moveCamera: true);
+      if (!mounted) return;
+      final latLng = LatLng(position.latitude, position.longitude);
+      setState(() {
+        _currentLatLng = latLng;
+        _initialCameraPosition = CameraPosition(target: latLng, zoom: 18.5);
+      });
+
+      // Update marker and center camera on start
+      await _updateMarkerPosition(position, moveCamera: true);
+    } catch (e) {
+      debugPrint("⚠️ Location error: $e");
+      _setFallbackPosition();
+    }
 
     // Stream location updates
     _positionStream = Geolocator.getPositionStream(
@@ -201,6 +224,18 @@ class MapSampleState extends State<MapSample> {
       }*/
 
       _updateMarkerPosition(newPos, moveCamera: _isAutoFollow);
+    }, onError: (e) {
+      debugPrint("⚠️ Position stream error: $e");
+    });
+  }
+
+  void _setFallbackPosition() {
+    if (!mounted) return;
+    // Default fallback - New Delhi coordinates
+    const fallback = LatLng(28.6139, 77.2090);
+    setState(() {
+      _currentLatLng = fallback;
+      _initialCameraPosition = const CameraPosition(target: fallback, zoom: 12);
     });
   }
 

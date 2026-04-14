@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/map/domain/model/configuration_model.dart';
@@ -77,24 +78,29 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     locationPath = [];
     lastPoint = PointsModel();
     configurationData = ConfigurationModel();
-    // Initialize in main()
-    await manager.initializeService();
+    // Initialize background service (Android only)
+    if (Platform.isAndroid) {
+      await manager.initializeService();
+    }
     final groupRoles = AppConfig.instanceInit()?.groupRoles;
     // 🔹 Request permission before starting service
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
-    }
+    // LocationPermission permission = await Geolocator.checkPermission();
+    // if (permission == LocationPermission.denied ||
+    //     permission == LocationPermission.deniedForever) {
+    //   permission = await Geolocator.requestPermission();
+    // }
 
-    // 🔹 Listen to background updates
-    final service = FlutterBackgroundService();
-    service.on('update').listen((data) {
-      if (data != null) {
-        String lastLocation =
-            "📍 Lat: ${data['lat']} | Lng: ${data['lng']}\n🕒 ${data['timestamp']}";
-      }
-    });
+    // 🔹 Listen to background updates (Android only)
+    if (Platform.isAndroid) {
+      final service = FlutterBackgroundService();
+      service.on('update').listen((data) {
+        if (data != null) {
+          // ignore: unused_local_variable
+          String lastLocation =
+              "📍 Lat: ${data['lat']} | Lng: ${data['lng']}\n🕒 ${data['timestamp']}";
+        }
+      });
+    }
 
     taskList =
         BlocProvider.of<TaskBloc>(
@@ -222,7 +228,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     if (taskData.taskStatus == TaskStatus.started ||
         taskData.taskStatus == TaskStatus.resume) {
-      if (!await manager.isRunning()) {
+      if (Platform.isAndroid && !await manager.isRunning()) {
         manager.startService();
       }
       add(
@@ -232,6 +238,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       add(StopTracking());
     }
     _eventComplete(emit);
+
+    print("Complete Map Bloc ============================= ");
   }
 
   LatLng convertEPSG3857ToLatLng(double x, double y) {
@@ -365,25 +373,25 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (taskStatus == TaskStatus.started) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "1");
-      if (!await manager.isRunning()) {
+      if (Platform.isAndroid && !await manager.isRunning()) {
         manager.startService();
       }
     } else if (taskStatus == TaskStatus.pause) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "2");
-      if (await manager.isRunning()) {
+      if (Platform.isAndroid && await manager.isRunning()) {
         manager.stopService();
       }
     } else if (taskStatus == TaskStatus.resume) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "5");
-      if (!await manager.isRunning()) {
+      if (Platform.isAndroid && !await manager.isRunning()) {
         manager.startService();
       }
     } else if (taskStatus == TaskStatus.completed) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "3");
-      if (await manager.isRunning()) {
+      if (Platform.isAndroid && await manager.isRunning()) {
         manager.stopService();
       }
     }

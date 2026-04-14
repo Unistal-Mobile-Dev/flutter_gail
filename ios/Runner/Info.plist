@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>HPOIL</string>
+	<string>HPOIL Line</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -75,8 +75,13 @@
    <key>UIBackgroundModes</key>
    <array>
      <string>remote-notification</string>
+     <string>location</string>
+     <string>fetch</string>
+     <string>processing</string>
    </array>
-   <key>NSUserTrackingUsageDescription</key>
-   <string>This app uses notifications to alert you about background updates.</string>
+   <key>BGTaskSchedulerPermittedIdentifiers</key>
+   <array>
+     <string>dev.flutter.background.refresh</string>
+   </array>
 </dict>
 </plist>

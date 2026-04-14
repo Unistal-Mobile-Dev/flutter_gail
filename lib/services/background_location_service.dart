@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class BackgroundManager {
 
   /// 🔧 Initialize background service safely
   Future<void> initializeService() async {
+    if (Platform.isIOS) return;
     try {
       final service = FlutterBackgroundService();
 
@@ -33,11 +35,11 @@ class BackgroundManager {
           initialNotificationContent: 'Running background tasks...',
           foregroundServiceNotificationId: _notificationId,
         ),
-        iosConfiguration: IosConfiguration(),
+        iosConfiguration: IosConfiguration(
+          autoStart: false,
+          onForeground: onStart,
+        ),
       );
-
-      // final running = await service.isRunning();
-      // isServiceRunning.value = running;
     } catch (e, s) {
       log("⚠️ Error initializing background service: $e", stackTrace: s);
     }
@@ -45,6 +47,7 @@ class BackgroundManager {
 
   /// ✅ Start background service safely
   Future<void> startService() async {
+    if (Platform.isIOS) return;
     try {
       final service = FlutterBackgroundService();
       final isRunning = await service.isRunning();
@@ -63,6 +66,7 @@ class BackgroundManager {
 
   /// ✅ Stop background service safely
   Future<void> stopService() async {
+    if (Platform.isIOS) return;
     try {
       final service = FlutterBackgroundService();
       final isRunning = await service.isRunning();
@@ -82,8 +86,8 @@ class BackgroundManager {
 
   /// ✅ Check if running safely
   Future<bool> isRunning() async {
+    if (Platform.isIOS) return false;
     try {
-      print("Service 3 === ");
       final service = FlutterBackgroundService();
       final running = await service.isRunning();
       isServiceRunning.value = running;
@@ -111,7 +115,11 @@ void onStart(ServiceInstance service) async {
 
     final notifications = FlutterLocalNotificationsPlugin();
     const initSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher_oil');
-    const initSettings = InitializationSettings(android: initSettingsAndroid);
+    const initSettingsIOS = DarwinInitializationSettings();
+    const initSettings = InitializationSettings(
+      android: initSettingsAndroid,
+      iOS: initSettingsIOS,
+    );
     await notifications.initialize(settings: initSettings);
 
     // 🔄 Timer reference
