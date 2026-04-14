@@ -38,7 +38,7 @@ Future<void> main() async {
     );
 
     await notificationPlugin.initialize(
-      const InitializationSettings(
+      settings: const InitializationSettings(
         android: androidSettings,
         iOS: iosSettings,
       ),

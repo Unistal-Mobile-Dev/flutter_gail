@@ -27,3 +27,9 @@ plugins {
 
 rootProject.name = "flutter_gail"
 include(":app")
+
+gradle.afterProject { proj ->
+    if (proj.extensions.findByName('android') != null) {
+        proj.android.ndkVersion = "27.0.12077973"
+    }
+}

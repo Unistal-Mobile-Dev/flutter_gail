@@ -112,7 +112,7 @@ void onStart(ServiceInstance service) async {
     final notifications = FlutterLocalNotificationsPlugin();
     const initSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher_oil');
     const initSettings = InitializationSettings(android: initSettingsAndroid);
-    await notifications.initialize(initSettings);
+    await notifications.initialize(settings: initSettings);
 
     // 🔄 Timer reference
     Timer? locationTimer;
@@ -155,10 +155,10 @@ void onStart(ServiceInstance service) async {
           if (service is AndroidServiceInstance &&
               await service.isForegroundService()) {
             await notifications.show(
-              999,
-              "Background Service Running",
-              "Lat: ${pos.latitude}, Lng: ${pos.longitude}",
-              const NotificationDetails(
+              id: 999,
+              title: "Background Service Running",
+              body: "Lat: ${pos.latitude}, Lng: ${pos.longitude}",
+              notificationDetails: const NotificationDetails(
                 android: AndroidNotificationDetails(
                   BackgroundManager._channelId,
                   'Background Service',

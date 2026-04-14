@@ -69,7 +69,7 @@ class DropDownSearchWidget extends StatelessWidget {
         ),
         items: (filter, infiniteScrollProps) => items,
         itemAsString: itemAsString,
-        onChanged: onChanged,
+        onSaved: onChanged,
         popupProps: PopupProps.dialog(
             searchFieldProps: TextFieldProps(
               style: TextStyle(fontSize: AppFont.font_13),
