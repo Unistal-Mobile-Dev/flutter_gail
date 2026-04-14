@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Flutter Gail</string>
+	<string>HPOIL</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -46,7 +46,19 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-    <string>This lets gail app record so you can send voice message to this marker point.</string>
+	<string>This lets the app record audio so you can send voice messages to marker points.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires camera access to capture photos and videos for pipeline inspection.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires photo library access to select and upload images for pipeline inspection.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app requires permission to save photos to your photo library.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app requires your location to track pipeline patrolling routes and mark inspection points.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app requires your location in the background to continuously track pipeline patrolling routes.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app requires your location in the background to continuously track pipeline patrolling routes.</string>
    <key>CFBundleURLTypes</key>
    <array>
      <dict>
