@@ -17,9 +17,9 @@ class PreferencesName {
 
   static get notificationSilent => "notificationSilent";
 
-
-
   static get userInfo => "userInfo";
+
+  static get token => "token";
 
 
 }

@@ -95,11 +95,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         _eventCompleted(emit);
         loginData = loginResponse(res);
         await AppConfig.instanceInit()?.setUserInfo(newData: loginData);
-
         String userJson = jsonEncode(res);
         SharedPreferencesUtils.setString(key: PreferencesName.userInfo, value : userJson);
-     //   await SharedPreferencesUtils.setString(key: PreferencesName.token, value:loginData.tokens!.access.toString());
-        Navigator.pushAndRemoveUntil(
+       await SharedPreferencesUtils.setString(key: PreferencesName.token, value:loginData.tokens!.access.toString());
+
+       Navigator.pushAndRemoveUntil(
           !event.context.mounted ? event.context : event.context,
            MaterialPageRoute(builder: (_) => const HomePage()),
          // MaterialPageRoute(builder: (_) => const HpOilDashboardPage()),
@@ -118,11 +118,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   _loginCheck(LoginCheckEvent event, emit) async {
+
     var res =  await LoginHelper.checkLogin(context: event.context);
     if(res != null){
-
       loginData = loginResponse(res);
-    //  await SharedPreferencesUtils.setString(key: PreferencesName.token, value:loginData.tokens!.access.toString());
+      await AppConfig.instanceInit()?.setUserInfo(newData: loginData);
+      String userJson = jsonEncode(res);
+      SharedPreferencesUtils.setString(key: PreferencesName.userInfo, value : userJson);
+      await SharedPreferencesUtils.setString(key: PreferencesName.token, value:loginData.tokens!.access.toString());
       Navigator.pushAndRemoveUntil(
         !event.context.mounted ? event.context : event.context,
           MaterialPageRoute(builder: (_) => const HomePage()),

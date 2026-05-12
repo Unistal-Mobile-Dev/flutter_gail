@@ -57,6 +57,11 @@ class AddIncidentBloc extends Bloc<AddIncidentEvent, AddIncidentState> {
 
   _selectIncidentType(AddIncidentSelectTypeEvent event, emit) {
     incidentTypeData =  event.incidentTypeData;
+
+
+    print(incidentTypeData.name);
+    print(incidentTypeData.id);
+
     _eventComplete(emit);
   }
 
@@ -97,7 +102,6 @@ class AddIncidentBloc extends Bloc<AddIncidentEvent, AddIncidentState> {
 
 
   _submit(AddIncidentSubmitEvent event, emit) async {
-
     bool isTextFieldValidation =  await AddIncidentHelper.textFieldValidation(
         context: !event.context.mounted ? event.context : event.context,
         incidentTypeData: incidentTypeData, incidentReport: incidentReportController.text.toString());

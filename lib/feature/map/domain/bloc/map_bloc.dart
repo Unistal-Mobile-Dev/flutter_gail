@@ -356,11 +356,14 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       add(StopTracking());
     }
 
+    String schema = AppConfig.instanceInit()?.userData.schema.toString() ?? "";
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString("taskStatus", "0");
     print("Task Id ======================== ${taskData.taskId}");
     await prefs.setString("taskId", taskData.taskId.toString());
     await prefs.setString("subTaskId", taskData.subTaskId.toString());
+
+    await prefs.setString("schema", schema);
 
     if (taskStatus == TaskStatus.started) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();

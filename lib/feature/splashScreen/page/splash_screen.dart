@@ -68,6 +68,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
     /// ✅ Step 4: Token check
     String token = AppConfig.instanceInit()?.userData.tokens?.access.toString() ?? "";
+    await SharedPreferencesUtils.setString(key: PreferencesName.token, value:token);
+
 
     if (!context.mounted) return;
 

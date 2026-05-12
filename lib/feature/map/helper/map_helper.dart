@@ -290,10 +290,9 @@ class MapHelper {
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String taskId = prefs.getString("taskId") ?? "";
-      String schema =
-          AppConfig.instanceInit()?.userData.schema.toString() ?? "";
-      // String schema = prefs.getString(PreferencesName.schema) ?? "";
+      String schema = prefs.getString("schema") ?? "";
       print("--------------------Task Id $taskId");
+      print("--------------------schema $schema");
       if (taskId.isEmpty) {
         return {"status": "error", "message": ""};
       }
@@ -332,7 +331,6 @@ class MapHelper {
 
       List<Map<String, dynamic>> payload = [];
       payload.add(hiveLocation.toServerJson());
-
       // 6. Check network
       bool connected = await NetworkHelper.isConnected();
       print("Check connection 1 $connected");
