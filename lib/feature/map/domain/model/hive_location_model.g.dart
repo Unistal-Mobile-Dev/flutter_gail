@@ -17,7 +17,6 @@ class HiveLocationModelAdapter extends TypeAdapter<HiveLocationModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return HiveLocationModel(
-      schema: fields[11] as String,
       taskId: fields[0] as String,
       subTaskId: fields[1] as String,
       gpsX: fields[2] as double,
@@ -29,6 +28,7 @@ class HiveLocationModelAdapter extends TypeAdapter<HiveLocationModel> {
       battery: fields[8] as int,
       inspectedDateTime: fields[9] as DateTime,
       isSynced: fields[10] as bool,
+      schema: fields[11] as String,
     );
   }
 

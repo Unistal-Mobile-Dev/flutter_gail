@@ -13,6 +13,7 @@ import 'package:flutter_gail/feature/imageShare/domain/model/sub_category_model.
 import 'package:flutter_gail/feature/task/createTask/domain/model/region_type_model.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
+import 'package:flutter_gail/utils/commonClass/connectivity_helper.dart';
 
 class ImageShareHelper extends ImageShareInterface {
   @override
@@ -234,6 +235,13 @@ class ImageShareHelper extends ImageShareInterface {
           return null;
        } else {
          locationData = locationRes;
+       }
+
+       if (await ConnectivityHelper.allConnectivityCheck(
+         context: context.mounted ? context : context,
+       ) ==
+           false) {
+         return null;
        }
 
        final DateFormat formatter = DateFormat('dd-MM-yyyy');

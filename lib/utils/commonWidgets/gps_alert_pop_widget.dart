@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:geolocator/geolocator.dart';
 
 class GPSAlertPopWidget extends StatelessWidget {
   const GPSAlertPopWidget({super.key});
@@ -11,7 +12,7 @@ class GPSAlertPopWidget extends StatelessWidget {
       onPopInvoked: (didPop) {},
       child: Center(
         child: Container(
-          height: MediaQuery.of(context).size.height * 0.30,
+          height: MediaQuery.of(context).size.height * 0.35,
           width: MediaQuery.of(context).size.width / 1.7,
           margin: EdgeInsets.all(MediaQuery.of(context).size.height * 0.03),
           child: Card(
@@ -29,6 +30,7 @@ class GPSAlertPopWidget extends StatelessWidget {
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.03,
                 ),
+                _enableGpsButton(context: context),
               ],
             ),
           ),
@@ -73,6 +75,25 @@ class GPSAlertPopWidget extends StatelessWidget {
           Navigator.pop(context);
         },
       ),
+    );
+  }
+
+  Widget _enableGpsButton({
+    required BuildContext context,
+  }) {
+    return ElevatedButton(
+      onPressed: () async {
+        await Geolocator.openLocationSettings();
+
+        bool serviceEnabled =
+        await Geolocator.isLocationServiceEnabled();
+
+        if (serviceEnabled) {
+          if (!context.mounted) return;
+          Navigator.pop(context);
+        }
+      },
+      child: const Text("Turn On GPS"),
     );
   }
 }

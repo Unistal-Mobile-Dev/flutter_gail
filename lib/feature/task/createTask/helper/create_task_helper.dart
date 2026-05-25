@@ -15,6 +15,7 @@ import 'package:flutter_gail/feature/task/createTask/domain/model/task_from_mode
 import 'package:flutter_gail/feature/task/createTask/domain/model/user_name_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/user_type_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/vendor_model.dart';
+import 'package:flutter_gail/utils/commonClass/connectivity_helper.dart';
 
 class CreateTaskHelper {
 
@@ -327,6 +328,13 @@ class CreateTaskHelper {
           data.add(shiftData.name.toString());
         }
         shiftNameData.add(data);
+      }
+
+      if (await ConnectivityHelper.allConnectivityCheck(
+        context: context.mounted ? context : context,
+      ) ==
+          false) {
+        return null;
       }
 
       String url =  APIs.assignTaskApi;

@@ -6,6 +6,7 @@ import 'package:flutter_gail/feature/task/deviation/domain/model/deviation_model
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
+import 'package:flutter_gail/utils/commonClass/connectivity_helper.dart';
 
 class DeviationHelper {
 
@@ -57,6 +58,17 @@ class DeviationHelper {
       if(locationRes != null){
         locationData =  locationRes;
       }
+      else {
+        return null;
+      }
+
+      if (await ConnectivityHelper.allConnectivityCheck(
+        context: context.mounted ? context : context,
+      ) ==
+          false) {
+        return null;
+      }
+
       var json = {
         "task_id" : taskData.taskId.toString(),
         "patrollroute_id" : taskData.patrollRouteId.toString(),

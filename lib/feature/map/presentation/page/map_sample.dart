@@ -159,16 +159,6 @@ class MapSampleState extends State<MapSample> {
         distanceFilter: 5,
       ),
     ).listen((Position newPos) {
-      // if (_currentLatLng != null &&
-      //     Geolocator.distanceBetween(
-      //       _currentLatLng!.latitude,
-      //       _currentLatLng!.longitude,
-      //       newPos.latitude,
-      //       newPos.longitude,
-      //     ) <
-      //         1) {
-      //   return;
-      // }
 
       context.read<MapBloc>().add(
         MapRouteLocationCheck(
@@ -178,27 +168,6 @@ class MapSampleState extends State<MapSample> {
           verticalAccuracy: newPos.speedAccuracy,
         ),
       );
-
-      /*      DateTime _lastLocationUpdate = DateTime.now();
-      final mapData = BlocProvider.of<MapBloc>(context).mapData;
-      final double buffer = (mapData.buffer is num)
-          ? mapData.buffer.toDouble()
-          : double.tryParse(mapData.buffer.toString()) ?? 0.0;
-
-      final int timeInterval = (mapData.timeInterval is int)
-          ? mapData.timeInterval
-          : int.tryParse(mapData.timeInterval.toString()) ?? 5;
-      final now = DateTime.now();
-      if (mounted && now.difference(_lastLocationUpdate).inSeconds >= timeInterval) {
-        _lastLocationUpdate = now;
-         // check location start button
-        context.read<MapBloc>().add(MapRouteLocationCheck(
-          context: context,
-          currentPoint: LatLng(newPos.latitude, newPos.longitude),
-          speed: newPos.speed,
-          verticalAccuracy: newPos.speedAccuracy
-        ));
-      }*/
 
       _updateMarkerPosition(newPos, moveCamera: _isAutoFollow);
     });

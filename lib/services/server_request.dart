@@ -381,8 +381,7 @@ class ServerRequest {
 
   static addToken() async {
     try{
-     // String token = await SharedPreferencesUtils.getString(key: PreferencesName.token);
-      String token = AppConfig.instanceInit()?.userData.tokens!.access.toString() ?? "";
+     String token = await SharedPreferencesUtils.getString(key: PreferencesName.token);
       header["X-Auth-Token"] = token;
     } catch(_){
       header["X-Auth-Token"] = "";

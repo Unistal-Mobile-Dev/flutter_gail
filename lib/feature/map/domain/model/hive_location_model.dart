@@ -41,7 +41,6 @@ class HiveLocationModel extends HiveObject {
   String schema;
 
   HiveLocationModel({
-    required this.schema,
     required this.taskId,
     required this.subTaskId,
     required this.gpsX,
@@ -53,6 +52,7 @@ class HiveLocationModel extends HiveObject {
     required this.battery,
     required this.inspectedDateTime,
     this.isSynced = false,
+    required this.schema,
   });
 
   Map<String, dynamic> toServerJson() => {

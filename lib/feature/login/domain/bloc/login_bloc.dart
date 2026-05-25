@@ -98,7 +98,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
         String userJson = jsonEncode(res);
         SharedPreferencesUtils.setString(key: PreferencesName.userInfo, value : userJson);
-     //   await SharedPreferencesUtils.setString(key: PreferencesName.token, value:loginData.tokens!.access.toString());
+       await SharedPreferencesUtils.setString(key: PreferencesName.token, value:loginData.tokens!.access.toString());
         Navigator.pushAndRemoveUntil(
           !event.context.mounted ? event.context : event.context,
            MaterialPageRoute(builder: (_) => const HomePage()),
@@ -122,7 +122,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if(res != null){
 
       loginData = loginResponse(res);
-    //  await SharedPreferencesUtils.setString(key: PreferencesName.token, value:loginData.tokens!.access.toString());
+      await SharedPreferencesUtils.setString(key: PreferencesName.token, value:loginData.tokens!.access.toString());
       Navigator.pushAndRemoveUntil(
         !event.context.mounted ? event.context : event.context,
           MaterialPageRoute(builder: (_) => const HomePage()),

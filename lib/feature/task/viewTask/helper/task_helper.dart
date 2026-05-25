@@ -5,6 +5,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
+import 'package:flutter_gail/utils/commonClass/connectivity_helper.dart';
 
 class TaskHelper {
   static Future<dynamic> fetchTask(
@@ -49,6 +50,17 @@ class TaskHelper {
       if (location != null) {
         locationModel = location;
       }
+      else {
+        return null;
+      }
+
+      if (await ConnectivityHelper.allConnectivityCheck(
+        context: context.mounted ? context : context,
+      ) ==
+          false) {
+        return null;
+      }
+
       final link = AppConfig.instanceInit()?.groupRoles.link;
       final String currentTime = "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
       String url = APIs.updateTaskApi(moduleName: link.toString());

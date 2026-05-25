@@ -11,6 +11,9 @@ import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/helper/task_helper.dart';
 import 'package:flutter_gail/services/background_location_service.dart';
+import 'package:flutter_gail/services/location/location_helper.dart';
+import 'package:flutter_gail/services/location/location_model.dart';
+import 'package:flutter_gail/utils/commonClass/connectivity_helper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -225,6 +228,17 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       if (!await manager.isRunning()) {
         manager.startService();
       }
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("taskStatus", "0");
+      print("Task Id ======================== ${taskData.taskId}");
+      await prefs.setString("taskId", taskData.taskId.toString());
+      await prefs.setString("subTaskId", taskData.subTaskId.toString());
+      String schema =
+          AppConfig.instanceInit()?.userData.schema.toString() ?? "";
+      print("schema ======================== $schema");
+      await prefs.setString("schema", schema);
+
       add(
         StartTracking(!event.context.mounted ? event.context : event.context),
       );
@@ -305,7 +319,24 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
   _updateTask(MapPageUpdateTaskEvent event, emit) async {
-    isLoader = true;
+
+      isLoader = true;
+      var location = await LocationHelper.getLocation(context: event.context.mounted ? event.context : event.context);
+      if (location == null) {
+        isLoader = false;
+        _eventComplete(emit);
+        return null;
+      }
+
+      if (await ConnectivityHelper.allConnectivityCheck(
+        context: event.context.mounted ? event.context : event.context,
+      ) ==
+          false) {
+        isLoader = false;
+        _eventComplete(emit);
+        return null;
+      }
+
     TaskStatus taskStatus = event.taskStatus;
     _eventComplete(emit);
 
@@ -347,20 +378,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       return;
     }
 
-    if (taskData.taskStatus == TaskStatus.started ||
-        taskData.taskStatus == TaskStatus.resume) {
-      add(
-        StartTracking(!event.context.mounted ? event.context : event.context),
-      );
-    } else {
-      add(StopTracking());
-    }
-
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString("taskStatus", "0");
     print("Task Id ======================== ${taskData.taskId}");
     await prefs.setString("taskId", taskData.taskId.toString());
     await prefs.setString("subTaskId", taskData.subTaskId.toString());
+    String schema =
+        AppConfig.instanceInit()?.userData.schema.toString() ?? "";
+    print("schema ======================== $schema");
+    await prefs.setString("schema", schema);
 
     if (taskStatus == TaskStatus.started) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -419,6 +445,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           context: !event.context.mounted ? event.context : event.context,
         ),
       );
+
+      if (taskStatus == TaskStatus.started ||
+          taskStatus == TaskStatus.resume) {
+        add(
+          StartTracking(!event.context.mounted ? event.context : event.context),
+        );
+      } else {
+        add(StopTracking());
+      }
+
     }
     isLoader = false;
     _eventComplete(emit);

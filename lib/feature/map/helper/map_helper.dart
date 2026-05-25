@@ -290,10 +290,9 @@ class MapHelper {
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String taskId = prefs.getString("taskId") ?? "";
-      String schema =
-          AppConfig.instanceInit()?.userData.schema.toString() ?? "";
-      // String schema = prefs.getString(PreferencesName.schema) ?? "";
+      String schema = prefs.getString("schema") ?? "";
       print("--------------------Task Id $taskId");
+      print("--------------------schema $schema");
       if (taskId.isEmpty) {
         return {"status": "error", "message": ""};
       }

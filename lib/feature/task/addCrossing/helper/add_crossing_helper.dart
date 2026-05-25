@@ -6,47 +6,53 @@ import 'package:flutter_gail/feature/task/addCrossing/domain/model/crossing_type
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
+import 'package:flutter_gail/utils/commonClass/connectivity_helper.dart';
 
 class AddCrossingHelper {
-
   static Future<dynamic> textFieldValidation({
     required BuildContext context,
     required CrossingTypeModel crossingTypeData,
   }) async {
-
-    try{
-      if(crossingTypeData.id == null){
-        SnackBarErrorWidget(context).show(message: "Please select crossing type");
+    try {
+      if (crossingTypeData.id == null) {
+        SnackBarErrorWidget(
+          context,
+        ).show(message: "Please select crossing type");
         return false;
       }
       return true;
-    }catch(_){}
+    } catch (_) {}
     return false;
   }
 
   static Future<dynamic> fetchCrossingType() async {
-    try{
+    try {
       List<CrossingTypeModel> crossingTypeList = [];
-      crossingTypeList.add(CrossingTypeModel(
-        id: "1",
-        crossingUrl: AppIcon.roadCrossingIcon,
-        name: "Road"
-      ));
-      crossingTypeList.add(CrossingTypeModel(
+      crossingTypeList.add(
+        CrossingTypeModel(
+          id: "1",
+          crossingUrl: AppIcon.roadCrossingIcon,
+          name: "Road",
+        ),
+      );
+      crossingTypeList.add(
+        CrossingTypeModel(
           id: "2",
           crossingUrl: AppIcon.riverCrossingIcon,
-          name: "River"
-      ));
-      crossingTypeList.add(CrossingTypeModel(
+          name: "River",
+        ),
+      );
+      crossingTypeList.add(
+        CrossingTypeModel(
           id: "3",
           crossingUrl: AppIcon.railCrossingIcon,
-          name: "Railway"
-      ));
+          name: "Railway",
+        ),
+      );
       return crossingTypeList;
-    }catch(_){}
+    } catch (_) {}
     return null;
   }
-
 
   static Future<dynamic> saveCrossingData({
     required BuildContext context,
@@ -64,64 +70,80 @@ class AddCrossingHelper {
       String url = APIs.addRouteObserveApi;
       List<FileModel> fileList = [];
       if (cameraFile.path.isNotEmpty) {
-        fileList.add(FileModel(
-            name: cameraFile.path
-                .split('/')
-                .last,
+        fileList.add(
+          FileModel(
+            name: cameraFile.path.split('/').last,
             file: cameraFile,
-            keyName: "photo_link"));
+            keyName: "photo_link",
+          ),
+        );
       }
       if (voiceFile.path.isNotEmpty) {
-        fileList.add(FileModel(
-            name: voiceFile.path
-                .split('/')
-                .last,
+        fileList.add(
+          FileModel(
+            name: voiceFile.path.split('/').last,
             file: voiceFile,
-            keyName: "voice_link"));
+            keyName: "voice_link",
+          ),
+        );
       }
       if (videoFile.path.isNotEmpty) {
-        fileList.add(FileModel(
-            name: videoFile.path
-                .split('/')
-                .last,
+        fileList.add(
+          FileModel(
+            name: videoFile.path.split('/').last,
             file: videoFile,
-            keyName: "video_link"));
+            keyName: "video_link",
+          ),
+        );
       }
 
       var deviceId = await LoginHelper.getUniqueDeviceId();
-
       var locationRes = await LocationHelper.getLocationOfflineMode(
-          context: context);
+        context: context,
+      );
       LocationModel locationData = LocationModel();
       if (locationRes != null) {
         locationData = locationRes;
+      } else {
+        return null;
+      }
+      if (await ConnectivityHelper.allConnectivityCheck(
+            context: context.mounted ? context : context,
+          ) ==
+          false) {
+        return null;
       }
       final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
       final DateTime now = DateTime.now();
       final String currentDate = formatter.format(now);
       var json = {
-        "task_id" : taskData.taskId.toString(),
-        "patrollroute_id" : taskData.patrollRouteId.toString(),
-        "observation_type" : RouteObservation.crossing.value.toString(),
-        "sectionCode " : taskData.sectionCode.toString(),
-        "description" : remark.toString(),
-        "condition" : "",
-        "vent_drain_condition" : drainCondition.toString(),
+        "task_id": taskData.taskId.toString(),
+        "patrollroute_id": taskData.patrollRouteId.toString(),
+        "observation_type": RouteObservation.crossing.value.toString(),
+        "sectionCode ": taskData.sectionCode.toString(),
+        "description": remark.toString(),
+        "condition": "",
+        "vent_drain_condition": drainCondition.toString(),
         "crossing_marker": markerCondition.toString(),
         "bank_condition": bankCondition.toString(),
-        "inspection_date" : currentDate.toString(),
+        "inspection_date": currentDate.toString(),
         "gpsx": locationData.lat != null ? locationData.lat.toString() : "0.0",
-        "gpsy": locationData.long != null ? locationData.long.toString(): "0.0",
-        "gps_accuracy" : locationData.accuracy.toString(),
-        "observation_subtype" : crossingTypeData.name.toString(),
-        "device_id" : deviceId.toString(),
+        "gpsy":
+            locationData.long != null ? locationData.long.toString() : "0.0",
+        "gps_accuracy": locationData.accuracy.toString(),
+        "observation_subtype": crossingTypeData.name.toString(),
+        "device_id": deviceId.toString(),
       };
-      var res = await ServerRequest.postDataWithFile(urlEndPoint: url,
-          body: json,
-          context: !context.mounted ? context : context,
-          fileList: fileList);
+      var res = await ServerRequest.postDataWithFile(
+        urlEndPoint: url,
+        body: json,
+        context: !context.mounted ? context : context,
+        fileList: fileList,
+      );
       if (res != null && res['message'] != null) {
-        SnackBarSuccessWidget(!context.mounted ? context : context).show(message: res['message'].toString());
+        SnackBarSuccessWidget(
+          !context.mounted ? context : context,
+        ).show(message: res['message'].toString());
         return res;
       }
       return null;
