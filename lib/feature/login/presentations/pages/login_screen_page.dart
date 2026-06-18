@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/login/presentations/Widgets/phone_login_widget.dart';
-import 'package:flutter_gail/feature/login/presentations/Widgets/tablet_login_widget.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 import '../../domain/bloc/login_event.dart';
 import '../../domain/bloc/login_state.dart';
@@ -33,8 +33,8 @@ class _LoginScreenPageState extends State<LoginScreenPage> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: <Color>[
-                    AppColor.themeLightColor,
-                    AppColor.themeColor,
+                    EnvironmentConfig.of(context)!.secondaryTheme,
+                    EnvironmentConfig.of(context)!.primaryTheme,
                   ])
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/utils/res/app_color.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class CustomStyleText {
   static TextStyle appBarStyle = TextStyle(
@@ -156,14 +157,14 @@ Widget styleAppBar() {
   );
 }
 
-BoxDecoration gradientDecoration = BoxDecoration(
+BoxDecoration gradientDecoration({required BuildContext context}) => BoxDecoration(
     borderRadius: BorderRadius.circular(24),
     gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: <Color>[
-          AppColor.themeColor,
-          AppColor.themeColor,
+          EnvironmentConfig.of(context)!.secondaryTheme,
+          EnvironmentConfig.of(context)!.primaryTheme,
         ]));
 
 BoxDecoration gradientGrayColorDecoration = BoxDecoration(
@@ -178,9 +179,9 @@ LinearGradient gradientColor = const LinearGradient(
     end: Alignment.bottomRight,
     colors: <Color>[Color(0xFF2D3194), Color(0xFF02A7E7)]);
 
-BoxDecoration buttonFlat = BoxDecoration(
+BoxDecoration buttonFlat({required BuildContext context}) => BoxDecoration(
     borderRadius: BorderRadius.circular(24),
-    border: Border.all(color: AppColor.themeColor, width: 1),
+    border: Border.all(color: EnvironmentConfig.of(context)!.primaryTheme, width: 1),
     gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,

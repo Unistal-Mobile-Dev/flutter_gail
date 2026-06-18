@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class LogOutPopWidget extends StatelessWidget {
   final String? logOutMessage;
@@ -44,7 +45,7 @@ class LogOutPopWidget extends StatelessWidget {
       height: MediaQuery.of(context).size.height * 0.09,
       child: Icon(
         Icons.lock_open,
-        color: AppColor.themeLightColor,
+        color:EnvironmentConfig.of(context)!.secondaryTheme,
         size: MediaQuery.of(context).size.height * 0.09,
       ),
     );
@@ -66,11 +67,11 @@ class LogOutPopWidget extends StatelessWidget {
             padding:
                 WidgetStateProperty.all<EdgeInsets>(const EdgeInsets.all(15)),
             foregroundColor:
-                WidgetStateProperty.all<Color>(AppColor.themeColor),
+                WidgetStateProperty.all<Color>(EnvironmentConfig.of(context)!.primaryTheme),
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
-                    side: BorderSide(color: AppColor.themeColor)))),
+                    side: BorderSide(color: EnvironmentConfig.of(context)!.primaryTheme)))),
         onPressed: () async {
 /*          Navigator.pushAndRemoveUntil(
               context,
@@ -86,7 +87,7 @@ class LogOutPopWidget extends StatelessWidget {
             textAlign: TextAlign.center,
             fontSize: AppFont.font_16,
             fontWeight: FontWeight.w500,
-            color: AppColor.themeColor,
+            color: EnvironmentConfig.of(context)!.primaryTheme,
           ),
         ));
   }

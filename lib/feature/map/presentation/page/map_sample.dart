@@ -17,6 +17,7 @@ import 'package:flutter_gail/feature/task/addMarker/presentation/page/add_marker
 import 'package:flutter_gail/feature/task/deviation/domain/bloc/deviation_bloc.dart';
 import 'package:flutter_gail/feature/task/deviation/presentation/page/deviation_page.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -494,7 +495,7 @@ class MapSampleState extends State<MapSample> {
             ),
             icon: Icon(
               Icons.task_outlined,
-              color: AppColor.themeColor,
+              color: EnvironmentConfig.of(context)!.primaryTheme,
               size: MediaQuery.of(context).size.width * 0.05,
             ),
             onPressed: () {
@@ -537,7 +538,7 @@ class MapSampleState extends State<MapSample> {
         ),
         icon: Icon(
           Icons.task_outlined,
-          color: AppColor.themeColor,
+          color: EnvironmentConfig.of(context)!.primaryTheme,
           size: MediaQuery.of(context).size.width * 0.05,
         ),
         onPressed: () {
@@ -569,7 +570,7 @@ class MapSampleState extends State<MapSample> {
         ),
         icon: Icon(
           Icons.location_searching_sharp,
-          color: AppColor.themeColor,
+          color: EnvironmentConfig.of(context)!.primaryTheme,
           size: MediaQuery.of(context).size.width * 0.05,
         ),
         onPressed: () {
@@ -602,7 +603,7 @@ class MapSampleState extends State<MapSample> {
         ),
         icon: Icon(
           Icons.transgender_outlined,
-          color: AppColor.themeColor,
+          color: EnvironmentConfig.of(context)!.primaryTheme,
           size: MediaQuery.of(context).size.width * 0.05,
         ),
         onPressed: () {
@@ -668,7 +669,7 @@ class MapSampleState extends State<MapSample> {
         ),
         icon: Icon(
           Icons.fence_rounded,
-          color: AppColor.themeColor,
+          color: EnvironmentConfig.of(context)!.primaryTheme,
           size: MediaQuery.of(context).size.width * 0.05,
         ),
         onPressed: () async {
@@ -701,7 +702,7 @@ class MapSampleState extends State<MapSample> {
         ),
         icon: Icon(
           Icons.developer_board,
-          color: AppColor.themeColor,
+          color: EnvironmentConfig.of(context)!.primaryTheme,
           size: MediaQuery.of(context).size.width * 0.05,
         ),
         onPressed: () async {

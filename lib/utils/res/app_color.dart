@@ -11,20 +11,20 @@ class AppColor {
     static dynamic theme_LightColor = 0xFF43A047;*/
 
 
-   static dynamic theme_Color = 0xFF1FA34A;
-    static dynamic theme_LightColor = 0xFF143E7A;
-
-
-  static dynamic theme_NormalLightColor = 0xFFE05C60;
-
-  AppColor({required dynamic themeColor, required dynamic themeLightColor}) {
-    theme_Color = themeColor;
-    theme_LightColor = themeLightColor;
-  }
-
-  static get themeColor => Color(theme_Color);
-
-  static get themeLightColor => Color(theme_LightColor);
+  //  static dynamic theme_Color = 0xFF1FA34A;
+  //   static dynamic theme_LightColor = 0xFF143E7A;
+  //
+  //
+   static dynamic theme_NormalLightColor = 0xFFE05C60;
+  //
+  // AppColor({required dynamic themeColor, required dynamic themeLightColor}) {
+  //   theme_Color = themeColor;
+  //   theme_LightColor = themeLightColor;
+  // }
+  //
+  // static get themeColor => Color(theme_Color);
+  //
+  // static get themeLightColor => Color(theme_LightColor);
 
 
   static get themeNormalLightColor => Color(theme_NormalLightColor);

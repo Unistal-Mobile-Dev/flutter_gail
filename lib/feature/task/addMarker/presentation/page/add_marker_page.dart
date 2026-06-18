@@ -1,10 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/addMarker/domain/bloc/add_marker_bloc.dart';
-import 'package:flutter_gail/feature/task/addMarker/presentation/widget/voice_record_widget.dart';
-import 'package:flutter_gail/utils/commonClass/fade_route.dart';
-import 'package:flutter_gail/utils/commonWidgets/cupertino_date_picker_widget.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class AddMarkerPage extends StatefulWidget {
   const AddMarkerPage({super.key});
@@ -79,7 +76,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
                 children: [
                   CircleAvatar(
                     backgroundColor: dataState.markerTypeList[index].isSelected == true
-                         ? AppColor.themeColor : AppColor.lightGrey,
+                         ? EnvironmentConfig.of(context)!.primaryTheme : AppColor.lightGrey,
                     child: Padding(
                       padding: const EdgeInsets.all(2), // Border radius
                       child: ClipOval(child: Image.asset(
@@ -93,7 +90,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
                   TextWidget(
                     dataState.markerTypeList[index].name.toString(),
                     color: dataState.markerTypeList[index].isSelected == true
-                        ? AppColor.themeColor : AppColor.black,
+                        ? EnvironmentConfig.of(context)!.primaryTheme : AppColor.black,
                     textAlign: TextAlign.center,
                     fontSize: AppFont.font_10,
                   ),
@@ -239,7 +236,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
             }
         }, icon: Icon(Icons.mic,
           color: dataState.voiceRecordFile.path.isEmpty ?
-          AppColor.grey : AppColor.themeColor),
+          AppColor.grey : EnvironmentConfig.of(context)!.primaryTheme),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),
 */
@@ -260,7 +257,7 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
           );
         }, icon: Icon(Icons.video_camera_back,
           color: dataState.voiceRecordFile.path.isEmpty ?
-          AppColor.grey : AppColor.themeColor,),
+          AppColor.grey : EnvironmentConfig.of(context)!.primaryTheme,),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),*/
       ],

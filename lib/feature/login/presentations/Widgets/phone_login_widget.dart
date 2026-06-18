@@ -6,6 +6,7 @@ import 'package:flutter_gail/feature/login/domain/bloc/login_event.dart';
 import 'package:flutter_gail/feature/login/domain/bloc/login_state.dart';
 import 'package:flutter_gail/feature/login/presentations/Widgets/header_widget.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/bloc/create_task_bloc.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class PhoneLoginWidget extends StatefulWidget {
   final FetchLoginStateData dataState;
@@ -62,7 +63,7 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
                 "HPOIL Login",
                 fontSize: AppFont.font_22,
                 fontWeight: FontWeight.w800,
-                color: AppColor.themeColor,
+                color: EnvironmentConfig.of(context)!.primaryTheme,
               ),
             ),
             _verticalSpace(),

@@ -3,11 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/home/presentation/widget/home_drawer_widget.dart';
 import 'package:flutter_gail/feature/login/presentations/Widgets/header_widget.dart';
-import 'package:flutter_gail/services/app_control_helper.dart';
-import 'package:flutter_gail/services/app_lifecycle_channel.dart';
-import 'package:flutter_gail/services/background_location_service.dart';
-import 'package:flutter_gail/utils/commonClass/user_info.dart';
 import 'package:flutter_gail/utils/commonWidgets/message_box_two_button_pop.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -49,7 +46,7 @@ class _HomePageState extends State<HomePage> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: <Color>[AppColor.themeLightColor, AppColor.themeColor],
+                colors: <Color>[EnvironmentConfig.of(context)!.secondaryTheme, EnvironmentConfig.of(context)!.primaryTheme,],
               ),
             ),
           ),

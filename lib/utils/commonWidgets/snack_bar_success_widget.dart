@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class SnackBarSuccessWidget {
   final BuildContext context;
@@ -13,7 +14,7 @@ class SnackBarSuccessWidget {
         fontSize: AppFont.font_14,
         color: AppColor.white,
       ),
-      backgroundColor: AppColor.themeColor,
+      backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
     ));
   }
 }

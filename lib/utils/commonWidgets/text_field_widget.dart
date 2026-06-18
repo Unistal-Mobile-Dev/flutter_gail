@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class TextFieldWidget extends StatelessWidget {
   final TextEditingController? controller;
@@ -79,12 +80,12 @@ class TextFieldWidget extends StatelessWidget {
               fontWeight:
                   isBoardRemove == true ? FontWeight.w700 : FontWeight.w500,
               color: controller == null
-                  ? AppColor.themeColor
+                  ? EnvironmentConfig.of(context)!.primaryTheme
                   : controller!.text.toString().isNotEmpty
-                      ? AppColor.themeColor
-                      : AppColor.themeColor,
+                      ? EnvironmentConfig.of(context)!.primaryTheme
+                      : EnvironmentConfig.of(context)!.primaryTheme,
             ),
-            fillColor: AppColor.themeColor,
+            fillColor: EnvironmentConfig.of(context)!.primaryTheme,
             // filled: true,
             enabledBorder:OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),

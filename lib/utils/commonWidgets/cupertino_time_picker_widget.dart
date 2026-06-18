@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 import 'package:vibration/vibration.dart';
 
 
@@ -26,7 +27,7 @@ class CupertinoTimePickerWidget extends StatelessWidget {
               Navigator.pop(context);
             },
             child: TextWidget("Done",
-              color: AppColor.themeColor,
+              color: EnvironmentConfig.of(context)!.primaryTheme,
               fontWeight: FontWeight.w700,),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class DateRangeWidget {
   static Future<DateTimeRange?> showDateRange(
@@ -15,7 +16,7 @@ class DateRangeWidget {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            colorScheme: ColorScheme.fromSeed(seedColor: AppColor.themeColor),
+            colorScheme: ColorScheme.fromSeed(seedColor: EnvironmentConfig.of(context)!.primaryTheme),
             //.dialogBackgroundColor:Colors.blue[900],
           ),
           child: child!,

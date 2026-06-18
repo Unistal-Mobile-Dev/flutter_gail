@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/domain/bloc/view_task_bloc.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/domain/model/task_model.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class TaskListDayWidget extends StatelessWidget {
   final FetchViewTaskDataState dataState;
@@ -43,7 +44,7 @@ class TaskListDayWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Icon(Icons.watch_later, color: AppColor.themeColor,
+                    Icon(Icons.watch_later, color: EnvironmentConfig.of(context)!.primaryTheme,
                       size:  MediaQuery.of(context).size.width * 0.05,),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.02,
@@ -55,9 +56,9 @@ class TaskListDayWidget extends StatelessWidget {
                     ),
                     Container(
                         decoration: BoxDecoration(
-                          color:  AppColor.themeColor,
+                          color:  EnvironmentConfig.of(context)!.primaryTheme,
                           border: Border.all(
-                            color:  AppColor.themeColor,
+                            color:  EnvironmentConfig.of(context)!.primaryTheme,
                           ),
                           borderRadius: BorderRadius.circular(20),
                         ),

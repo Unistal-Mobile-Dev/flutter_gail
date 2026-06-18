@@ -4,6 +4,7 @@ import 'package:flutter_gail/feature/hpoil_dashboard/domain/bloc/hpOil_dashboard
 import 'package:flutter_gail/feature/hpoil_dashboard/domain/bloc/hpOil_dashboard_event.dart';
 import 'package:flutter_gail/feature/hpoil_dashboard/domain/bloc/hpOil_dashboard_state.dart';
 import 'package:flutter_gail/feature/task/viewTask/presentation/page/task_page.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class HpOilDashboardPage extends StatefulWidget {
   const HpOilDashboardPage({super.key});
@@ -69,7 +70,7 @@ class _HpOilDashboardPageState extends State<HpOilDashboardPage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 gradient: LinearGradient(
-                  colors: <Color>[AppColor.themeLightColor, AppColor.themeColor],
+                  colors: <Color>[EnvironmentConfig.of(context)!.secondaryTheme, EnvironmentConfig.of(context)!.primaryTheme,],
                   /*colors: [Color(0xFF1FA34A), // green
                 Color(0xFF143E7A),],*/
                   begin: Alignment.topLeft,

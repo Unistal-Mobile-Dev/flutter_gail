@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -68,11 +69,11 @@ class GPSSettingPermissionPopWidget extends StatelessWidget {
             padding:
                 WidgetStateProperty.all<EdgeInsets>(const EdgeInsets.all(15)),
             foregroundColor:
-                WidgetStateProperty.all<Color>(AppColor.themeColor),
+                WidgetStateProperty.all<Color>(EnvironmentConfig.of(context)!.primaryTheme),
             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
-                    side: BorderSide(color: AppColor.themeColor)))),
+                    side: BorderSide(color: EnvironmentConfig.of(context)!.primaryTheme)))),
         onPressed: () async {
           await openAppSettings();
           if (!context.mounted) return;
@@ -85,7 +86,7 @@ class GPSSettingPermissionPopWidget extends StatelessWidget {
             textAlign: TextAlign.center,
             fontSize: AppFont.font_16,
             fontWeight: FontWeight.w500,
-            color: AppColor.themeColor,
+            color: EnvironmentConfig.of(context)!.primaryTheme,
           ),
         ));
   }

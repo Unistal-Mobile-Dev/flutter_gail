@@ -8,6 +8,7 @@ import 'package:flutter_gail/feature/task/viewTask/presentation/page/task_page.d
 import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/presentation/page/add_tlp_survey_page.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class HomeDrawerWidget extends StatelessWidget {
   HomeDrawerWidget({super.key});
@@ -80,17 +81,14 @@ class HomeDrawerWidget extends StatelessWidget {
             child: Container(
               // color: AppColor.white,
               width: MediaQuery.of(context).size.width / 1.5,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color.fromARGB(255, 67, 160, 71), // green 600
-                    Color.fromARGB(255, 12, 142, 30), // green 700
-                    Color.fromARGB(255, 46, 125, 50), // green 800
-                    // Color.fromARGB(255, 230, 55, 70),
-                    // Color.fromARGB(230, 216, 77, 89),
-                    // Color.fromARGB(255, 230, 55, 70),
+                    EnvironmentConfig.of(context)!.primaryTheme,
+                    EnvironmentConfig.of(context)!.secondaryTheme.withOpacity(0.7),
+                    EnvironmentConfig.of(context)!.primaryTheme,
                   ],
                 ),
               ),

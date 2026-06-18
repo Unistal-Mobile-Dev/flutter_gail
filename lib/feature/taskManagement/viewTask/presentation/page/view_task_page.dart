@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/domain/bloc/view_task_bloc.dart';
-import 'package:flutter_gail/feature/taskManagement/viewTask/domain/model/task_data_model.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/presentation/widget/task_day_calendar_widget.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/presentation/widget/task_filter_widget.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/presentation/widget/task_list_day_widget.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/presentation/widget/task_monthly_calendar_widget.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class ViewTaskPage extends StatefulWidget {
   const ViewTaskPage({super.key});
@@ -73,7 +73,7 @@ class _ViewTaskPageState extends State<ViewTaskPage> {
                  crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
                    TextWidget(dataState.taskList[index].date.toString().replaceAll("00:00:00.000", ""),
-                    color: AppColor.themeColor,
+                    color: EnvironmentConfig.of(context)!.primaryTheme,
                     fontWeight: FontWeight.w700,
                    ),
                    TaskListDayWidget(
@@ -123,7 +123,7 @@ class _ViewTaskPageState extends State<ViewTaskPage> {
             onPressed: () {
               BlocProvider.of<ViewTaskBloc>(context)
                   .add(ViewTaskPageSelectDateEvent(context: context));
-        }, icon: Icon(Icons.calendar_month, color: AppColor.themeColor,)),
+        }, icon: Icon(Icons.calendar_month, color: EnvironmentConfig.of(context)!.primaryTheme,)),
 
       ],
     );

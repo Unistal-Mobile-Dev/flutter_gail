@@ -27,6 +27,8 @@ class EnvironmentConfig extends InheritedWidget {
       case EnvironmentFlavours.developmentHPOIL:
      //   return "https://tpimsdev.smartgasnet.com/";
         return "https://hpoil.smartgasnet.com/";
+      case EnvironmentFlavours.prodHPCL:
+        return "https://hpcl.smartgasnet.com/";
     }
   }
 
@@ -37,8 +39,32 @@ class EnvironmentConfig extends InheritedWidget {
       case EnvironmentFlavours.developmentHPOIL:
         // return "http://115.241.54.252:8000/";
         return "https://gailgis.gail.co.in/";
+      case EnvironmentFlavours.prodHPCL:
+        return "https://hpcl.smartgasnet.com/";
+    }
+  }
+
+  Color get primaryTheme {
+    switch (flavours) {
+      case EnvironmentFlavours.productionHPOIL:
+        return Color(0xFF2E8B3A);
+      case EnvironmentFlavours.developmentHPOIL:
+        return Color(0xFF2E8B3A);
+      case EnvironmentFlavours.prodHPCL:
+        return Color(0xFF1A237E);
+    }
+  }
+
+  Color get secondaryTheme {
+    switch (flavours) {
+      case EnvironmentFlavours.productionHPOIL:
+        return Color(0xFF1A3A8C);
+      case EnvironmentFlavours.developmentHPOIL:
+        return Color(0xFF1A3A8C);
+      case EnvironmentFlavours.prodHPCL:
+        return Color(0xFFC62828);
     }
   }
 }
 
-enum EnvironmentFlavours { productionHPOIL, developmentHPOIL }
+enum EnvironmentFlavours { productionHPOIL,developmentHPOIL,  prodHPCL}

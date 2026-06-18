@@ -1,6 +1,7 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class DropDownSearchWidget extends StatelessWidget {
   final List<dynamic> items;
@@ -50,10 +51,10 @@ class DropDownSearchWidget extends StatelessWidget {
             ),
             label: TextWidget(
               "$hint${isRequired == false ? "" : ' *'}",
-              color: AppColor.themeColor, fontSize: AppFont.font_13,
+              color: EnvironmentConfig.of(context)!.primaryTheme, fontSize: AppFont.font_13,
             ),
             hintStyle: TextStyle(
-                fontSize: AppFont.font_13, color: AppColor.themeColor),
+                fontSize: AppFont.font_13, color: EnvironmentConfig.of(context)!.primaryTheme),
             contentPadding: EdgeInsets.only(
                 top: AppConfig.getDeviceType(context: context) ==
                     DeviceType.phone

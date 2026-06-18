@@ -1,6 +1,7 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class DropDownSearchMultiSelectWidget extends StatelessWidget {
   final List<dynamic> items;
@@ -46,7 +47,7 @@ class DropDownSearchMultiSelectWidget extends StatelessWidget {
               ),
             ),
             hintStyle: TextStyle(
-                fontSize: AppFont.font_14, color: AppColor.themeColor),
+                fontSize: AppFont.font_14, color: EnvironmentConfig.of(context)!.primaryTheme),
             contentPadding: EdgeInsets.only(
               top: MediaQuery.of(context).size.height * 0.018,
               left: MediaQuery.of(context).size.height * 0.01,

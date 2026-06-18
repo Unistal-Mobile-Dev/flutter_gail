@@ -8,6 +8,7 @@ import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
 import 'package:flutter_gail/feature/task/viewTask/presentation/widget/tab_item.dart';
 import 'package:flutter_gail/feature/task/viewTask/presentation/widget/task_item_box_widget.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class TaskPage extends StatefulWidget {
   final bool isAssignTask;
@@ -63,7 +64,7 @@ class _TaskPageState extends State<TaskPage>
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
                 indicator: BoxDecoration(
-                  color: AppColor.themeColor,
+                  color: EnvironmentConfig.of(context)!.primaryTheme,
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
                 ),
                 labelColor: Colors.white,

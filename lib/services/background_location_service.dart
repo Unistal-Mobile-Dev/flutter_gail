@@ -1,16 +1,24 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:ui';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
+import 'package:flutter_gail/utils/commonClass/app_config.dart';
+import 'package:flutter_gail/utils/res/enums.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 
 class BackgroundManager {
-  static const _channelId = 'link_walker_hpoil';
-  static const _notificationId = 987654321;
+  static String get _channelId =>
+      AppConfig.instanceInit()!.client == Client.hpcl
+          ? "link_walker_hpcl"
+          : 'link_walker_hpoil';
+
+  static int get _notificationId =>
+      AppConfig.instanceInit()!.client == Client.hpcl
+          ? 1234567890
+          : 987654321;
   // static const _channelId = 'my_foreground_oil';
   // static const _notificationId = 941678999;
 
@@ -158,7 +166,7 @@ void onStart(ServiceInstance service) async {
               999,
               "Background Service Running",
               "Lat: ${pos.latitude}, Lng: ${pos.longitude}",
-              const NotificationDetails(
+              NotificationDetails(
                 android: AndroidNotificationDetails(
                   BackgroundManager._channelId,
                   'Background Service',

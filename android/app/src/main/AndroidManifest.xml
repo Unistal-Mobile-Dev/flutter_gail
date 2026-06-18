@@ -20,8 +20,9 @@
 
     <application
         android:name="${applicationName}"
-        android:label="Line Patrolling"
-        android:icon="@mipmap/ic_launcher_oil"
+        android:label="@string/app_name"
+        android:icon="@mipmap/hpcl_logo"
+        android:roundIcon="${appIconRound}"
         android:requestLegacyExternalStorage="true">
 
         <activity

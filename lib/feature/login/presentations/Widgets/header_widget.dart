@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/testing_page.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class HeaderWidget extends StatefulWidget {
   final double _height;
@@ -39,8 +40,8 @@ class _HeaderWidgetState extends State<HeaderWidget> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColor.themeLightColor.withOpacity(0.4),
-                  AppColor.themeColor.withOpacity(0.7),
+                  EnvironmentConfig.of(context)!.secondaryTheme.withOpacity(0.4),
+                  EnvironmentConfig.of(context)!.primaryTheme.withOpacity(0.7),
                 ],
                 begin: const FractionalOffset(0.0, 0.0),
                 end: const FractionalOffset(1.0, 0.0),
@@ -61,8 +62,8 @@ class _HeaderWidgetState extends State<HeaderWidget> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColor.themeLightColor.withOpacity(0.4),
-                  AppColor.themeColor.withOpacity(0.7),
+                  EnvironmentConfig.of(context)!.secondaryTheme.withOpacity(0.4),
+                  EnvironmentConfig.of(context)!.primaryTheme.withOpacity(0.7),
                 ],
                 begin: const FractionalOffset(0.0, 0.0),
                 end: const FractionalOffset(1.0, 0.0),
@@ -82,7 +83,7 @@ class _HeaderWidgetState extends State<HeaderWidget> {
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppColor.themeLightColor, AppColor.themeColor],
+                colors: [EnvironmentConfig.of(context)!.secondaryTheme, EnvironmentConfig.of(context)!.primaryTheme,],
                 begin: const FractionalOffset(0.0, 0.0),
                 end: const FractionalOffset(1.0, 0.0),
                 stops: [0.0, 1.0],

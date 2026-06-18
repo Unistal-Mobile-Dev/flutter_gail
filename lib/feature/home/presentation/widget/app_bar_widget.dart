@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
@@ -49,7 +50,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       iconTheme: const IconThemeData(color: Colors.white),
 
       /// BACKGROUND (fallback if gradient = false)
-      backgroundColor: isGradient ? Colors.transparent : AppColor.themeColor,
+      backgroundColor: isGradient ? Colors.transparent : EnvironmentConfig.of(context)!.primaryTheme,
 
       /// TITLE
       title: titleWidget ??
@@ -70,8 +71,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColor.themeLightColor,
-              AppColor.themeColor,
+              EnvironmentConfig.of(context)!.secondaryTheme,
+              EnvironmentConfig.of(context)!.primaryTheme,
             ],
           ),
           borderRadius: const BorderRadius.only(
@@ -82,7 +83,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       )
           : Container(
         decoration: BoxDecoration(
-          color: AppColor.themeColor,
+          color: EnvironmentConfig.of(context)!.primaryTheme,
           borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(8),
             bottomRight: Radius.circular(8),

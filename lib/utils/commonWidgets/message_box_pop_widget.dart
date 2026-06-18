@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class MessageBoxPopWidget extends StatelessWidget {
   final String message;
@@ -66,7 +67,7 @@ class MessageBoxPopWidget extends StatelessWidget {
             fontSize: AppFont.font_16,
             fontWeight: FontWeight.w700,
             textAlign: TextAlign.center,
-            color: AppColor.themeColor,
+            color: EnvironmentConfig.of(context)!.primaryTheme,
           ),
         ),
         Align(

@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
-import 'package:flutter_gail/feature/task/addMarker/presentation/widget/voice_record_widget.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class AddCrossingPage extends StatefulWidget {
   const AddCrossingPage({super.key});
@@ -80,7 +79,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
                   children: [
                     CircleAvatar(
                       backgroundColor: dataState.crossingTypeList[index].isSelected == true
-                          ? AppColor.themeColor : AppColor.lightGrey,
+                          ? EnvironmentConfig.of(context)!.primaryTheme : AppColor.lightGrey,
                       child: Padding(
                         padding: const EdgeInsets.all(2), // Border radius
                         child: ClipOval(child: Image.asset(
@@ -94,7 +93,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
                     TextWidget(
                       dataState.crossingTypeList[index].name.toString(),
                       color: dataState.crossingTypeList[index].isSelected == true
-                          ? AppColor.themeColor : AppColor.black,
+                          ? EnvironmentConfig.of(context)!.primaryTheme : AppColor.black,
                       textAlign: TextAlign.center,
                       fontSize: AppFont.font_10,
                     ),
@@ -283,7 +282,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
               BlocProvider.of<AddCrossingBloc>(context.mounted ? context : context)
                   .add(AddCrossingSelectVoiceEvent(audioPath: res.toString()));
             }
-          }, icon: Icon(Icons.mic, color: dataState.voiceRecordFile.path.isNotEmpty ? AppColor.themeColor :AppColor.grey,),
+          }, icon: Icon(Icons.mic, color: dataState.voiceRecordFile.path.isNotEmpty ? EnvironmentConfig.of(context)!.primaryTheme :AppColor.grey,),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),*/
 
@@ -302,7 +301,7 @@ class _AddCrossingPageState extends State<AddCrossingPage> {
                 }
             );
           }, icon: Icon(Icons.video_camera_back,
-          color: dataState.videoFile.path.isNotEmpty ? AppColor.themeColor : AppColor.grey,),
+          color: dataState.videoFile.path.isNotEmpty ? EnvironmentConfig.of(context)!.primaryTheme : AppColor.grey,),
           style: IconButton.styleFrom(backgroundColor: AppColor.lightGrey),
         ),*/
       ],
