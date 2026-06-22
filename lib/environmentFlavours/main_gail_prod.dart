@@ -23,7 +23,7 @@ Future<void> main() async {
   if (apiKey.isEmpty) {
     throw Exception('ArcGIS API key missing');
   }
-  ArcGISEnvironment.apiKey = apiKey;
+ ArcGISEnvironment.apiKey = apiKey;
 
   await Hive.initFlutter();
 
@@ -42,7 +42,9 @@ Future<void> main() async {
     // ✅ 2. Notification Initialization
     final FlutterLocalNotificationsPlugin notificationPlugin =
     FlutterLocalNotificationsPlugin();
-
+    debugPrint(
+      "Plugin => ${notificationPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()}",
+    );
     const AndroidInitializationSettings androidSettings =
     AndroidInitializationSettings('@mipmap/ic_launcher_upims');
 
@@ -107,6 +109,8 @@ Future<void> main() async {
   //   debugPrint("ArcGISEnvironment.apiKey: ${ArcGISEnvironment.apiKey}");
   //   debugPrint("ArcGISEnvironment.apiKey: ${apiKey}");
   // }
+  ArcGISEnvironment.apiKey = "AAPK61287a314f53402d91bb41dffde6de9c_BFuvT1vTFyCyRq4Cx46fgTaP_ax8er0gNXa1ZR-_Tnw4xmBJj6GDtrrxad7rfzL";
+
 
   // ✅ 7. App Config
   var configuredApp = const EnvironmentConfig(

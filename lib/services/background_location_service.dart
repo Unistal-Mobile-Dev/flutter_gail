@@ -4,9 +4,13 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/map/domain/model/hive_location_model.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 
 class BackgroundManager {
   static const _channelId = 'my_foreground';
@@ -99,6 +103,14 @@ void onStart(ServiceInstance service) async {
     WidgetsFlutterBinding.ensureInitialized();
     DartPluginRegistrant.ensureInitialized();
 
+    final dir = await getApplicationDocumentsDirectory();
+    Hive.init(dir.path);
+
+    Hive.registerAdapter(HiveLocationModelAdapter());
+
+    await Hive.openBox<HiveLocationModel>('location_box');
+
+    final prefs = await SharedPreferences.getInstance();
     const channel = AndroidNotificationChannel(
       'my_foreground',
       'Background Service Channel',

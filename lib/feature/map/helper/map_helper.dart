@@ -283,7 +283,7 @@ class MapHelper {
       );
 
       // 5. Save offline in Hive
-      await Hive.initFlutter();
+   //   await Hive.initFlutter();
       if (!Hive.isAdapterRegistered(1)) {
         Hive.registerAdapter(HiveLocationModelAdapter());
         print("📦 Hive Adapter Registered (typeId: 1)");

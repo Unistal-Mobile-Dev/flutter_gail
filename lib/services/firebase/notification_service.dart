@@ -27,6 +27,7 @@ GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  WidgetsFlutterBinding.ensureInitialized();
   log("Notification ${message.data}");
   List<String> notificationList = [];
   notificationList.add(jsonEncode(message.data));
