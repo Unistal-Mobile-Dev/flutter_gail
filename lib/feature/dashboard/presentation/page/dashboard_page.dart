@@ -33,14 +33,16 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DashboardBloc, DashboardState>(
-      builder: (context, state) {
-        if (state is FetchDashboardDataState) {
-          return _buildLayout(dataState: state);
-        } else {
-          return const Center(child: CenterLoaderWidget());
-        }
-      },
+    return SafeArea(
+      child: BlocBuilder<DashboardBloc, DashboardState>(
+        builder: (context, state) {
+          if (state is FetchDashboardDataState) {
+            return _buildLayout(dataState: state);
+          } else {
+            return const Center(child: CenterLoaderWidget());
+          }
+        },
+      ),
     );
   }
 

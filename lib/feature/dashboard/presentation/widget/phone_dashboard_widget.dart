@@ -15,13 +15,15 @@ class PhoneDashboardWidget extends StatefulWidget {
 class _PhoneDashboardWidgetState extends State<PhoneDashboardWidget> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
-      if (state is FetchHomeDataState) {
-        return _listBuilder(dataState: state);
-      } else {
-        return const SizedBox.shrink();
-      }
-    });
+    return SafeArea(
+      child: BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
+        if (state is FetchHomeDataState) {
+          return _listBuilder(dataState: state);
+        } else {
+          return const SizedBox.shrink();
+        }
+      }),
+    );
   }
 
   Widget _listBuilder({required FetchHomeDataState dataState}) {

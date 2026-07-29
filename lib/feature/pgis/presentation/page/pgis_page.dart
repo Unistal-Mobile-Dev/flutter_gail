@@ -81,14 +81,16 @@ class _PgisPageState extends State<PgisPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PgisBloc, PgisState>(
-      builder: (context, state) {
-        if (state is FetchPgisDataState) {
-          return _itemBuilder(dataState: state);
-        } else {
-          return const Center(child: SpinLoader());
-        }
-      },
+    return SafeArea(
+      child: BlocBuilder<PgisBloc, PgisState>(
+        builder: (context, state) {
+          if (state is FetchPgisDataState) {
+            return _itemBuilder(dataState: state);
+          } else {
+            return const Center(child: SpinLoader());
+          }
+        },
+      ),
     );
   }
 
@@ -314,6 +316,7 @@ class _PgisPageState extends State<PgisPage> {
     return ArcGISMapView(
       controllerProvider: () => _mapViewController,
       onMapViewReady: () {
+        _mapViewController.interactionOptions.flingEnabled = false;
         context.read<PgisBloc>().add(PGISMapReady(_mapViewController));
       },
       onTap: (details) async {

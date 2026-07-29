@@ -17,7 +17,7 @@ class HomeHelper {
       List<DrawerModel> drawerList = [];
       drawerList.add(
         DrawerModel(
-          widget: const DashboardPage(),
+          widget: SafeArea(child: const DashboardPage()),
           icon: Icons.home_outlined,
           label: AppString.dashboard,
           sublist: [],
