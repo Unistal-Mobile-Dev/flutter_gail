@@ -171,12 +171,6 @@ class PGISHelper {
         ),
       ),
     ]);
-
-    // await mapController.setViewpointCenter(
-    //   point,
-    //   scale: 3000,
-    // );
-
     return bufferGeometry;
   }
 
@@ -200,8 +194,9 @@ class PGISHelper {
     required String query,
   }) async {
     Map<String, String> para = {
-      'where': "(UPPER(sectionName) LIKE '%${query.toUpperCase()}%' "
-          "OR UPPER(engroutename) LIKE '%${query.toUpperCase()}%')",
+      // 'where': "(UPPER(sectionName) LIKE '%${query.toUpperCase()}%' "
+      //     "OR UPPER(engroutename) LIKE '%${query.toUpperCase()}%')",
+      'where': '1=1',
       'outFields': 'ADMIN.PipelineLine.engroutename,dbo.vw_Pipeline_GIS_Attributes.sectionName',
       'returnGeometry': 'false',
       'f': 'json',
@@ -231,7 +226,8 @@ class PGISHelper {
   }) async {
     try {
       Map<String, String> para = {
-        'where': "UPPER(ADMIN.PipelineLine.engroutename) LIKE '%${query.toUpperCase()}%'",
+       // 'where': "UPPER(ADMIN.PipelineLine.engroutename) LIKE '%${query.toUpperCase()}%'",
+        'where': '1=1',
         'outFields': 'ADMIN.PipelineLine.engroutename',
         'returnGeometry': 'true',
         'f': 'json',
@@ -267,14 +263,14 @@ class PGISHelper {
         whereClause += " AND UPPER(engroutename) = '${pipelineNameOrCode.toUpperCase()}'";
       }
       final params = {
-        'where': whereClause,
-        'outFields': 'OBJECTID,stationname,engroutename',
+        //'where': whereClause,
+        'where': '1=1',
+       'outFields': 'OBJECTID,stationname,engroutename',
         'returnGeometry': 'false',
         'f': 'json',
       };
       final queryString = Uri(queryParameters: params).query;
       final fullUrl = '${APIs.stationQuery}$queryString';
-
       final res = await ServerRequest.getDataGail(urlEndPoint: fullUrl);
       if (res != null && res['features'] != null) {
         final features = res['features'] as List;
@@ -351,7 +347,8 @@ class PGISHelper {
       }
 
       final params = {
-        'where': whereClause,
+       // 'where': whereClause,
+        'where': '1=1',
         'outFields': 'OBJECTID,tlpno,TLPType,engroutename',
         'returnGeometry': 'false',
         'f': 'json',
@@ -533,56 +530,5 @@ class PGISHelper {
         return ArcGISMap.withBasemapStyle(BasemapStyle.arcGISStreets);
     }
   }
-
-  // static Future<void> show(BuildContext context, ArcGISMapController mapController) async {
-  //   final basemaps = [
-  //     {'name': 'Streets', 'basemap': Basemap.streets()},
-  //     {'name': 'Satellite', 'basemap': Basemap.imagery()},
-  //     {'name': 'OpenStreetMap Light', 'basemap': Basemap.openStreetMap()},
-  //     {'name': 'Terrain', 'basemap': Basemap.terrain()},
-  //     {'name': 'Navigation', 'basemap': Basemap.navigation()},
-  //   ];
-
-//  static Future<List<StructureBoundaryPoint>?> structureBoundaryQuery({
- //    required BuildContext context,
- //    required String query,
- //    required Geometry bufferGeometry,
- //    required SpatialReference spatialReference,
- //  }) async {
- //    // final params = {
- //    //   'where':
- //    //   "(UPPER(stationname) LIKE '%${query.toUpperCase()}%' "
- //    //       "OR UPPER(engroutename) LIKE '%${query.toUpperCase()}%')",
- //    //   'outFields': 'stationname,engroutename,OBJECTID',
- //    //   'returnGeometry': 'true',
- //    //   'f': 'json',
- //    //   'inSR': spatialReference.wkid.toString(),
- //    //   'spatialRel': 'esriSpatialRelIntersects',
- //    // };
- //
- // final params = {
- //      'where': '1=1',
- //      'geometry': jsonEncode(bufferGeometry.toJson()),
- //      'geometryType': 'esriGeometryPolygon',
- //      'spatialRel': 'esriSpatialRelIntersects',
- //      'inSR': spatialReference.wkid.toString(),
- //      'outFields': 'stationname,engroutename,OBJECTID',
- //      'returnGeometry': "true",
- //      'f': 'json',
- //    };
- //
- //    final queryString = Uri(queryParameters: params).query;
- //
- //    final res = await ServerRequest.getDataGail(
- //      urlEndPoint: APIs.structureBoundaryQuery + queryString,
- //    );
- //
- //    if (res == null || res['features'] == null) return null;
- //
- //    return (res['features'] as List)
- //        .map((e) => StructureBoundaryPoint.fromJson(e))
- //        .toList();
- //  }
-
 
 }

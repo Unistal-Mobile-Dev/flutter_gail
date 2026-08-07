@@ -45,22 +45,17 @@ class APIs {
 
   static get addMarkerPointApi => "patrolling-surveillance/marker/add-marker";
 
-  static get addCrossingPointApi =>
-      "patrolling-surveillance/crossing/add-crossing";
+  static get addCrossingPointApi => "patrolling-surveillance/crossing/add-crossing";
 
   static get getIncidentTypeApi => "patrolling-surveillance/route-observer/incident-types";
 
-  static get addIncidentDataApi =>
-      "patrolling-surveillance/incident/add-incident";
+  static get addIncidentDataApi => "patrolling-surveillance/incident/add-incident";
 
-  static get updateTaskApi =>
-      "patrolling-surveillance/patrollman-task/update-task-status";
+  static get updateTaskApi => "patrolling-surveillance/patrollman-task/update-task-status";
 
-  static get createTaskValuesListApi =>
-      "patrolling-surveillance/patrollman-task/task-form-details";
+  static get createTaskValuesListApi => "patrolling-surveillance/patrollman-task/task-form-details";
 
-  static get areaStructureApi =>
-      "common-apis/area-structure";
+  static get areaStructureApi => "common-apis/area-structure";
 
   static get getsupervisorUserApi =>
       "patrolling-surveillance/patrollman-task/supervisor-users";

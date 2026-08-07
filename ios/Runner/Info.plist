@@ -2,63 +2,99 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>CFBundleDisplayName</key>
-	<string>Flutter Gail</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>flutter_gail</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>NSMicrophoneUsageDescription</key>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>$(DEVELOPMENT_LANGUAGE)</string>
+    <key>CFBundleDisplayName</key>
+    <string>GAIL UPIMS</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>flutter_gail</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>$(FLUTTER_BUILD_NAME)</string>
+    <key>CFBundleSignature</key>
+    <string>????</string>
+    <key>CFBundleVersion</key>
+    <string>$(FLUTTER_BUILD_NUMBER)</string>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>UILaunchStoryboardName</key>
+    <string>LaunchScreen</string>
+    <key>UIMainStoryboardFile</key>
+    <string>Main</string>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+       <string>UIInterfaceOrientationPortrait</string>
+       <string>UIInterfaceOrientationLandscapeLeft</string>
+       <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+       <string>UIInterfaceOrientationPortrait</string>
+       <string>UIInterfaceOrientationPortraitUpsideDown</string>
+       <string>UIInterfaceOrientationLandscapeLeft</string>
+       <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>CADisableMinimumFrameDurationOnPhone</key>
+    <true/>
+    <key>UIApplicationSupportsIndirectInputEvents</key>
+    <true/>
+
+    <!-- MICROPHONE (already had this) -->
+    <key>NSMicrophoneUsageDescription</key>
     <string>This lets gail app record so you can send voice message to this marker point.</string>
-   <key>CFBundleURLTypes</key>
-   <array>
-     <dict>
-       <key>CFBundleURLSchemes</key>
-       <array>
-         <string>https</string>
-       </array>
-       <key>CFBundleURLName</key>
-       <string>unistal.com</string>
-     </dict>
-   </array>
-   <key>FlutterDeepLinkingEnabled</key>
-   <true/>
+
+    <!-- LOCATION (maps ACCESS_FINE_LOCATION / ACCESS_COARSE_LOCATION / ACCESS_BACKGROUND_LOCATION) -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>GAIL UPIMS needs your location to track pipeline inspection points.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>GAIL UPIMS needs background location to keep tracking while the app is minimized.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>GAIL UPIMS needs background location to keep tracking while the app is minimized.</string>
+
+    <!-- PHOTO / MEDIA (maps READ_EXTERNAL_STORAGE / WRITE_EXTERNAL_STORAGE / MANAGE_EXTERNAL_STORAGE) -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>GAIL UPIMS needs access to your photos to attach images to inspection points.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>GAIL UPIMS needs permission to save images to your photo library.</string>
+
+    <!-- CAMERA (needed if you capture photos/video for inspection points) -->
+    <key>NSCameraUsageDescription</key>
+    <string>GAIL UPIMS needs camera access to capture inspection photos.</string>
+
+    <!-- FILE SHARING (closest iOS equivalent to external-storage visibility) -->
+    <key>UIFileSharingEnabled</key>
+    <true/>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+
+    <!-- BACKGROUND MODES (maps FOREGROUND_SERVICE location|dataSync + POST_NOTIFICATIONS/FCM) -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>fetch</string>
+        <string>processing</string>
+        <string>remote-notification</string>
+    </array>
+
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>https</string>
+        </array>
+        <key>CFBundleURLName</key>
+        <string>unistal.com</string>
+      </dict>
+    </array>
+    <key>FlutterDeepLinkingEnabled</key>
+    <true/>
 </dict>
 </plist>
