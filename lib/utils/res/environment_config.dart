@@ -21,12 +21,9 @@ class EnvironmentConfig extends InheritedWidget {
 
   String get generalUrlBaseOnFlavour {
     switch (flavours) {
-      case EnvironmentFlavours.productionHPOIL:
-       // return "https://upims.gail.co.in:8000/";
-        return "https://hpoil.smartgasnet.com/";
-      case EnvironmentFlavours.developmentHPOIL:
-     //   return "https://tpimsdev.smartgasnet.com/";
-        return "https://hpoil.smartgasnet.com/";
+      case EnvironmentFlavours.prodHPOIL:
+       // return "https://hpoil.smartgasnet.com/";
+        return "http://gis.hpoilgas.in/";
       case EnvironmentFlavours.prodHPCL:
         return "https://hpcl.smartgasnet.com/";
     }
@@ -34,11 +31,10 @@ class EnvironmentConfig extends InheritedWidget {
 
   String get generalGailUrlBaseOnFlavour {
     switch (flavours) {
-      case EnvironmentFlavours.productionHPOIL:
-        return "https://gailgis.gail.co.in/";
-      case EnvironmentFlavours.developmentHPOIL:
+      case EnvironmentFlavours.prodHPOIL:
         // return "http://115.241.54.252:8000/";
-        return "https://gailgis.gail.co.in/";
+      //  return "https://gailgis.gail.co.in/";
+        return "http://gis.hpoilgas.in/";
       case EnvironmentFlavours.prodHPCL:
         return "https://hpcl.smartgasnet.com/";
     }
@@ -46,9 +42,7 @@ class EnvironmentConfig extends InheritedWidget {
 
   Color get primaryTheme {
     switch (flavours) {
-      case EnvironmentFlavours.productionHPOIL:
-        return Color(0xFF2E8B3A);
-      case EnvironmentFlavours.developmentHPOIL:
+      case EnvironmentFlavours.prodHPOIL:
         return Color(0xFF2E8B3A);
       case EnvironmentFlavours.prodHPCL:
         return Color(0xFF1A237E);
@@ -57,9 +51,7 @@ class EnvironmentConfig extends InheritedWidget {
 
   Color get secondaryTheme {
     switch (flavours) {
-      case EnvironmentFlavours.productionHPOIL:
-        return Color(0xFF1A3A8C);
-      case EnvironmentFlavours.developmentHPOIL:
+      case EnvironmentFlavours.prodHPOIL:
         return Color(0xFF1A3A8C);
       case EnvironmentFlavours.prodHPCL:
         return Color(0xFFC62828);
@@ -67,4 +59,4 @@ class EnvironmentConfig extends InheritedWidget {
   }
 }
 
-enum EnvironmentFlavours { productionHPOIL,developmentHPOIL,  prodHPCL}
+enum EnvironmentFlavours { prodHPOIL, prodHPCL}

@@ -130,9 +130,7 @@ class HomeDrawerWidget extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: Image.asset(
-            AppConfig.instanceInit()!.client == Client.hpoil
-                ? AppIcon.hpOILLogo
-                : AppIcon.hpOILLogo,
+            AppIcon.logo(),
             height: MediaQuery.of(context).size.width * 0.15,
             width: MediaQuery.of(context).size.width * 0.15,
           ),

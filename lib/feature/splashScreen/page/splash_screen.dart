@@ -102,9 +102,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body:Align(
         alignment: Alignment.center,
         child:  Image.asset(
-          AppConfig.instanceInit()!.client == Client.hpoil
-              ? AppIcon.hpOILLogo
-              : AppIcon.hpOILLogo,
+          AppIcon.logo(),
           height: MediaQuery.of(context).size.width * 0.40,
           width: MediaQuery.of(context).size.width * 0.40,
         ),

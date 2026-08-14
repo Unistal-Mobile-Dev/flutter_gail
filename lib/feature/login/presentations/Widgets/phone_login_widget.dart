@@ -25,24 +25,22 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
     return Column(
       children: [
         Flexible(
-          child: SizedBox(
-           // height: 190,
-            child: Stack(
-              children: [
-                SizedBox(
-                  height: _headerHeight,
-                  child: HeaderWidget(_headerHeight, true, Icons.person),
-                ),
-                Positioned(
-                    top: 70,
-                    left: 0.0,
-                    right: 0.0,
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.width * 0.28,
-                      child: _logo(),
-                    )),
-              ],
-            ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              SizedBox(
+                height: _headerHeight,
+                child: HeaderWidget(_headerHeight, true, Icons.person),
+              ),
+              Positioned(
+                  top: MediaQuery.of(context).size.height * 0.08,
+                  left: 0.0,
+                  right: 0.0,
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.width * 0.28,
+                    child: _logo(context),
+                  )),
+            ],
           ),
         ),
         _itemBuilder(dataState: widget.dataState),
@@ -60,7 +58,7 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
             Align(
               alignment: Alignment.topLeft,
               child: TextWidget(
-                "HPOIL Login",
+                 AppIcon.loginTitle(),
                 fontSize: AppFont.font_22,
                 fontWeight: FontWeight.w800,
                 color: EnvironmentConfig.of(context)!.primaryTheme,
@@ -156,13 +154,15 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
     );
   }
 
-  Widget _logo() {
+  Widget _logo(BuildContext context) {
+    final logoWidth = MediaQuery.of(context).size.width * 0.28;
+
     return Hero(
       tag: 'logo',
       child: Image.asset(
-        AppConfig.instanceInit()!.client == Client.hpoil
-            ? AppIcon.hpOILLogo
-            : AppIcon.hpOILLogo,
+        AppIcon.logo(),
+        width: logoWidth,
+        fit: BoxFit.contain,
       ),
     );
   }

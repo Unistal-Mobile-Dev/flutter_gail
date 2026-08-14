@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: [
             Image.asset(
-              AppIcon.hpOILLogo,
+              AppIcon.logo(),
               height: MediaQuery.of(context).size.width * 0.08,
             ),
             SizedBox(width: MediaQuery.of(context).size.width * 0.03),

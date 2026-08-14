@@ -1,10 +1,15 @@
+import 'package:flutter_gail/utils/commonClass/app_config.dart';
+
+import 'enums.dart';
+
 class AppIcon {
-  static get gailLogo => "assets/upims_logo.png";
+  static get gailLogo => "assets/logo/upims_logo.png";
 
   static get oilLogo => "assets/oil.png";
   static get hpOILLogo => "assets/logo/hp_oil_logo.png";
   static get hpclLogo => "assets/logo/hpcl_logo.png";
 
+  static get unistalLogo => "assets/logo/unistal_logo.png";
   static get transperentBackground => "assets/transperent_background.png";
 
   static get gpsMovedIcon => "assets/ic_gps_moved.png";
@@ -48,5 +53,27 @@ class AppIcon {
   static get arcGISImageryIcon => "assets/ic_arcGISImagery.png";
 
   static get arcGISStreetsIcon => "assets/ic_arcGISStreets.png";
+
+
+  static String logo() {
+    switch ( AppConfig.instanceInit()!.client) {
+      case Client.hpoil:
+        return AppIcon.hpOILLogo;
+      case Client.hpcl:
+        return AppIcon.hpclLogo;
+        default:
+    return AppIcon.unistalLogo;
+    }
+  }
+  static String loginTitle() {
+    switch ( AppConfig.instanceInit()!.client) {
+      case Client.hpoil:
+        return "HPOIL Login";
+      case Client.hpcl:
+        return "HPCL Login";
+      default:
+        return "Unistal Login";
+    }
+  }
 
 }

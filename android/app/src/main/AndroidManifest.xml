@@ -21,7 +21,7 @@
     <application
         android:name="${applicationName}"
         android:label="@string/app_name"
-        android:icon="@mipmap/hpcl_logo"
+        android:icon="@mipmap/hp_oil_logo"
         android:roundIcon="${appIconRound}"
         android:requestLegacyExternalStorage="true">
 

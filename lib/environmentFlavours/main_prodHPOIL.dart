@@ -83,7 +83,7 @@ Future<void> main() async {
 
   // ✅ 7. App Config
   var configuredApp = const EnvironmentConfig(
-    flavours: EnvironmentFlavours.developmentHPOIL,
+    flavours: EnvironmentFlavours.prodHPOIL,
     child: Root(client: Client.hpoil),
   );
 

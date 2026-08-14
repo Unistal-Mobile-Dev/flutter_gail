@@ -5,10 +5,6 @@ plugins {
 }
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('hpoil.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}
 
 android {
     namespace = "unistal.app.hpoil"
@@ -27,26 +23,34 @@ android {
 
     flavorDimensions "default"
     productFlavors {
-        productionHPOIL {
+        prodHPOIL {
             resValue "string", "app_name", "HPOIL Line Patrolling"
             applicationIdSuffix ".app.hpoil"
             manifestPlaceholders = [
-                    appIcon: "@mipmap/ic_launcher_oil",
-                    appIconRound: "@mipmap/ic_launcher_oil"
+                    appIcon: "@mipmap/hp_oil_logo",
+                    appIconRound: "@mipmap/hp_oil_logo"
             ]
-            versionCode 1
+            def keystorePropertiesFile = rootProject.file('hpoil.properties')
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+            }
+            versionCode 2
             versionName "1.0.0-HPOIL"
         }
-        prodHPCL  {
-            resValue "string", "app_name", "HPCL Line Patrolling"
-            applicationIdSuffix ".hpcl.smartgasnet.app"
-            manifestPlaceholders = [
-                    appIcon: "@mipmap/hpcl_logo",
-                    appIconRound: "@mipmap/hpcl_logo"
-            ]
-            versionCode 1
-            versionName "1.0.0-HPCL"
-        }
+//        prodHPCL  {
+//            resValue "string", "app_name", "HPCL Line Patrolling"
+//            applicationIdSuffix ".hpcl.smartgasnet.app"
+//            manifestPlaceholders = [
+//                    appIcon: "@mipmap/unistal_logo",
+//                    appIconRound: "@mipmap/unistal_logo"
+//            ]
+//            def keystorePropertiesFile = rootProject.file('hpcl.properties')
+//            if (keystorePropertiesFile.exists()) {
+//                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+//            }
+//            versionCode 1
+//            versionName "1.0.0-HPCL"
+//        }
     }
     defaultConfig {
         applicationId = "unistal"
