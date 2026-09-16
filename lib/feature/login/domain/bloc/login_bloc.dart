@@ -100,8 +100,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   _submitLoginData(LoginSubmitDataEvent event, emit) async {
+    _isLoader = true;
+    _eventCompleted(emit);
     if (await ConnectivityHelper.allConnectivityCheck(context: event.context) ==
         false) {
+      _isLoader = false;
+      _eventCompleted(emit);
       return;
     }
     userId = "";
@@ -141,6 +145,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         );
 
     }
+    _isLoader = false;
+    _eventCompleted(emit);
   }
 
   _loginCheck(LoginCheckEvent event, emit) async {
