@@ -1,7 +1,8 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=E:\Software\flutter_sdk\flutter_windows_3.38.8-stable\flutter"
-export "FLUTTER_APPLICATION_PATH=E:\All Update Office Project\GAIL UPIMS\flutter_gail"
+export "FLUTTER_ROOT=/Users/ankushkumar/Downloads/FlutterSDK/flutter"
+export "FLUTTER_APPLICATION_PATH=/Users/ankushkumar/Documents/flutter_gail"
+export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/ankushkumar/Documents/flutter_gail/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.3"

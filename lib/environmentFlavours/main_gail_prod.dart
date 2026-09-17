@@ -18,25 +18,56 @@ Future<void> main() async {
   // ✅ APPLY PORTAL LICENSE FIRST
   // await applyRuntimeStandardLicense();
 
-  // // ✅ APPLY LICENSE FIRST (before any map usage)
-  const apiKey = String.fromEnvironment('API_KEY');
-  if (apiKey.isEmpty) {
-    throw Exception('ArcGIS API key missing');
-  }
- ArcGISEnvironment.apiKey = apiKey;
-
-  await Hive.initFlutter();
-
-  await FirebaseService.instance.initializeService();
-
-  // ✅ 1. Location Permission
-  LocationPermission permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied ||
-      permission == LocationPermission.deniedForever) {
-    permission = await Geolocator.requestPermission();
+  // ✅ APPLY LICENSE FIRST (before any map usage)
+  try {
+    const apiKey = String.fromEnvironment('API_KEY');
+    if (apiKey.isEmpty) {
+      debugPrint('Warning: ArcGIS API key not provided via environment variable');
+    } else {
+      ArcGISEnvironment.apiKey = apiKey;
+      debugPrint("ArcGISEnvironment initialized with provided API key");
+    }
+  } catch (e) {
+    debugPrint("Error setting ArcGIS API key: $e");
   }
 
-  await DashboardHelper.requestPermission();
+  try {
+    await Hive.initFlutter();
+    debugPrint("Hive initialized");
+  } catch (e) {
+    debugPrint("Hive initialization error: $e");
+  }
+
+  try {
+    await FirebaseService.instance.initializeService().timeout(
+      const Duration(seconds: 15),
+      onTimeout: () {
+        debugPrint("Firebase initialization timeout");
+      },
+    );
+    debugPrint("Firebase initialized");
+  } catch (e) {
+    debugPrint("Firebase initialization error: $e");
+  }
+
+  // ✅ 1. Location Permission (with timeout)
+  try {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+    }
+    debugPrint("Location permission status: $permission");
+  } catch (e) {
+    debugPrint("Location permission error: $e");
+  }
+
+  try {
+    await DashboardHelper.requestPermission();
+    debugPrint("Dashboard permission requested");
+  } catch (e) {
+    debugPrint("Dashboard permission error: $e");
+  }
 
   try {
     // ✅ 2. Notification Initialization
@@ -60,10 +91,20 @@ Future<void> main() async {
         android: androidSettings,
         iOS: iosSettings,
       ),
+    ).timeout(
+      const Duration(seconds: 10),
+      onTimeout: () async {
+        debugPrint("Notification plugin initialization timeout");
+      },
     );
 
     // ✅ 3. Request Notification Permission (Android 13+ & iOS)
-    await requestNotificationPermission(notificationPlugin);
+    await requestNotificationPermission(notificationPlugin).timeout(
+      const Duration(seconds: 10),
+      onTimeout: () async {
+        debugPrint("Notification permission request timeout");
+      },
+    );
 
     // ✅ 4. Create Android Notification Channel
     const channel = AndroidNotificationChannel(
@@ -78,39 +119,50 @@ Future<void> main() async {
         AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
+    debugPrint("Notifications initialized successfully");
+  } catch (e) {
+    debugPrint("Notification Init Error: $e");
+  }
 
-    await WakelockPlus.enable(); // Keeps CPU awake while screen off
+  try {
+    await WakelockPlus.enable();
+    debugPrint("Wakelock enabled");
+  } catch (e) {
+    debugPrint("Wakelock error: $e");
+  }
 
-    final isIgnoring = await BatteryOptimizationHelper.isIgnoringBatteryOptimizations();
+  try {
+    final isIgnoring = await BatteryOptimizationHelper
+        .isIgnoringBatteryOptimizations();
     if (!isIgnoring) {
-      await BatteryOptimizationHelper.openIgnoreBatteryOptimizations();
+      // ✅ OPTION 1: Non-blocking battery optimization dialog
+      // This prevents the app from getting stuck waiting for user interaction
+      unawaited(BatteryOptimizationHelper.openIgnoreBatteryOptimizations());
+      debugPrint("Battery optimization dialog opened (non-blocking)");
     }
+  } catch (e) {
+    debugPrint("Battery optimization error: $e");
+  }
 
-    // ✅ 5. Background service management
+  try {
+    // ✅ 5. Background service management (with timeout)
     final backgroundManager = BackgroundManager();
-    backgroundManager.initializeService();
+    await backgroundManager.initializeService().timeout(
+      const Duration(seconds: 10),
+      onTimeout: () async {
+        debugPrint("Background service initialization timeout");
+      },
+    );
 
     BackgroundManager.isServiceRunning.addListener(() {
       debugPrint(
         "Service State Changed → ${BackgroundManager.isServiceRunning.value ? 'RUNNING' : 'STOPPED'}",
       );
     });
+    debugPrint("Background service initialized");
   } catch (e) {
-    debugPrint("Notification Init Error: $e");
+    debugPrint("Background service error: $e");
   }
-
-  // var apiKey = const String.fromEnvironment('API_KEY');
-  // if (apiKey.isEmpty) {
-  //   throw Exception('apiKey undefined');
-  // } else {
-  //   ArcGISEnvironment.apiKey = apiKey;
-  //   ArcGISEnvironment.setLicenseUsingKey(ArcGISEnvironment.apiKey);
-  //
-  //   debugPrint("ArcGISEnvironment.apiKey: ${ArcGISEnvironment.apiKey}");
-  //   debugPrint("ArcGISEnvironment.apiKey: ${apiKey}");
-  // }
-  ArcGISEnvironment.apiKey = "AAPK61287a314f53402d91bb41dffde6de9c_BFuvT1vTFyCyRq4Cx46fgTaP_ax8er0gNXa1ZR-_Tnw4xmBJj6GDtrrxad7rfzL";
-
 
   // ✅ 7. App Config
   var configuredApp = const EnvironmentConfig(
@@ -128,38 +180,52 @@ Future<void> main() async {
 /// ✅ Helper function to request notification permission
 Future<void> requestNotificationPermission(
     FlutterLocalNotificationsPlugin notificationPlugin) async {
-  // For Android 13+ (API 33+)
-  final androidImplementation = notificationPlugin
-      .resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin>();
-  if (androidImplementation != null) {
-    final bool? granted = await androidImplementation.requestNotificationsPermission();
-    debugPrint("Android Notification Permission: $granted");
-  }
+  try {
+    // For Android 13+ (API 33+)
+    final androidImplementation = notificationPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (androidImplementation != null) {
+      final bool? granted =
+      await androidImplementation.requestNotificationsPermission();
+      debugPrint("Android Notification Permission: $granted");
+    }
 
-  // For iOS
-  final iosImplementation = notificationPlugin
-      .resolvePlatformSpecificImplementation<
-      IOSFlutterLocalNotificationsPlugin>();
-  if (iosImplementation != null) {
-    final bool? granted = await iosImplementation.requestPermissions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-    debugPrint("iOS Notification Permission: $granted");
+    // For iOS
+    final iosImplementation = notificationPlugin
+        .resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+    if (iosImplementation != null) {
+      final bool? granted = await iosImplementation.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      debugPrint("iOS Notification Permission: $granted");
+    }
+  } catch (e) {
+    debugPrint("Notification permission request error: $e");
   }
 }
+
 Future<void> applyRuntimeStandardLicense() async {
-  final portal = Portal(
-    Uri.parse('https://gailgis.gail.co.in/portal'),
-    connection: PortalConnection.authenticated,
-  );
+  try {
+    final portal = Portal(
+      Uri.parse('https://gailgis.gail.co.in/portal'),
+      connection: PortalConnection.authenticated,
+    );
 
-  await portal.load();
+    await portal.load().timeout(
+      const Duration(seconds: 10),
+      onTimeout: () {
+        debugPrint("Portal load timeout");
+      },
+    );
 
-  final result =
-  await ArcGISEnvironment.getLicense();
+    final result = await ArcGISEnvironment.getLicense();
 
-  debugPrint('License Status: ${result}');
+    debugPrint('License Status: $result');
+  } catch (e) {
+    debugPrint("License error: $e");
+  }
 }

@@ -315,7 +315,7 @@ class DashboardHelper {
     // Install APK
     try {
       await InstallPlugin.installApk(filePath);
-      await checkAppVersion(!context.mounted ? context : context);
+     // await checkAppVersion(!context.mounted ? context : context);
     } catch (e) {
       ScaffoldMessenger.of(!context.mounted ? context : context)
           .showSnackBar(SnackBar(content: Text("Install error: $e")));

@@ -7,14 +7,10 @@ import 'package:flutter_gail/feature/pgis/helper/pgis_helper.dart';
 import 'package:flutter_gail/feature/pgis/presentation/widget/filter_widget.dart';
 import 'package:flutter_gail/feature/pgis/presentation/widget/map_layer_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 part 'pgis_event.dart';
-
 part 'pgis_state.dart';
 
 class PgisBloc extends Bloc<PgisEvent, PgisState> {
-
-
   late ArcGISMap arcGISMapType;
   final Envelope indiaEnvelope = Envelope.fromXY(
     xMin: 68,
@@ -45,7 +41,6 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
   AppPermissionStatus locationPermission = AppPermissionStatus.denied;
 
   final locationDataSource = SystemLocationDataSource();
-
 
   final GraphicsOverlay _graphicsOverlay = GraphicsOverlay();
 
@@ -118,7 +113,7 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
     _pipelineOverlay = GraphicsOverlay();
     _stationOverlay = GraphicsOverlay();
     _tlpOverlay = GraphicsOverlay();
-    requestLocationPermissions();
+    await requestLocationPermissions();
     _eventCompleted(emit);
   }
 
@@ -133,214 +128,675 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
     }
   }
 
-  Future<void> _location(LocationEvent event, emit) async {
+  // ==========================================================
+  // LOCATION EVENT
+  // ==========================================================
+
+  Future<void> _location(
+      LocationEvent event,
+      Emitter<PgisState> emit,
+      ) async {
     final controller = event.controller;
+
     controller.locationDisplay.autoPanMode =
         LocationDisplayAutoPanMode.recenter;
+
     _eventCompleted(emit);
   }
 
-  Future<void> _searchRounded(SearchRoundedEvent event, emit) async {
+  // ==========================================================
+  // SEARCH
+  // ==========================================================
+
+  Future<void> _searchRounded(
+      SearchRoundedEvent event,
+      Emitter<PgisState> emit,
+      ) async {
     showDialog(
       context: event.ctx,
       builder: (BuildContext context) {
-        return FilterWidget(mapViewController: event.arcGISMapViewController);
+        return FilterWidget(
+          mapViewController: event.arcGISMapViewController,
+        );
       },
     );
+
     _eventCompleted(emit);
   }
 
-  _mapLayer(MapLayerEvent event, emit) {
+  // ==========================================================
+  // MAP LAYER
+  // ==========================================================
+
+  _mapLayer(
+      MapLayerEvent event,
+      Emitter<PgisState> emit,
+      ) {
     showDialog(
       context: event.ctx,
       builder: (BuildContext context) {
-        return MapLayerWidget(controller: event.controller);
+        return MapLayerWidget(
+          controller: event.controller,
+        );
       },
     );
+
     _eventCompleted(emit);
   }
+
+  // ==========================================================
+  // IDENTIFY FEATURES
+  // ==========================================================
 
   Future<void> _onIdentifyFeatures(
-    IdentifyFeaturesAtTapEvent event,
-    emit,
-  ) async {
+      IdentifyFeaturesAtTapEvent event,
+      Emitter<PgisState> emit,
+      ) async {
     PGISHelper.showLoaderDialog(event.context);
+
     _eventCompleted(emit);
+
     final attributeJsonList = <Map<String, dynamic>>[];
 
-    //  try {
-    for (final featureLayer in featureLayerList) {
-      featureLayer.clearSelection();
+    try {
+      // ------------------------------------------------------
+      // Identify features
+      // ------------------------------------------------------
 
-      final identifyLayerResult = await event.controller.identifyLayer(
-        featureLayer,
-        screenPoint: event.offset,
-        tolerance: 22,
-        maximumResults: 1000,
-      );
+      for (final featureLayer in featureLayerList) {
+        featureLayer.clearSelection();
 
-      final features =
-          identifyLayerResult.geoElements.whereType<Feature>().toList();
-      if (features.isNotEmpty) {
-        for (final feature in features) {
-          final table = feature.featureTable;
-          for (final entry in feature.attributes.entries) {
-            final fieldName = entry.key;
-            final value = entry.value;
-            String displayName = fieldName;
-            String? fieldType;
-            if (table != null) {
-              final field =
-                  table.fields
-                      .where((f) => f.name == fieldName)
-                      .cast<Field?>()
-                      .firstOrNull;
+        final identifyLayerResult =
+        await event.controller.identifyLayer(
+          featureLayer,
+          screenPoint: event.offset,
+          tolerance: 22,
+          maximumResults: 1000,
+        );
 
-              if (field != null) {
-                fieldType = field.type.name;
-                displayName = field.alias;
+        final features = identifyLayerResult.geoElements
+            .whereType<Feature>()
+            .toList();
+
+        if (features.isNotEmpty) {
+          for (final feature in features) {
+            final table = feature.featureTable;
+
+            for (final entry in feature.attributes.entries) {
+              final fieldName = entry.key;
+              final value = entry.value;
+
+              String displayName = fieldName;
+              String? fieldType;
+
+              if (table != null) {
+                final field = table.fields
+                    .where(
+                      (f) => f.name == fieldName,
+                )
+                    .cast<Field?>()
+                    .firstOrNull;
+
+                if (field != null) {
+                  fieldType = field.type.name;
+                  displayName = field.alias;
+                }
               }
+
+              attributeJsonList.add({
+                "field": displayName,
+                "value": value ?? "—",
+                "type": fieldType ?? "unknown",
+              });
             }
-            attributeJsonList.add({
-              "field": displayName,
-              "value": value ?? "—",
-              "type": fieldType ?? "unknown",
-            });
+          }
+        } else {
+          final selectedResult =
+          await featureLayer.getSelectedFeatures();
+
+          final selectedFeatures =
+          selectedResult.features();
+
+          for (final feature in selectedFeatures) {
+            featureLayer.unselectFeature(feature);
           }
         }
-      } else {
-        final selectedResult = await featureLayer.getSelectedFeatures();
-        final selectedFeatures = selectedResult.features();
-        for (final feature in selectedFeatures) {
-          featureLayer.unselectFeature(feature);
-        }
       }
-    }
-    Navigator.pop(event.context);
-    if (attributeJsonList.isNotEmpty) {
-      showAttributeDialog(
-        destination: event.offset,
+
+      // ------------------------------------------------------
+      // Close loader
+      // ------------------------------------------------------
+
+      if (event.context.mounted) {
+        Navigator.pop(event.context);
+      }
+
+      // ------------------------------------------------------
+      // Show feature information
+      // ------------------------------------------------------
+
+      if (attributeJsonList.isNotEmpty) {
+        showAttributeDialog(
+          destination: event.offset,
+          controller: event.controller,
+          context: event.context,
+          attributeJsonList: attributeJsonList,
+        );
+      }
+
+      // ------------------------------------------------------
+      // Get clicked map point
+      // ------------------------------------------------------
+
+      final mapPoint = event.controller.screenToLocation(
+        screen: event.offset,
+      );
+
+      if (mapPoint == null || mapPoint.isEmpty) {
+        debugPrint(
+          '❌ Unable to convert screen point to map location',
+        );
+
+        _eventCompleted(emit);
+        return;
+      }
+
+      debugPrint(
+        '📍 CLICKED MAP POINT: '
+            'x=${mapPoint.x}, '
+            'y=${mapPoint.y}, '
+            'wkid=${mapPoint.spatialReference?.wkid}',
+      );
+
+      // ------------------------------------------------------
+      // Convert destination to WGS84
+      // ------------------------------------------------------
+
+      desPoint = PGISHelper.toWgs84(mapPoint);
+
+      debugPrint(
+        '🌍 DESTINATION WGS84: '
+            'lat=${desPoint.y}, '
+            'lng=${desPoint.x}, '
+            'wkid=${desPoint.spatialReference?.wkid}',
+      );
+
+      // ------------------------------------------------------
+      // Validate destination
+      // ------------------------------------------------------
+
+      if (!_isValidRoutePoint(desPoint)) {
+        debugPrint(
+          '❌ Invalid destination point: '
+              'x=${desPoint.x}, '
+              'y=${desPoint.y}',
+        );
+
+        _eventCompleted(emit);
+        return;
+      }
+
+      // ------------------------------------------------------
+      // Clear previous route graphics
+      // ------------------------------------------------------
+
+      _graphicsOverlay.graphics.clear();
+
+      // Current location marker
+      if (_isValidRoutePoint(curPoint)) {
+        PGISHelper.drawPoint(
+          point: curPoint,
+          color: Colors.green,
+          graphicsOverlay: _graphicsOverlay,
+        );
+      }
+
+      // Destination marker
+      PGISHelper.drawPoint(
+        point: desPoint,
+        color: Colors.red,
+        graphicsOverlay: _graphicsOverlay,
+      );
+
+      // ------------------------------------------------------
+      // Solve route
+      // ------------------------------------------------------
+
+      await _solveRoute(
         controller: event.controller,
+      );
+
+      // ------------------------------------------------------
+      // Draw destination buffer
+      // ------------------------------------------------------
+
+      final bufferGeometry = await PGISHelper.drawBuffer(
+        point: desPoint,
+        distanceMeters: 1000,
+        mapController: event.controller,
+        graphicsOverlay: bufferOverlay,
+      );
+
+      debugPrint(
+        '📍 Destination Location: '
+            '${desPoint.x}, ${desPoint.y}',
+      );
+
+      // ------------------------------------------------------
+      // Structure query
+      // ------------------------------------------------------
+
+      final stations = await PGISHelper.structureBoundaryQuery(
         context: event.context,
-        attributeJsonList: attributeJsonList,
+        query: '',
+        spatialReference:
+        desPoint.spatialReference!,
+        bufferGeometry: bufferGeometry,
       );
-    }
-    final mapPoint = event.controller.screenToLocation(screen: event.offset);
-    desPoint = mapPoint!;
-    if (desPoint.isEmpty) return;
-    _graphicsOverlay.graphics.clear();
 
-    PGISHelper.drawPoint(point: curPoint,color: Colors.green, graphicsOverlay: _graphicsOverlay);
-    PGISHelper.drawPoint(point: desPoint,color: Colors.red,graphicsOverlay: _graphicsOverlay);
-    await _solveRoute(controller: event.controller);
+      if (stations.isNotEmpty) {
+        stationList = stations;
+        _eventCompleted(emit);
+      }
 
-    final bufferGeometry = await PGISHelper.drawBuffer(
-      point: desPoint,
-      distanceMeters: 1000,
-      mapController: event.controller,
-      graphicsOverlay: bufferOverlay,
-    );
-    debugPrint('desPoint Location: ${desPoint.x}, ${desPoint.y}');
+      // ------------------------------------------------------
+      // Destination marker
+      // ------------------------------------------------------
 
-    final stations = await PGISHelper.structureBoundaryQuery(
-      context: event.context,
-      query: '',
-      spatialReference: desPoint.spatialReference!,
-      bufferGeometry: bufferGeometry,
-    );
-
-    if (stations.isNotEmpty) {
-      stationList = stations;
-      _eventCompleted(emit);
-    }
-   // PGISHelper.drawPoint(point: desPoint,color: Colors.purple, graphicsOverlay: bufferOverlay);
-    bufferOverlay.graphics.add(
-      Graphic(
-        geometry: desPoint,
-        symbol: SimpleMarkerSymbol(
-          style: SimpleMarkerSymbolStyle.circle,
-          color: Colors.purple,
-          size: 15,
-        ),
-      ),
-    );
-    final spatialRef = desPoint.spatialReference!;
-    final markerSymbol = SimpleMarkerSymbol(
-      style: SimpleMarkerSymbolStyle.circle,
-      color: Colors.blue,
-      size: 8,
-    );
-
-// Optional: clear only once if needed
-// bufferOverlay.graphics.clear();
-
-    for (final s in stations) {
-      final point = ArcGISPoint(
-        x: s.geometry.x,
-        y: s.geometry.y,
-        spatialReference: spatialRef,
-      );
       bufferOverlay.graphics.add(
         Graphic(
-          geometry: point,
-          symbol: markerSymbol,
+          geometry: desPoint,
+          symbol: SimpleMarkerSymbol(
+            style: SimpleMarkerSymbolStyle.circle,
+            color: Colors.purple,
+            size: 15,
+          ),
         ),
+      );
+
+      final spatialRef = desPoint.spatialReference!;
+
+      final markerSymbol = SimpleMarkerSymbol(
+        style: SimpleMarkerSymbolStyle.circle,
+        color: Colors.blue,
+        size: 8,
+      );
+
+      // ------------------------------------------------------
+      // Station markers
+      // ------------------------------------------------------
+
+      for (final s in stations) {
+        final point = ArcGISPoint(
+          x: s.geometry.x,
+          y: s.geometry.y,
+          spatialReference: spatialRef,
+        );
+
+        bufferOverlay.graphics.add(
+          Graphic(
+            geometry: point,
+            symbol: markerSymbol,
+          ),
+        );
+      }
+
+      // ------------------------------------------------------
+      // Move map
+      // ------------------------------------------------------
+
+      await event.controller.setViewpointCenter(
+        desPoint,
+        scale: 25000,
+      );
+    } catch (e, stackTrace) {
+      if (event.context.mounted) {
+        Navigator.of(event.context).maybePop();
+      }
+
+      debugPrint(
+        '❌ Identify feature error: $e',
+      );
+
+      debugPrintStack(
+        stackTrace: stackTrace,
       );
     }
 
-    await event.controller.setViewpointCenter(
-      desPoint,
-      scale: 25000,
-    );
-
-    // } catch (e) {
-    //   Navigator.pop(event.context);
-    //   debugPrint("Identify error: $e");
-    // }
     _eventCompleted(emit);
   }
 
-  // ---------------- DRAW POINT ----------------
+  // ==========================================================
+  // ROUTE POINT VALIDATION
+  // ==========================================================
 
-  // ---------------- SOLVE ROUTE ----------------
+  bool _isValidRoutePoint(ArcGISPoint? point) {
+    if (point == null || point.isEmpty) {
+      return false;
+    }
+
+    final x = point.x;
+    final y = point.y;
+
+    if (x.isNaN || x.isInfinite) {
+      return false;
+    }
+
+    if (y.isNaN || y.isInfinite) {
+      return false;
+    }
+
+    // WGS84:
+    // x = longitude
+    // y = latitude
+
+    if (x < -180 || x > 180) {
+      return false;
+    }
+
+    if (y < -90 || y > 90) {
+      return false;
+    }
+
+    // Reject 0,0
+    if (x == 0 && y == 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  // ==========================================================
+  // SOLVE ROUTE
+  // ==========================================================
+
   Future<void> _solveRoute({
     required ArcGISMapViewController controller,
   }) async {
-    if (curPoint == null || desPoint == null) return;
-    final params = await _routeTask.createDefaultParameters();
+    try {
+      // ------------------------------------------------------
+      // Validate current location
+      // ------------------------------------------------------
 
-    params.setStops([Stop(curPoint), Stop(desPoint)]);
+      if (!_isValidRoutePoint(curPoint)) {
+        debugPrint(
+          '❌ Invalid current location: '
+              'x=${curPoint.x}, '
+              'y=${curPoint.y}',
+        );
 
-    params.returnRoutes = true;
-    params.returnDirections = true;
-    params.outputSpatialReference = SpatialReference.wgs84;
+        return;
+      }
 
-    final result = await _routeTask.solveRoute(params);
-    if (result.routes.isEmpty) return;
-    final route = result.routes.first;
+      // ------------------------------------------------------
+      // Validate destination
+      // ------------------------------------------------------
 
-    distanceKm = route.totalLength / 1000; // meters → km
-    travelTimeMin = route.travelTime; // minutes
-    _drawRoute(geometry: route.routeGeometry!, controller: controller);
+      if (!_isValidRoutePoint(desPoint)) {
+        debugPrint(
+          '❌ Invalid destination location: '
+              'x=${desPoint.x}, '
+              'y=${desPoint.y}',
+        );
+
+        return;
+      }
+
+      debugPrint(
+        '📍 CURRENT POINT: '
+            'lat=${curPoint.y}, '
+            'lng=${curPoint.x}, '
+            'wkid=${curPoint.spatialReference?.wkid}',
+      );
+
+      debugPrint(
+        '📍 DESTINATION POINT: '
+            'lat=${desPoint.y}, '
+            'lng=${desPoint.x}, '
+            'wkid=${desPoint.spatialReference?.wkid}',
+      );
+
+      // ------------------------------------------------------
+      // Convert start point to WGS84
+      // ------------------------------------------------------
+
+      final startWgs84 = PGISHelper.toWgs84(
+        curPoint,
+      );
+
+      // ------------------------------------------------------
+      // Convert destination to WGS84
+      // ------------------------------------------------------
+
+      final destinationWgs84 = PGISHelper.toWgs84(
+        desPoint,
+      );
+
+      debugPrint(
+        '🌍 START WGS84: '
+            'lat=${startWgs84.y}, '
+            'lng=${startWgs84.x}, '
+            'wkid=${startWgs84.spatialReference?.wkid}',
+      );
+
+      debugPrint(
+        '🌍 DESTINATION WGS84: '
+            'lat=${destinationWgs84.y}, '
+            'lng=${destinationWgs84.x}, '
+            'wkid=${destinationWgs84.spatialReference?.wkid}',
+      );
+
+      // ------------------------------------------------------
+      // Validate converted start
+      // ------------------------------------------------------
+
+      if (!_isValidRoutePoint(startWgs84)) {
+        debugPrint(
+          '❌ Start WGS84 point is invalid',
+        );
+
+        return;
+      }
+
+      // ------------------------------------------------------
+      // Validate converted destination
+      // ------------------------------------------------------
+
+      if (!_isValidRoutePoint(destinationWgs84)) {
+        debugPrint(
+          '❌ Destination WGS84 point is invalid',
+        );
+
+        return;
+      }
+
+      // ------------------------------------------------------
+      // Route task
+      // ------------------------------------------------------
+
+      debugPrint(
+        '🛣️ ROUTE SERVICE: ${APIs.routeARCGIS}',
+      );
+
+      // ------------------------------------------------------
+      // Create route parameters
+      // ------------------------------------------------------
+
+      final params =
+      await _routeTask.createDefaultParameters();
+
+      // ------------------------------------------------------
+      // Create stops
+      // ------------------------------------------------------
+
+      final startStop = Stop(
+        startWgs84,
+      );
+
+      final destinationStop = Stop(
+        destinationWgs84,
+      );
+
+      // ------------------------------------------------------
+      // Add stops
+      // ------------------------------------------------------
+
+      params.setStops([
+        startStop,
+        destinationStop,
+      ]);
+
+      params.returnRoutes = true;
+      params.returnDirections = true;
+      params.outputSpatialReference =
+          SpatialReference.wgs84;
+
+      debugPrint(
+        '🚗 ROUTE STOPS CREATED',
+      );
+
+      debugPrint(
+        '🟢 STOP 1: '
+            'lat=${startWgs84.y}, '
+            'lng=${startWgs84.x}',
+      );
+
+      debugPrint(
+        '🔴 STOP 2: '
+            'lat=${destinationWgs84.y}, '
+            'lng=${destinationWgs84.x}',
+      );
+
+      // ------------------------------------------------------
+      // Solve
+      // ------------------------------------------------------
+
+      debugPrint(
+        '🚗 Solving ArcGIS route...',
+      );
+
+      final result =
+      await _routeTask.solveRoute(params);
+
+      routeResult = result;
+
+      // ------------------------------------------------------
+      // Check result
+      // ------------------------------------------------------
+
+      if (result.routes.isEmpty) {
+        debugPrint(
+          '❌ ArcGIS returned no routes',
+        );
+
+        return;
+      }
+
+      final route = result.routes.first;
+
+      // ------------------------------------------------------
+      // Distance
+      // ------------------------------------------------------
+
+      distanceKm =
+          route.totalLength / 1000;
+
+      // ------------------------------------------------------
+      // Travel time
+      // ------------------------------------------------------
+
+      travelTimeMin =
+          route.travelTime;
+
+      debugPrint(
+        '✅ ROUTE FOUND',
+      );
+
+      debugPrint(
+        '📏 Distance: '
+            '${distanceKm.toStringAsFixed(2)} KM',
+      );
+
+      debugPrint(
+        '⏱ Travel Time: '
+            '${travelTimeMin.toStringAsFixed(2)} minutes',
+      );
+
+      // ------------------------------------------------------
+      // Route geometry
+      // ------------------------------------------------------
+
+      final routeGeometry =
+          route.routeGeometry;
+
+      if (routeGeometry == null ||
+          routeGeometry.isEmpty) {
+        debugPrint(
+          '❌ Route geometry is empty',
+        );
+
+        return;
+      }
+
+      // ------------------------------------------------------
+      // Draw route
+      // ------------------------------------------------------
+
+      _drawRoute(
+        geometry: routeGeometry,
+        controller: controller,
+      );
+    } on ArcGISException catch (
+    e, stackTrace) {
+    debugPrint(
+    '❌ ArcGIS Route Exception: $e',
+    );
+
+    debugPrintStack(
+    stackTrace: stackTrace,
+    );
+    } catch (e, stackTrace) {
+    debugPrint('❌ Route Exception: $e',
+    );
+
+    debugPrintStack(
+    stackTrace: stackTrace,
+    );
+    }
   }
 
-  // ---------------- DRAW ROUTE ----------------
+  // ==========================================================
+  // DRAW ROUTE
+  // ==========================================================
+
   void _drawRoute({
     required Geometry geometry,
     required ArcGISMapViewController controller,
   }) {
-    final routeGraphic = Graphic(
-      geometry: geometry,
-      symbol: SimpleLineSymbol(
-        style: SimpleLineSymbolStyle.solid,
-        color: Colors.blue,
-        width: 4,
-      ),
-    );
+    try {
+      final routeGraphic = Graphic(
+        geometry: geometry,
+        symbol: SimpleLineSymbol(
+          style: SimpleLineSymbolStyle.solid,
+          color: Colors.blue,
+          width: 4,
+        ),
+      );
 
-    _graphicsOverlay.graphics.add(routeGraphic);
+      _graphicsOverlay.graphics.add(
+        routeGraphic,
+      );
 
-    controller.setViewpoint(Viewpoint.fromTargetExtent(geometry));
+      controller.setViewpoint(
+        Viewpoint.fromTargetExtent(
+          geometry,
+        ),
+      );
+    } catch (e) {
+      debugPrint(
+        '❌ Draw route error: $e',
+      );
+    }
   }
 
   void showAttributeDialog({
@@ -356,12 +812,16 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
           content: SizedBox(
             width: double.maxFinite,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   "Do you want to navigate?",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
+
                 ElevatedButton.icon(
                   icon: const Icon(Icons.navigation, color: Colors.white),
                   label: const Text(
@@ -371,22 +831,39 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.themeColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  style:
+                  ElevatedButton.styleFrom(
+                    backgroundColor:
+                    AppColor.themeColor,
+                    shape:
+                    RoundedRectangleBorder(
+                      borderRadius:
+                      BorderRadius.circular(
+                        12,
+                      ),
                     ),
                   ),
                   onPressed: () async {
-                    final mapPoint = controller.screenToLocation(
-                      screen: Offset(destination.dx, destination.dy),
+                    final mapPoint =
+                    controller.screenToLocation(
+                      screen: Offset(
+                        destination.dx,
+                        destination.dy,
+                      ),
                     );
-                    if (mapPoint != null) {
+
+                    if (mapPoint != null &&
+                        !mapPoint.isEmpty) {
                       Navigator.of(context).pop();
-                      context.read<PgisBloc>().add(
+
+                      context
+                          .read<PgisBloc>()
+                          .add(
                         StartNavigationEvent(
-                          controller: controller,
-                          destination: mapPoint,
+                          controller:
+                          controller,
+                          destination:
+                          mapPoint,
                         ),
                       );
                     }
@@ -423,7 +900,9 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Close'),
+              child: const Text(
+                'Close',
+              ),
             ),
           ],
         );
@@ -431,472 +910,1127 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
     );
   }
 
-  Future<void> _onStartNavigation(StartNavigationEvent event, emit) async {
-    final controller = event.controller;
-    final locationDisplay = controller.locationDisplay;
-    if (!locationDisplay.started) {
-      locationDisplay.start();
+  // ==========================================================
+  // START NAVIGATION
+  // ==========================================================
+
+  Future<void> _onStartNavigation(
+      StartNavigationEvent event,
+      Emitter<PgisState> emit,
+      ) async {
+    try {
+      final controller =
+          event.controller;
+
+      final locationDisplay =
+          controller.locationDisplay;
+
+      if (!locationDisplay.started) {
+        locationDisplay.start();
+      }
+
+      final location =
+          locationDisplay.location;
+
+      if (location == null ||
+          location.position.isEmpty) {
+        debugPrint(
+          '❌ Location fix not yet available',
+        );
+
+        return;
+      }
+
+      // ------------------------------------------------------
+      // Current location WGS84
+      // ------------------------------------------------------
+
+      final currentWgs84 =
+      PGISHelper.toWgs84(
+        location.position,
+      );
+
+      // ------------------------------------------------------
+      // Destination WGS84
+      // ------------------------------------------------------
+
+      final destinationWgs84 =
+      PGISHelper.toWgs84(
+        event.destination,
+      );
+
+      // ------------------------------------------------------
+      // Validate
+      // ------------------------------------------------------
+
+      if (!_isValidRoutePoint(
+        currentWgs84,
+      )) {
+        debugPrint(
+          '❌ Invalid current navigation location',
+        );
+
+        return;
+      }
+
+      if (!_isValidRoutePoint(
+        destinationWgs84,
+      )) {
+        debugPrint(
+          '❌ Invalid destination navigation location',
+        );
+
+        return;
+      }
+
+      curPoint = currentWgs84;
+      desPoint = destinationWgs84;
+
+      debugPrint(
+        '🧭 NAVIGATION',
+      );
+
+      debugPrint(
+        'FROM: '
+            'lat=${currentWgs84.y}, '
+            'lng=${currentWgs84.x}',
+      );
+
+      debugPrint(
+        'TO: '
+            'lat=${destinationWgs84.y}, '
+            'lng=${destinationWgs84.x}',
+      );
+
+      // ------------------------------------------------------
+      // Open Google Maps
+      // ------------------------------------------------------
+
+      await PGISHelper.openGoogleMapsNavigation(
+        sourceLat: currentWgs84.y,
+        sourceLng: currentWgs84.x,
+        destLat: destinationWgs84.y,
+        destLng: destinationWgs84.x,
+      );
+
+      _eventCompleted(emit);
+    } catch (
+    e,
+    stackTrace
+    ) {
+      debugPrint(
+        '❌ Navigation error: $e',
+      );
+
+      debugPrintStack(
+        stackTrace: stackTrace,
+      );
     }
-    final location = locationDisplay.location;
-    if (location == null || location.position.isEmpty) {
-      debugPrint("Location fix not yet available");
-      return;
-    }
-
-    curPoint = location.position;
-
-    final destWgs84 = PGISHelper.toWgs84(event.destination);
-
-    debugPrint(
-      "NAV FROM ${curPoint.y}, ${curPoint.x} TO ${destWgs84.y}, ${destWgs84.x}",
-    );
-
-    await PGISHelper.openGoogleMapsNavigation(
-      sourceLat: curPoint.y,
-      sourceLng: curPoint.x,
-      destLat: destWgs84.y,
-      destLng: destWgs84.x,
-    );
-
-    _eventCompleted(emit);
   }
 
-  Future<void> _enableUserLocation(ArcGISMapViewController controller) async {
-    controller.locationDisplay.dataSource = locationDataSource;
+  // ==========================================================
+  // ENABLE LOCATION
+  // ==========================================================
+
+  Future<void> _enableUserLocation(
+      ArcGISMapViewController controller,
+      ) async {
+    controller.locationDisplay.dataSource =
+        locationDataSource;
+
     await locationDataSource.start();
   }
 
-  _onMapReady(PGISMapReady event, emit) async {
-    final controller = event.controller;
-    arcGISMapType = ArcGISMap.withBasemapStyle(BasemapStyle.arcGISStreets);
-    controller.arcGISMap = arcGISMapType;
+  // ==========================================================
+  // MAP READY
+  // ==========================================================
 
-    controller.graphicsOverlays.add(_graphicsOverlay);
-    _routeTask = RouteTask.withUri(Uri.parse(APIs.routeARCGIS));
+  Future<void> _onMapReady(
+      PGISMapReady event,
+      Emitter<PgisState> emit,
+      ) async {
+    try {
+      final controller =
+          event.controller;
 
-    await _enableUserLocation(controller);
-    await _addPipelineLayer(controller);
-    // await _addCadastralLayer(controller);
+      arcGISMapType =
+          ArcGISMap.withBasemapStyle(
+            BasemapStyle.arcGISStreets,
+          );
 
-    final ArcGISPoint currentPoint = await PGISHelper.startCurrentLocation();
+      controller.arcGISMap =
+          arcGISMapType;
 
-    debugPrint('Current Location: ${currentPoint.y}, ${currentPoint.x}');
-    curPoint = currentPoint;
-    await controller.setViewpointGeometry(indiaEnvelope, paddingInDiPs: 50);
+      // ------------------------------------------------------
+      // Graphics overlay
+      // ------------------------------------------------------
 
-    bufferOverlay = GraphicsOverlay();
-    event.controller.graphicsOverlays.add(bufferOverlay);
+      controller.graphicsOverlays.add(
+        _graphicsOverlay,
+      );
+
+      // ------------------------------------------------------
+      // Route task
+      // ------------------------------------------------------
+
+      final routeUri =
+      Uri.parse(APIs.routeARCGIS);
+
+      debugPrint(
+        '🛣️ ROUTE SERVICE: $routeUri',
+      );
+
+      _routeTask =
+          RouteTask.withUri(
+            routeUri,
+          );
+
+      // ------------------------------------------------------
+      // Location
+      // ------------------------------------------------------
+
+      await _enableUserLocation(
+        controller,
+      );
+
+      // ------------------------------------------------------
+      // Get current location
+      // ------------------------------------------------------
+
+      try {
+        final currentPoint =
+        await PGISHelper.startCurrentLocation();
+
+        final currentWgs84 =
+        PGISHelper.toWgs84(
+          currentPoint,
+        );
+
+        debugPrint(
+          '📍 CURRENT LOCATION WGS84: '
+              'lat=${currentWgs84.y}, '
+              'lng=${currentWgs84.x}, '
+              'wkid=${currentWgs84.spatialReference?.wkid}',
+        );
+
+        if (_isValidRoutePoint(
+          currentWgs84,
+        )) {
+          curPoint =
+              currentWgs84;
+        } else {
+          debugPrint(
+            '❌ Current location is invalid',
+          );
+        }
+      } catch (
+      e,
+      stackTrace
+      ) {
+        debugPrint(
+          '❌ Current location error: $e',
+        );
+
+        debugPrintStack(
+          stackTrace: stackTrace,
+        );
+      }
+
+      // ------------------------------------------------------
+      // India envelope
+      // ------------------------------------------------------
+
+      await controller.setViewpointGeometry(
+        indiaEnvelope,
+        paddingInDiPs: 50,
+      );
+
+      // ------------------------------------------------------
+      // Buffer overlay
+      // ------------------------------------------------------
+
+      bufferOverlay =
+          GraphicsOverlay();
+
+      event.controller.graphicsOverlays.add(
+        bufferOverlay,
+      );
+
+      // ------------------------------------------------------
+      // Pipeline
+      // ------------------------------------------------------
+
+      await _addPipelineLayer(
+        controller,
+      );
+    } catch (
+    e,
+    stackTrace
+    ) {
+      debugPrint(
+        '❌ Map ready error: $e',
+      );
+
+      debugPrintStack(
+        stackTrace: stackTrace,
+      );
+    }
+
     _eventCompleted(emit);
   }
+
+  // ==========================================================
+  // PIPELINE LAYER
+  // ==========================================================
 
   ServiceFeatureTable? _pipelineTable;
 
-  final Map<String, ServiceFeatureTable> sublayerTables = {};
+  final Map<String, ServiceFeatureTable>
+  sublayerTables = {};
 
-  Future<void> _addPipelineLayer(ArcGISMapViewController controller) async {
-    final uri = Uri.parse(APIs.baseGailUrl + APIs.pipelineLayerUrl);
+  Future<void> _addPipelineLayer(
+      ArcGISMapViewController controller,
+      ) async {
+    try {
+      final uri = Uri.parse(
+        APIs.baseGailUrl +
+            APIs.pipelineLayerUrl,
+      );
 
-    final pipelineLayer = ArcGISMapImageLayer.withUri(uri);
-    await pipelineLayer.load();
+      final pipelineLayer =
+      ArcGISMapImageLayer.withUri(
+        uri,
+      );
 
-    controller.arcGISMap?.operationalLayers.add(pipelineLayer);
+      await pipelineLayer.load();
 
-    for (final content in pipelineLayer.subLayerContents) {
-      if (content is ArcGISMapImageSublayer) {
-        await content.load();
+      controller.arcGISMap?.operationalLayers
+          .add(
+        pipelineLayer,
+      );
 
-        final id = content.id.toString();
-        layerMap[id] = content;
+      for (final content
+      in pipelineLayer.subLayerContents) {
+        if (content
+        is ArcGISMapImageSublayer) {
+          await content.load();
 
-        final sublayerUri = content.table?.uri;
-        if (sublayerUri != null) {
-          final table = ServiceFeatureTable.withUri(sublayerUri);
-          final featureLayer = FeatureLayer.withFeatureTable(table);
-          await featureLayer.load();
-          featureLayerList.add(featureLayer);
+          final id =
+          content.id.toString();
 
-          sublayerTables[id] = table;
-          if (id == '8') {
-            _pipelineTable = table;
-            if (kDebugMode) {
-              print("_pipelineTable88888888888888888--   $_pipelineTable");
+          layerMap[id] =
+              content;
+
+          final sublayerUri =
+              content.table?.uri;
+
+          if (sublayerUri != null) {
+            final table =
+            ServiceFeatureTable.withUri(
+              sublayerUri,
+            );
+
+            final featureLayer =
+            FeatureLayer.withFeatureTable(
+              table,
+            );
+
+            await featureLayer.load();
+
+            featureLayerList.add(
+              featureLayer,
+            );
+
+            sublayerTables[id] =
+                table;
+
+            if (id == '8') {
+              _pipelineTable =
+                  table;
+
+              if (kDebugMode) {
+                print(
+                  "_pipelineTable "
+                      "$_pipelineTable",
+                );
+              }
             }
-          }
 
-          log('Sublayer $id ready → $sublayerUri');
+            log(
+              'Sublayer $id ready → '
+                  '$sublayerUri',
+            );
+          }
         }
       }
+    } catch (
+    e,
+    stackTrace
+    ) {
+      log(
+        '❌ Pipeline layer error',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
-  Future<void> _addCadastralLayer(ArcGISMapViewController controller) async {
+  // ==========================================================
+  // CADASTRAL LAYER
+  // ==========================================================
+
+  Future<void> _addCadastralLayer(
+      ArcGISMapViewController controller,
+      ) async {
     if (_cadastralMapImageLayer != null) {
-      return; // already added
+      return;
     }
 
     try {
-      final urlString = APIs.baseGailUrl + APIs.cadastralLayerUrl;
-      final uri = Uri.parse(urlString);
-      log("Cadastral URL ---> $uri");
+      final urlString =
+          APIs.baseGailUrl +
+              APIs.cadastralLayerUrl;
 
-      final mapImageLayer = ArcGISMapImageLayer.withUri(uri);
+      final uri =
+      Uri.parse(urlString);
+
+      log(
+        "Cadastral URL ---> $uri",
+      );
+
+      final mapImageLayer =
+      ArcGISMapImageLayer.withUri(
+        uri,
+      );
+
       await mapImageLayer.load();
 
-      controller.arcGISMap!.operationalLayers.add(mapImageLayer);
-      _cadastralMapImageLayer = mapImageLayer;
+      controller.arcGISMap!
+          .operationalLayers
+          .add(
+        mapImageLayer,
+      );
 
-      for (final content in mapImageLayer.subLayerContents) {
-        if (content is ArcGISMapImageSublayer) {
+      _cadastralMapImageLayer =
+          mapImageLayer;
+
+      for (final content
+      in mapImageLayer.subLayerContents) {
+        if (content
+        is ArcGISMapImageSublayer) {
           await content.load();
 
-          final sublayerUri = content.table?.uri;
-          if (sublayerUri == null) continue;
+          final sublayerUri =
+              content.table?.uri;
 
-          final serviceFeatureTable = ServiceFeatureTable.withUri(sublayerUri);
+          if (sublayerUri == null) {
+            continue;
+          }
 
-          final featureLayer = FeatureLayer.withFeatureTable(
+          final serviceFeatureTable =
+          ServiceFeatureTable.withUri(
+            sublayerUri,
+          );
+
+          final featureLayer =
+          FeatureLayer.withFeatureTable(
             serviceFeatureTable,
           );
+
           await featureLayer.load();
-          _cadastralFeatureLayers.add(featureLayer);
+
+          _cadastralFeatureLayers.add(
+            featureLayer,
+          );
         }
       }
 
-      final viewpoint = await controller.getCurrentViewpoint(ViewpointType.centerAndScale);
-      if (viewpoint != null) {
-        controller.setViewpoint(viewpoint);
-      }
-      controller.arcGISMap!.operationalLayers.addAll(_cadastralFeatureLayers);
-    } catch (e, s) {
-      log('❌ Error loading cadastral layer', error: e, stackTrace: s);
-    }
-  }
-
-  void _removeCadastralLayer(ArcGISMapViewController controller) {
-    if (_cadastralMapImageLayer == null) return;
-
-    for (final layer in _cadastralFeatureLayers) {
-      controller.arcGISMap!.operationalLayers.remove(layer);
-    }
-    controller.arcGISMap!.operationalLayers.remove(_cadastralMapImageLayer);
-    _cadastralFeatureLayers.clear();
-    _cadastralMapImageLayer = null;
-  }
-
-  // static Future<void> _addCadastralLayer(ArcGISMapViewController controller) async {
-  //   String urlString = APIs.baseGailUrl + APIs.cadastralLayerUrl;
-  //
-  //   final uri = Uri.parse(urlString);
-  //   log("url--->${uri}");
-  //   final pipelineLayer = ArcGISMapImageLayer.withUri(uri);
-  //
-  //   await pipelineLayer.load();
-  //   controller.arcGISMap?.operationalLayers.add(pipelineLayer);
-  //
-  //   layerMap.clear();
-  //   for (final content in pipelineLayer.subLayerContents) {
-  //     if (content is ArcGISMapImageSublayer) {
-  //       await content.load();
-  //
-  //       final id = content.id.toString();
-  //
-  //       print("📌 Loaded Sublayer → ID: $id | Name: ${content.name}");
-  //
-  //       // Store real sublayer reference
-  //       layerMap[id] = content;
-  //     }
-  //   }
-  //
-  //   print("🎉 All layers loaded → ${layerMap.keys.toList()}");
-  // }
-
-  void _setLayerVisibility(String key, bool visible) {
-    final layer = layerMap[key];
-    if (layer != null) {
-      layer.isVisible = visible;
-      if (kDebugMode) {
-        print("🔄 Layer [$key] visibility → $visible");
-      }
-    } else {
-      if (kDebugMode) {
-        print("❌ Layer ID $key not found!");
-      }
-    }
-  }
-
-  _selectEngRoute(SelectPipelineEngRouteEvent event, emit) async {
-    final polylineBuilder = PolylineBuilder(
-      spatialReference: SpatialReference.wgs84,
-    );
-    var res = await PGISHelper.zoomToPipeLine(
-      context: event.context,
-      query: event.query,
-    );
-    if (res != null) {
-      for (var point in res) {
-        polylineBuilder.addPoint(
-          ArcGISPoint(
-            x: point[0],
-            y: point[1],
-            spatialReference: SpatialReference.wgs84,
-          ),
-        );
-      }
-      final polyline = polylineBuilder.toGeometry();
-
-      final graphic = Graphic(
-        geometry: polyline,
-        symbol: SimpleLineSymbol(
-          color: Colors.red,
-          width: 3,
-          style: SimpleLineSymbolStyle.solid,
-        ),
+      final viewpoint =
+      await controller
+          .getCurrentViewpoint(
+        ViewpointType.centerAndScale,
       );
 
-      _pipelineOverlay.graphics.add(graphic);
-      event.controller.graphicsOverlays.clear();
-      event.controller.graphicsOverlays.add(_pipelineOverlay);
-      await event.controller.setViewpointGeometry(polyline, paddingInDiPs: 100);
-    }
-    _eventCompleted(emit);
-  }
-
-  _selectStation(SelectStationEvent event, emit) async {
-    final polylineBuilder = PolylineBuilder(
-      spatialReference: SpatialReference.wgs84,
-    );
-    var res = await PGISHelper.zoomToStation(
-      context: event.context,
-      query: event.query,
-    );
-    if (res != null) {
-      final points = res['points'];
-      if (kDebugMode) {
-        print(
-          "Points--------------------------------------------------$points",
+      if (viewpoint != null) {
+        controller.setViewpoint(
+          viewpoint,
         );
       }
-      if (points != null && points is List) {
-        for (var point in points) {
+
+      controller.arcGISMap!
+          .operationalLayers
+          .addAll(
+        _cadastralFeatureLayers,
+      );
+    } catch (
+    e,
+    stackTrace
+    ) {
+      log(
+        '❌ Error loading cadastral layer',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // ==========================================================
+  // REMOVE CADASTRAL
+  // ==========================================================
+
+  void _removeCadastralLayer(
+      ArcGISMapViewController controller,
+      ) {
+    if (_cadastralMapImageLayer ==
+        null) {
+      return;
+    }
+
+    for (final layer
+    in _cadastralFeatureLayers) {
+      controller.arcGISMap!
+          .operationalLayers
+          .remove(layer);
+    }
+
+    controller.arcGISMap!
+        .operationalLayers
+        .remove(
+      _cadastralMapImageLayer,
+    );
+
+    _cadastralFeatureLayers.clear();
+
+    _cadastralMapImageLayer =
+    null;
+  }
+
+  // ==========================================================
+  // ENGINEERING ROUTE
+  // ==========================================================
+
+  _selectEngRoute(
+      SelectPipelineEngRouteEvent event,
+      Emitter<PgisState> emit,
+      ) async {
+    try {
+      final polylineBuilder =
+      PolylineBuilder(
+        spatialReference:
+        SpatialReference.wgs84,
+      );
+
+      final res =
+      await PGISHelper.zoomToPipeLine(
+        context: event.context,
+        query: event.query,
+      );
+
+      if (res != null) {
+        for (final point in res) {
           polylineBuilder.addPoint(
             ArcGISPoint(
               x: point[0],
               y: point[1],
-              spatialReference: SpatialReference.wgs84,
+              spatialReference:
+              SpatialReference.wgs84,
             ),
           );
         }
-        final polygon = polylineBuilder.toGeometry();
 
-        final fillSymbol = SimpleFillSymbol(
-          style: SimpleFillSymbolStyle.solid,
-          color: Colors.red.withValues(red: 0.3, green: 0.3),
-          outline: SimpleLineSymbol(
+        final polyline =
+        polylineBuilder.toGeometry();
+
+        final graphic = Graphic(
+          geometry: polyline,
+          symbol: SimpleLineSymbol(
             color: Colors.red,
-            width: 2,
-            style: SimpleLineSymbolStyle.solid,
+            width: 3,
+            style:
+            SimpleLineSymbolStyle.solid,
           ),
         );
 
-        final graphic = Graphic(geometry: polygon, symbol: fillSymbol);
+        _pipelineOverlay.graphics
+            .add(graphic);
 
-        _stationOverlay.graphics.clear();
-        _stationOverlay.graphics.add(graphic);
+        event.controller
+            .graphicsOverlays
+            .clear();
 
-        await event.controller.setViewpointGeometry(
-          polygon,
+        event.controller
+            .graphicsOverlays
+            .add(
+          _pipelineOverlay,
+        );
+
+        await event.controller
+            .setViewpointGeometry(
+          polyline,
           paddingInDiPs: 100,
         );
       }
-      _eventCompleted(emit);
+    } catch (e) {
+      debugPrint(
+        '❌ Select engineering route error: $e',
+      );
     }
+
+    _eventCompleted(emit);
   }
 
-  _selectTLP(SelectTLPEvent event, emit) async {
-    var res = await PGISHelper.zoomToTLP(
-      context: event.context,
-      query: event.query,
-    );
-    if (res != null &&
-        res['geometryType'] == 'point' &&
-        res['attributes'] != null) {
-      final double x = res['x'];
-      final double y = res['y'];
+  // ==========================================================
+  // SELECT STATION
+  // ==========================================================
 
-      final attributes = res['attributes'] ?? {};
-      final point = ArcGISPoint(
-        x: x,
-        y: y,
-        spatialReference: SpatialReference.wgs84,
-      );
-      final markerSymbol = SimpleMarkerSymbol(
-        style: SimpleMarkerSymbolStyle.circle,
-        color: Colors.red,
-        size: 12,
+  _selectStation(
+      SelectStationEvent event,
+      Emitter<PgisState> emit,
+      ) async {
+    try {
+      final polylineBuilder =
+      PolylineBuilder(
+        spatialReference:
+        SpatialReference.wgs84,
       );
 
-      final graphic = Graphic(geometry: point, symbol: markerSymbol);
+      final res =
+      await PGISHelper.zoomToStation(
+        context: event.context,
+        query: event.query,
+      );
 
-      _tlpOverlay.graphics.add(graphic);
-      event.controller.graphicsOverlays.add(_tlpOverlay);
+      if (res != null) {
+        final points =
+        res['points'];
 
-      await event.controller.setViewpointCenter(point, scale: 5000);
-      if (attributes != null) {
-        if (!event.context.mounted) return;
-        showModalBottomSheet(
-          context: event.context,
-          builder:
-              (_) => Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "TLP No: ${attributes['tlpno'] ?? ''}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text("TLP Type: ${attributes['TLPType'] ?? ''}"),
-                  ],
-                ),
+        if (kDebugMode) {
+          print(
+            "Points --> $points",
+          );
+        }
+
+        if (points != null &&
+            points is List) {
+          for (final point in points) {
+            polylineBuilder.addPoint(
+              ArcGISPoint(
+                x: point[0],
+                y: point[1],
+                spatialReference:
+                SpatialReference.wgs84,
               ),
+            );
+          }
+
+          final polygon =
+          polylineBuilder
+              .toGeometry();
+
+          final fillSymbol =
+          SimpleFillSymbol(
+            style:
+            SimpleFillSymbolStyle.solid,
+            color: Colors.red.withValues(
+              red: 0.3,
+              green: 0.3,
+            ),
+            outline:
+            SimpleLineSymbol(
+              color: Colors.red,
+              width: 2,
+              style:
+              SimpleLineSymbolStyle
+                  .solid,
+            ),
+          );
+
+          final graphic = Graphic(
+            geometry: polygon,
+            symbol: fillSymbol,
+          );
+
+          _stationOverlay
+              .graphics
+              .clear();
+
+          _stationOverlay
+              .graphics
+              .add(
+            graphic,
+          );
+
+          await event.controller
+              .setViewpointGeometry(
+            polygon,
+            paddingInDiPs: 100,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint(
+        '❌ Select station error: $e',
+      );
+    }
+
+    _eventCompleted(emit);
+  }
+
+  // ==========================================================
+  // SELECT TLP
+  // ==========================================================
+
+  _selectTLP(
+      SelectTLPEvent event,
+      Emitter<PgisState> emit,
+      ) async {
+    try {
+      final res =
+      await PGISHelper.zoomToTLP(
+        context: event.context,
+        query: event.query,
+      );
+
+      if (res != null &&
+          res['geometryType'] ==
+              'point' &&
+          res['attributes'] != null) {
+        final double x =
+        res['x'];
+
+        final double y =
+        res['y'];
+
+        final attributes =
+            res['attributes'] ?? {};
+
+        final point = ArcGISPoint(
+          x: x,
+          y: y,
+          spatialReference:
+          SpatialReference.wgs84,
+        );
+
+        final markerSymbol =
+        SimpleMarkerSymbol(
+          style:
+          SimpleMarkerSymbolStyle
+              .circle,
+          color: Colors.red,
+          size: 12,
+        );
+
+        final graphic = Graphic(
+          geometry: point,
+          symbol: markerSymbol,
+        );
+
+        _tlpOverlay.graphics.add(
+          graphic,
+        );
+
+        event.controller
+            .graphicsOverlays
+            .add(
+          _tlpOverlay,
+        );
+
+        await event.controller
+            .setViewpointCenter(
+          point,
+          scale: 5000,
+        );
+
+        if (event.context.mounted) {
+          showModalBottomSheet(
+            context: event.context,
+            builder: (_) => Padding(
+              padding:
+              const EdgeInsets.all(
+                16,
+              ),
+              child: Column(
+                mainAxisSize:
+                MainAxisSize.min,
+                crossAxisAlignment:
+                CrossAxisAlignment
+                    .start,
+                children: [
+                  Text(
+                    "TLP No: "
+                        "${attributes['tlpno'] ?? ''}",
+                    style:
+                    const TextStyle(
+                      fontWeight:
+                      FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "TLP Type: "
+                        "${attributes['TLPType'] ?? ''}",
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      } else {
+        debugPrint(
+          "❌ No point geometry "
+              "returned for TLP",
         );
       }
-      _eventCompleted(emit);
-    } else {
-      if (kDebugMode) {
-        print("❌ No point geometry returned for TLP");
-      }
+    } catch (e) {
+      debugPrint(
+        '❌ Select TLP error: $e',
+      );
     }
+
+    _eventCompleted(emit);
   }
 
-  _resetPipeline(ResetPipelineEvent event, emit) async {
+  // ==========================================================
+  // RESET PIPELINE
+  // ==========================================================
+
+  _resetPipeline(
+      ResetPipelineEvent event,
+      Emitter<PgisState> emit,
+      ) async {
     _pipelineOverlay.graphics.clear();
-    event.controller.graphicsOverlays.remove(_pipelineOverlay);
+
+    event.controller
+        .graphicsOverlays
+        .remove(
+      _pipelineOverlay,
+    );
+
     pipelineCtrl.clear();
     sectionCtrl.clear();
     tlpCtrl.clear();
-    await event.controller.setViewpointGeometry(
+
+    await event.controller
+        .setViewpointGeometry(
       indiaEnvelope,
       paddingInDiPs: 50,
     );
+
     _eventCompleted(emit);
   }
 
-  _resetStation(ResetStationEvent event, emit) async {
+  // ==========================================================
+  // RESET STATION
+  // ==========================================================
+
+  _resetStation(
+      ResetStationEvent event,
+      Emitter<PgisState> emit,
+      ) async {
     _stationOverlay.graphics.clear();
-    event.controller.graphicsOverlays.remove(_stationOverlay);
+
+    event.controller
+        .graphicsOverlays
+        .remove(
+      _stationOverlay,
+    );
+
     sectionCtrl.clear();
-    await event.controller.setViewpointGeometry(
+
+    await event.controller
+        .setViewpointGeometry(
       indiaEnvelope,
       paddingInDiPs: 50,
     );
+
     _eventCompleted(emit);
   }
 
-  _resetTLP(ResetTLPEvent event, emit) async {
+  // ==========================================================
+  // RESET TLP
+  // ==========================================================
+
+  _resetTLP(
+      ResetTLPEvent event,
+      Emitter<PgisState> emit,
+      ) async {
     _tlpOverlay.graphics.clear();
-    event.controller.graphicsOverlays.remove(_tlpOverlay);
+
+    event.controller
+        .graphicsOverlays
+        .remove(
+      _tlpOverlay,
+    );
+
     tlpCtrl.clear();
-    await event.controller.setViewpointGeometry(
+
+    await event.controller
+        .setViewpointGeometry(
       indiaEnvelope,
       paddingInDiPs: 50,
     );
+
     _eventCompleted(emit);
   }
 
-  _onStopNavigation(StopNavigationEvent event, emit) async {
-    final mapController = event.controller;
-    mapController.locationDisplay.autoPanMode = LocationDisplayAutoPanMode.off;
-    // emit(state.copyWith(isNavigating: false, routeStatus: 'Destination reached.'));
+  // ==========================================================
+  // STOP NAVIGATION
+  // ==========================================================
+
+  _onStopNavigation(
+      StopNavigationEvent event,
+      Emitter<PgisState> emit,
+      ) async {
+    final mapController =
+        event.controller;
+
+    mapController.locationDisplay
+        .autoPanMode =
+        LocationDisplayAutoPanMode.off;
+
     _eventCompleted(emit);
   }
 
-  _togglePipelineDevice(TogglePipelineDeviceEvent event, emit) {
-    isPipelineDeviceCheck = !isPipelineDeviceCheck;
-    _setLayerVisibility("200", isPipelineDeviceCheck);
+  // ==========================================================
+  // TOGGLES
+  // ==========================================================
+
+  _togglePipelineDevice(
+      TogglePipelineDeviceEvent event,
+      Emitter<PgisState> emit,
+      ) {
+    isPipelineDeviceCheck =
+    !isPipelineDeviceCheck;
+
+    _setLayerVisibility(
+      "200",
+      isPipelineDeviceCheck,
+    );
+
     _eventCompleted(emit);
   }
 
-  _toggleStructure(ToggleStructureEvent event, emit) {
-    isStructureCheck = !isStructureCheck;
-    _setLayerVisibility("8", isStructureCheck);
+  _toggleStructure(
+      ToggleStructureEvent event,
+      Emitter<PgisState> emit,
+      ) {
+    isStructureCheck =
+    !isStructureCheck;
+
+    _setLayerVisibility(
+      "8",
+      isStructureCheck,
+    );
+
     _eventCompleted(emit);
   }
 
-  _togglePipeline(TogglePipelineEvent event, emit) {
-    isPipelineCheck = !isPipelineCheck;
-    _setLayerVisibility("210052", isPipelineCheck);
+  _togglePipeline(
+      TogglePipelineEvent event,
+      Emitter<PgisState> emit,
+      ) {
+    isPipelineCheck =
+    !isPipelineCheck;
+
+    _setLayerVisibility(
+      "210052",
+      isPipelineCheck,
+    );
+
     _eventCompleted(emit);
   }
 
-  _toggleContinuous(ToggleContinuousEvent event, emit) {
-    isContinuousCheck = !isContinuousCheck;
-    _setLayerVisibility("900017", isContinuousCheck);
+  _toggleContinuous(
+      ToggleContinuousEvent event,
+      Emitter<PgisState> emit,
+      ) {
+    isContinuousCheck =
+    !isContinuousCheck;
+
+    _setLayerVisibility(
+      "900017",
+      isContinuousCheck,
+    );
+
     _eventCompleted(emit);
   }
 
-  _toggleEngineering(ToggleEngineeringEvent event, emit) {
-    isEngineeringCheck = !isEngineeringCheck;
-    _setLayerVisibility("910", isEngineeringCheck);
+  _toggleEngineering(
+      ToggleEngineeringEvent event,
+      Emitter<PgisState> emit,
+      ) {
+    isEngineeringCheck =
+    !isEngineeringCheck;
+
+    _setLayerVisibility(
+      "910",
+      isEngineeringCheck,
+    );
+
     _eventCompleted(emit);
   }
 
-  _toggleStructureBoundary(ToggleStructureBoundaryEvent event, emit) {
-    isStructureBoundaryCheck = !isStructureBoundaryCheck;
-    _setLayerVisibility("910", isStructureBoundaryCheck);
+  _toggleStructureBoundary(
+      ToggleStructureBoundaryEvent event,
+      Emitter<PgisState> emit,
+      ) {
+    isStructureBoundaryCheck =
+    !isStructureBoundaryCheck;
+
+    _setLayerVisibility(
+      "910",
+      isStructureBoundaryCheck,
+    );
+
     _eventCompleted(emit);
   }
 
-  _toggleService(ToggleServiceEvent event, emit) {
-    isServiceCheck = !isServiceCheck;
-    _setLayerVisibility("920", isServiceCheck);
+  _toggleService(
+      ToggleServiceEvent event,
+      Emitter<PgisState> emit,
+      ) {
+    isServiceCheck =
+    !isServiceCheck;
+
+    _setLayerVisibility(
+      "920",
+      isServiceCheck,
+    );
+
     _eventCompleted(emit);
   }
 
-  Future<void> _toggleCadastral(ToggleCadastralEvent event, emit) async {
-    isCadastralCheck = !isCadastralCheck;
+  // ==========================================================
+  // CADASTRAL TOGGLE
+  // ==========================================================
+
+  Future<void> _toggleCadastral(
+      ToggleCadastralEvent event,
+      Emitter<PgisState> emit,
+      ) async {
+    isCadastralCheck =
+    !isCadastralCheck;
+
     if (isCadastralCheck) {
-      await _addCadastralLayer(event.controller);
+      await _addCadastralLayer(
+        event.controller,
+      );
     } else {
-      _removeCadastralLayer(event.controller);
+      _removeCadastralLayer(
+        event.controller,
+      );
     }
+
     _eventCompleted(emit);
   }
 
-  Future<void> _onChangeBasemap(ChangeBasemapEvent event, emit) async {
-    final controller = event.controller;
-    final viewpoint = await controller.getCurrentViewpoint(ViewpointType.centerAndScale);
+  // ==========================================================
+  // CHANGE BASEMAP
+  // ==========================================================
 
-    controller.arcGISMap?.basemap = Basemap.withStyle(event.basemapStyle);
+  Future<void> _onChangeBasemap(
+      ChangeBasemapEvent event,
+      Emitter<PgisState> emit,
+      ) async {
+    final controller =
+        event.controller;
+
+    final viewpoint =
+    await controller
+        .getCurrentViewpoint(
+      ViewpointType.centerAndScale,
+    );
+
+    controller.arcGISMap?.basemap =
+        Basemap.withStyle(
+          event.basemapStyle,
+        );
+
     if (viewpoint != null) {
-       controller.setViewpoint(viewpoint);
+      controller.setViewpoint(
+        viewpoint,
+      );
     }
+
     _eventCompleted(emit);
   }
 
-  _eventCompleted(Emitter<PgisState> emit) {
+  // ==========================================================
+  // LAYER VISIBILITY
+  // ==========================================================
+
+  void _setLayerVisibility(
+      String key,
+      bool visible,
+      ) {
+    final layer =
+    layerMap[key];
+
+    if (layer != null) {
+      layer.isVisible =
+          visible;
+
+      if (kDebugMode) {
+        print(
+          "🔄 Layer [$key] visibility "
+              "→ $visible",
+        );
+      }
+    } else {
+      if (kDebugMode) {
+        print(
+          "❌ Layer ID $key not found!",
+        );
+      }
+    }
+  }
+
+  // ==========================================================
+  // STATE
+  // ==========================================================
+
+  void _eventCompleted(
+      Emitter<PgisState> emit,
+      ) {
     emit(
       FetchPgisDataState(
-        isPageLoader: isPageLoader,
-        isArcGISStreets: isArcGISStreets,
-        pipelineCtrl: pipelineCtrl,
-        sectionCtrl: sectionCtrl,
-        stationCtrl: stationCtrl,
-        tlpCtrl: tlpCtrl,
-        isContinuousCheck: isContinuousCheck,
-        isEngineeringCheck: isEngineeringCheck,
-        isPipelineCheck: isPipelineCheck,
-        isServiceCheck: isServiceCheck,
-        isStructureCheck: isStructureCheck,
-        isStructureBoundaryCheck: isStructureBoundaryCheck,
-        isPipelineDeviceCheck: isPipelineDeviceCheck,
-        isCadastralCheck: isCadastralCheck,
-        stationList: stationList,
-        curPoint: curPoint,
-        desPoint: desPoint,
-        distanceKm: distanceKm,
-        travelTimeMin: travelTimeMin,
+        isPageLoader:
+        isPageLoader,
+        isArcGISStreets:
+        isArcGISStreets,
+        pipelineCtrl:
+        pipelineCtrl,
+        sectionCtrl:
+        sectionCtrl,
+        stationCtrl:
+        stationCtrl,
+        tlpCtrl:
+        tlpCtrl,
+        isContinuousCheck:
+        isContinuousCheck,
+        isEngineeringCheck:
+        isEngineeringCheck,
+        isPipelineCheck:
+        isPipelineCheck,
+        isServiceCheck:
+        isServiceCheck,
+        isStructureCheck:
+        isStructureCheck,
+        isStructureBoundaryCheck:
+        isStructureBoundaryCheck,
+        isPipelineDeviceCheck:
+        isPipelineDeviceCheck,
+        isCadastralCheck:
+        isCadastralCheck,
+        stationList:
+        stationList,
+        curPoint:
+        curPoint,
+        desPoint:
+        desPoint,
+        distanceKm:
+        distanceKm,
+        travelTimeMin:
+        travelTimeMin,
       ),
     );
   }

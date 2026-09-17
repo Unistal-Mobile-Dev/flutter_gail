@@ -73,7 +73,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     appVersion = packageInfo.version; // 1.0.0
 
-    await DashboardHelper.checkAppVersion(event.context);
+   // await DashboardHelper.checkAppVersion(event.context);
 
     String notificationSilent = await SharedPreferencesUtils.getString(key: PreferencesName.notificationSilent);
     if (notificationSilent == "1") {

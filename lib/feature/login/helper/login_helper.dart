@@ -21,12 +21,33 @@ class LoginHelper {
     }
   }
 
+  // static Future<bool> isDeveloperModeEnabled() async {
+  //   try {
+  //     final bool result = await platform.invokeMethod('isDevMode');
+  //     return result;
+  //   } on PlatformException catch (e) {
+  //     print("Failed to check dev mode: ${e.message}");
+  //     return false;
+  //   }
+  // }
+
   static Future<bool> isDeveloperModeEnabled() async {
+    // iOS par is custom native channel ki zarurat nahi hai
+    if (Platform.isIOS) {
+      return false;
+    }
+
     try {
-      final bool result = await platform.invokeMethod('isDevMode');
-      return result;
+      final bool? result = await platform.invokeMethod<bool>('isDevMode');
+      return result ?? false;
+    } on MissingPluginException catch (e) {
+      debugPrint("isDevMode plugin not available: $e");
+      return false;
     } on PlatformException catch (e) {
-      print("Failed to check dev mode: ${e.message}");
+      debugPrint("Failed to check dev mode: ${e.message}");
+      return false;
+    } catch (e) {
+      debugPrint("Unexpected isDevMode error: $e");
       return false;
     }
   }

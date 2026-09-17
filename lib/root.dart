@@ -8,7 +8,7 @@ import 'package:arcgis_maps/arcgis_maps.dart';
 
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin();
 
 class Root extends StatefulWidget {
   final Client client;
@@ -104,7 +104,7 @@ class _NavigateRouteState extends State<NavigateRoute> {
     _mapController.locationDisplay.dataSource = locationDataSource;
     _mapController.locationDisplay.autoPanMode = LocationDisplayAutoPanMode.recenter;
 
-     _mapController.locationDisplay.start();
+    _mapController.locationDisplay.start();
 
     locationDataSource.onLocationChanged.listen((location) {
       final pos = location.position;
