@@ -24,6 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> pageOpen() async {
+    try {
     final appConfig = AppConfig.instanceInit();
     await appConfig?.getPackageInfo();
 
@@ -82,6 +83,16 @@ class _SplashScreenState extends State<SplashScreen> {
       context.read<LoginBloc>().add(
         LoginCheckEvent(context: context),
       );
+    }
+    } catch (e) {
+      print("SplashScreen error: $e");
+      if (context.mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreenPage()),
+          (_) => false,
+        );
+      }
     }
   }
   Future<bool> _onWillPop() async {

@@ -22,11 +22,12 @@ class LoginHelper {
   }
 
   static Future<bool> isDeveloperModeEnabled() async {
+    if (!Platform.isAndroid) return false;
     try {
       final bool result = await platform.invokeMethod('isDevMode');
       return result;
-    } on PlatformException catch (e) {
-      print("Failed to check dev mode: ${e.message}");
+    } catch (e) {
+      print("Failed to check dev mode: $e");
       return false;
     }
   }
