@@ -9,12 +9,10 @@ final class AddTlpSurveyInitial extends AddTlpSurveyState {
   List<Object> get props => [];
 }
 
-
 final class AddTlpSurveyPageLoadState extends AddTlpSurveyInitial {
   @override
   List<Object> get props => [];
 }
-
 
 final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
   final bool isLoader;
@@ -42,10 +40,17 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
   final List<TlpConnectionModel> tlpConnectionList;
   final TlpConnectionModel tlpConnectionData;
 
+  // NEW: Additional TLP Connection 1
+  final List<TlpConnectionModel> tlpConnection1List;
+  final TlpConnectionModel tlpConnection1Data;
+
   final TextEditingController taskIdController;
   final TextEditingController chainageKMController;
   final TextEditingController locationDetaolController;
   final TextEditingController yearController;
+
+  // NEW: Section Code
+  final TextEditingController sectionCodeController;
 
   // PSP Reading (-mV)
   final TextEditingController pspOnController;
@@ -62,8 +67,17 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
   final TextEditingController foreignPspOnController;
   final TextEditingController foreignPspOffController;
 
+  // NEW: DC Interference (Yes/No)
+  final TextEditingController dcInterferenceController;
+
   // AC PSP (At HT Crossing/Parallel) Volts
   final TextEditingController acPspVoltController;
+
+  // NEW: Acceptable AC PSP (Volts)
+  final TextEditingController acceptableAcPspVoltController;
+
+  // NEW: Soil Resistivity (Ω·m)
+  final TextEditingController soilResistivityController;
 
   // IJ Reading (Un-protected Side) (-mV)
   final TextEditingController ijOnController;
@@ -74,6 +88,10 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
 
   // Condition of Surge Diverter
   final TextEditingController surgeDiverterConditionController;
+
+  // NEW: Coupon current density (A/m²)
+  final TextEditingController couponDcCurrentDensityController;
+  final TextEditingController couponAcCurrentDensityController;
 
   // PSP Polarisation Coupon (-mV)
   final TextEditingController couponOnController;
@@ -93,6 +111,9 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
   final TextEditingController remarksController;
   final TextEditingController acCurrentDischargeController;
 
+  // NEW: Remarks 2
+  final TextEditingController remarks2Controller;
+
   final String allowedTLPType;
   final String allowedTLPCondition;
 
@@ -108,6 +129,8 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
     required this.regionList,
     required this.tlpConnectionData,
     required this.tlpConnectionList,
+    required this.tlpConnection1Data,
+    required this.tlpConnection1List,
     required this.tlpNumberData,
     required this.tlpNumberList,
     required this.tlpTaskPeriodData,
@@ -121,11 +144,16 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
     required this.casingIntegrityController,
     required this.foreignPspOnController,
     required this.foreignPspOffController,
+    required this.dcInterferenceController,
     required this.acPspVoltController,
+    required this.acceptableAcPspVoltController,
+    required this.soilResistivityController,
     required this.ijOnController,
     required this.ijOffController,
     required this.ijIntegrityController,
     required this.surgeDiverterConditionController,
+    required this.couponDcCurrentDensityController,
+    required this.couponAcCurrentDensityController,
     required this.couponOnController,
     required this.couponOffController,
     required this.calibrationController,
@@ -135,7 +163,9 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
     required this.groundingResistanceController,
     required this.dateOfReadingController,
     required this.remarksController,
+    required this.remarks2Controller,
     required this.taskIdController,
+    required this.sectionCodeController,
     required this.chainageKMController,
     required this.locationDetaolController,
     required this.yearController,
@@ -163,6 +193,8 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
     tlpTypeData,
     tlpConnectionList,
     tlpConnectionData,
+    tlpConnection1List,
+    tlpConnection1Data,
     pspOnController,
     pspOffController,
     casingPspOnController,
@@ -170,11 +202,16 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
     casingIntegrityController,
     foreignPspOnController,
     foreignPspOffController,
+    dcInterferenceController,
     acPspVoltController,
+    acceptableAcPspVoltController,
+    soilResistivityController,
     ijOnController,
     ijOffController,
     ijIntegrityController,
     surgeDiverterConditionController,
+    couponDcCurrentDensityController,
+    couponAcCurrentDensityController,
     couponOnController,
     couponOffController,
     calibrationController,
@@ -184,7 +221,9 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
     groundingResistanceController,
     dateOfReadingController,
     remarksController,
+    remarks2Controller,
     taskIdController,
+    sectionCodeController,
     chainageKMController,
     locationDetaolController,
     yearController,
@@ -193,4 +232,3 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
     acCurrentDischargeController,
   ];
 }
-

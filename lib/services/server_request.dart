@@ -19,6 +19,7 @@ class ServerRequest {
       String url = APIs.baseUrl + urlEndPoint;
       log(Uri.parse(url.toString()).toString());
       log(header.toString());
+      log("url -->  ${url}");
       final response = await get(Uri.parse(url.toString()), headers: header)
           .timeout(const Duration(minutes: 1));
       log(response.body);
@@ -48,6 +49,7 @@ class ServerRequest {
       String url = APIs.baseGailUrl + urlEndPoint;
       log(Uri.parse(url.toString()).toString());
       log(header.toString());
+      log("url -->  ${url}");
       final response = await get(Uri.parse(url.toString()),)
           .timeout(const Duration(minutes: 1));
       log(response.body);
@@ -76,7 +78,7 @@ class ServerRequest {
     try {
       await addToken();
       String url = APIs.baseUrl + urlEndPoint;
-      log(url);
+      log("url -->  ${url}");
       log(body);
       final response =
           await put(Uri.parse(url), headers: header, body: body)
@@ -125,7 +127,7 @@ class ServerRequest {
         print("Base Url ====================  $baseUrl");
       }
       String url = baseUrl + urlEndPoint;
-      log(url);
+      log("url -->  ${url}");
       log(jsonEncode(body).toString());
       log(header.toString());
       final response =
@@ -164,6 +166,7 @@ class ServerRequest {
       log(url);
       await addToken();
       print(body);
+      log("url -->  ${url}");
       log(header.toString());
       final response = await post(Uri.parse(url), headers: header, body: body)
           .timeout(const Duration(minutes: 1));

@@ -57,7 +57,7 @@ class DropDownSearchMultiSelectWidget extends StatelessWidget {
         ),
         items: (filter, infiniteScrollProps) => items,
         itemAsString: itemAsString,
-        onSaved: onChanged,
+        onSelected: onChanged,
         popupProps: MultiSelectionPopupProps.dialog(
           onItemAdded: onItemAdded,
           onItemRemoved: onItemRemoved,

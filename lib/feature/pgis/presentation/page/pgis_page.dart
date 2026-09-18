@@ -173,7 +173,7 @@ class _PgisPageState extends State<PgisPage> {
                 shape: BoxShape.circle,
                 boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 6)],
               ),
-              child: Icon(Icons.navigation, color: Colors.red, size: 21),
+              child: Icon(Icons.navigation, color: AppColor.themeColor, size: 21),
             ),
           ),
         );

@@ -76,6 +76,7 @@ dependencies:
 #  install_plugin: ^2.1.0
   arcgis_maps: ^200.8.0+4672
   install_plugin: ^2.1.0
+  mobile_scanner: ^7.4.2
 
 
 dev_dependencies:

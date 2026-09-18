@@ -15,6 +15,7 @@ import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/domain/model/tlp_tas
 import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/domain/model/tlp_task_period_model.dart';
 import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/domain/model/tlp_type_model.dart';
 import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/helper/add_tlp_survey_helper.dart';
+import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/presentation/widget/scan_qr.dart';
 
 part 'add_tlp_survey_event.dart';
 
@@ -47,10 +48,17 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
   List<TlpConnectionModel> tlpConnectionList = [];
   TlpConnectionModel tlpConnectionData = TlpConnectionModel();
 
+  // NEW: Additional TLP Connection 1
+  List<TlpConnectionModel> tlpConnection1List = [];
+  TlpConnectionModel tlpConnection1Data = TlpConnectionModel();
+
   TextEditingController taskIdController = TextEditingController();
   TextEditingController chainageKMController = TextEditingController();
   TextEditingController locationDetaolController = TextEditingController();
   TextEditingController yearController = TextEditingController();
+
+// NEW: Section Code
+  TextEditingController sectionCodeController = TextEditingController();
 
 // PSP Reading (-mV)
   TextEditingController pspOnController = TextEditingController();
@@ -67,8 +75,17 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
   TextEditingController foreignPspOnController = TextEditingController();
   TextEditingController foreignPspOffController = TextEditingController();
 
+// NEW: DC Interference (Yes/No)
+  TextEditingController dcInterferenceController = TextEditingController();
+
 // AC PSP (At HT Crossing/Parallel) Volts
   TextEditingController acPspVoltController = TextEditingController();
+
+// NEW: Acceptable AC PSP (Volts)
+  TextEditingController acceptableAcPspVoltController = TextEditingController();
+
+// NEW: Soil Resistivity (Ω·m)
+  TextEditingController soilResistivityController = TextEditingController();
 
 // IJ Reading (Un-protected Side) (-mV)
   TextEditingController ijOnController = TextEditingController();
@@ -79,6 +96,12 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
 
 // Condition of Surge Diverter
   TextEditingController surgeDiverterConditionController =
+  TextEditingController();
+
+// NEW: Coupon current density (A/m²)
+  TextEditingController couponDcCurrentDensityController =
+  TextEditingController();
+  TextEditingController couponAcCurrentDensityController =
   TextEditingController();
 
 // PSP Polarisation Coupon (-mV)
@@ -99,6 +122,9 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
   TextEditingController remarksController = TextEditingController();
   TextEditingController acCurrentDischargeController = TextEditingController();
 
+// NEW: Remarks 2
+  TextEditingController remarks2Controller = TextEditingController();
+
   TlpTaskModel tlpTaskData = TlpTaskModel();
 
   String allowedTLPType = "";
@@ -114,9 +140,70 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
     on<SelectTlpNumberEvent>(_selectTlpNumber);
     on<SelectTlpTypeEvent>(_selectTlpType);
     on<SelectTlpConnectionEvent>(_selectTlpConnection);
+    on<SelectTlpConnection1Event>(_selectTlpConnection1); // NEW
     on<SelectYearEvent>(_selectYear);
     on<SelectDateReadingEvent>(_selectDateReading);
+    on<ScanQrCodeEvent>(_scanQrCode);
+    on<QrDataScannedEvent>(_handleQrDataScanned);
     on<SubmitTlpEvent>(_submit);
+  }
+
+  // Helper: (re)initialise every measurement / input controller.
+  void _initControllers() {
+    // Identification
+    sectionCodeController = TextEditingController(); // NEW
+
+    // PSP Reading (-mV)
+    pspOnController = TextEditingController();
+    pspOffController = TextEditingController();
+
+    // Casing PSP (-mV)
+    casingPspOnController = TextEditingController();
+    casingPspOffController = TextEditingController();
+
+    // Integrity of Casing & Carrier Pipe
+    casingIntegrityController = TextEditingController();
+
+    // Foreign Pipeline PSP (-mV)
+    foreignPspOnController = TextEditingController();
+    foreignPspOffController = TextEditingController();
+    dcInterferenceController = TextEditingController(); // NEW
+
+    // AC PSP / Acceptable AC PSP / Soil Resistivity
+    acPspVoltController = TextEditingController();
+    acceptableAcPspVoltController = TextEditingController(); // NEW
+    soilResistivityController = TextEditingController(); // NEW
+
+    // IJ Reading (Un-protected Side) (-mV)
+    ijOnController = TextEditingController();
+    ijOffController = TextEditingController();
+
+    // Integrity of IJ
+    ijIntegrityController = TextEditingController();
+
+    // Condition of Surge Diverter
+    surgeDiverterConditionController = TextEditingController();
+
+    // Monitoring of Coupons
+    couponDcCurrentDensityController = TextEditingController(); // NEW
+    couponAcCurrentDensityController = TextEditingController(); // NEW
+    couponOnController = TextEditingController();
+    couponOffController = TextEditingController();
+
+    // Current Measurement
+    calibrationController = TextEditingController();
+    mvAcrossTerminalController = TextEditingController();
+    testStationCurrentController = TextEditingController();
+
+    // Polarisation Cell
+    cellConditionController = TextEditingController();
+    groundingResistanceController = TextEditingController();
+
+    // Other
+    dateOfReadingController = TextEditingController();
+    remarksController = TextEditingController();
+    remarks2Controller = TextEditingController(); // NEW
+    acCurrentDischargeController = TextEditingController();
   }
 
   _pageLoad(AddTlpSurveyPageLoadEvent event, emit) async {
@@ -154,65 +241,23 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
     tlpConnectionList = [];
     tlpConnectionData = TlpConnectionModel();
 
+    // TLP Connection 1  // NEW
+    tlpConnection1List = [];
+    tlpConnection1Data = TlpConnectionModel();
+
     taskIdController = TextEditingController();
     chainageKMController = TextEditingController();
     locationDetaolController = TextEditingController();
     yearController = TextEditingController();
 
-    // PSP Reading (-mV)
-    pspOnController = TextEditingController();
-    pspOffController = TextEditingController();
-
-    // Casing PSP (-mV)
-    casingPspOnController = TextEditingController();
-    casingPspOffController = TextEditingController();
-
-    // Integrity of Casing & Carrier Pipe
-    casingIntegrityController = TextEditingController();
-
-    // Foreign Pipeline PSP (-mV)
-    foreignPspOnController = TextEditingController();
-    foreignPspOffController = TextEditingController();
-
-    // AC PSP (At HT Crossing/Parallel) Volts
-    acPspVoltController = TextEditingController();
-
-    // IJ Reading (Un-protected Side) (-mV)
-    ijOnController = TextEditingController();
-    ijOffController = TextEditingController();
-
-    // Integrity of IJ
-    ijIntegrityController = TextEditingController();
-
-    // Condition of Surge Diverter
-    surgeDiverterConditionController = TextEditingController();
-
-    // PSP Polarisation Coupon (-mV)
-    couponOnController = TextEditingController();
-    couponOffController = TextEditingController();
-
-    // Current Measurement
-    calibrationController = TextEditingController();
-    mvAcrossTerminalController = TextEditingController();
-    testStationCurrentController = TextEditingController();
-
-    // Polarisation Cell
-    cellConditionController = TextEditingController();
-    groundingResistanceController = TextEditingController();
-
-    // Other
-    dateOfReadingController = TextEditingController();
-    remarksController = TextEditingController();
-    acCurrentDischargeController = TextEditingController();
+    _initControllers();
 
     var resRegion = await AddTLPSurveyHelper.fetchArea();
     if (resRegion != null) {
       regionList = resRegion;
     }
 
-    tlpTaslPeriodList = TlpTaskPeriodModel().getData(DateTime
-        .now()
-        .year);
+    tlpTaslPeriodList = TlpTaskPeriodModel().getData(DateTime.now().year);
 
     tlpTypeLIst = TlpTypeModel().getData();
     tlpTaskData = TlpTaskModel();
@@ -269,6 +314,9 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
 
   void _selectSection(SelectSectionEvent event, emit) {
     sectionData = event.sectionData;
+    // NEW: populate Section Code from the selected section (adjust the field
+    // name to match your SectionModel, e.g. sectionData.code / .sectionCode).
+    sectionCodeController.text = sectionData.code?.toString() ?? "";
     _eventCompleted(emit);
   }
 
@@ -308,13 +356,15 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
   void _selectTlpType(SelectTlpTypeEvent event, emit) {
     tlpTypeData = event.tlpTypeData;
     tlpConnectionData = TlpConnectionModel();
+    tlpConnection1Data = TlpConnectionModel(); // NEW
     allowedTLPType = tlpTypeData.name.toString();
     if (allowedTLPType == "A" ||
         allowedTLPType == "E" ||
         allowedTLPType == "F" ||
         allowedTLPType == "I" ||
         allowedTLPType == "J" ||
-        allowedTLPType == "L" && allowedTLPType == "M" &&
+        allowedTLPType == "L" &&
+            allowedTLPType == "M" &&
             allowedTLPType == "N" ||
         allowedTLPType == "O" ||
         allowedTLPType == "Q") {
@@ -322,52 +372,10 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
     } else {
       tlpConnectionList = TlpConnectionModel().getFullData();
     }
+    // NEW: Conn1 uses the same option list as Conn.
+    tlpConnection1List = tlpConnectionList;
 
-    // PSP Reading (-mV)
-    pspOnController = TextEditingController();
-    pspOffController = TextEditingController();
-
-    // Casing PSP (-mV)
-    casingPspOnController = TextEditingController();
-    casingPspOffController = TextEditingController();
-
-    // Integrity of Casing & Carrier Pipe
-    casingIntegrityController = TextEditingController();
-
-    // Foreign Pipeline PSP (-mV)
-    foreignPspOnController = TextEditingController();
-    foreignPspOffController = TextEditingController();
-
-    // AC PSP (At HT Crossing/Parallel) Volts
-    acPspVoltController = TextEditingController();
-
-    // IJ Reading (Un-protected Side) (-mV)
-    ijOnController = TextEditingController();
-    ijOffController = TextEditingController();
-
-    // Integrity of IJ
-    ijIntegrityController = TextEditingController();
-
-    // Condition of Surge Diverter
-    surgeDiverterConditionController = TextEditingController();
-
-    // PSP Polarisation Coupon (-mV)
-    couponOnController = TextEditingController();
-    couponOffController = TextEditingController();
-
-    // Current Measurement
-    calibrationController = TextEditingController();
-    mvAcrossTerminalController = TextEditingController();
-    testStationCurrentController = TextEditingController();
-
-    // Polarisation Cell
-    cellConditionController = TextEditingController();
-    groundingResistanceController = TextEditingController();
-
-    // Other
-    dateOfReadingController = TextEditingController();
-    remarksController = TextEditingController();
-    acCurrentDischargeController = TextEditingController();
+    _initControllers();
 
     _eventCompleted(emit);
   }
@@ -376,51 +384,14 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
     tlpConnectionData = event.tlpConnectionData;
     allowedTLPCondition = tlpConnectionData.name.toString();
 
-    // PSP Reading (-mV)
-    pspOnController = TextEditingController();
-    pspOffController = TextEditingController();
+    _initControllers();
+    _eventCompleted(emit);
+  }
 
-    // Casing PSP (-mV)
-    casingPspOnController = TextEditingController();
-    casingPspOffController = TextEditingController();
-
-    // Integrity of Casing & Carrier Pipe
-    casingIntegrityController = TextEditingController();
-
-    // Foreign Pipeline PSP (-mV)
-    foreignPspOnController = TextEditingController();
-    foreignPspOffController = TextEditingController();
-
-    // AC PSP (At HT Crossing/Parallel) Volts
-    acPspVoltController = TextEditingController();
-
-    // IJ Reading (Un-protected Side) (-mV)
-    ijOnController = TextEditingController();
-    ijOffController = TextEditingController();
-
-    // Integrity of IJ
-    ijIntegrityController = TextEditingController();
-
-    // Condition of Surge Diverter
-    surgeDiverterConditionController = TextEditingController();
-
-    // PSP Polarisation Coupon (-mV)
-    couponOnController = TextEditingController();
-    couponOffController = TextEditingController();
-
-    // Current Measurement
-    calibrationController = TextEditingController();
-    mvAcrossTerminalController = TextEditingController();
-    testStationCurrentController = TextEditingController();
-
-    // Polarisation Cell
-    cellConditionController = TextEditingController();
-    groundingResistanceController = TextEditingController();
-
-    // Other
-    dateOfReadingController = TextEditingController();
-    remarksController = TextEditingController();
-    acCurrentDischargeController = TextEditingController();
+  // NEW: Additional TLP Connection 1 — stores the value only. It does not
+  // change allowedTLPCondition or reset the measurement fields.
+  void _selectTlpConnection1(SelectTlpConnection1Event event, emit) {
+    tlpConnection1Data = event.tlpConnection1Data;
     _eventCompleted(emit);
   }
 
@@ -429,9 +400,7 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
       context: event.context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
-      lastDate: DateTime(DateTime
-          .now()
-          .year + 10),
+      lastDate: DateTime(DateTime.now().year + 10),
       helpText: "Select Year",
       initialDatePickerMode: DatePickerMode.year,
     );
@@ -467,12 +436,11 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
       dateOfReadingController.text = formattedApiDate;
       _eventCompleted(emit);
     }
-
   }
 
-  void _submit(SubmitTlpEvent event, emit) async{
+  void _submit(SubmitTlpEvent event, emit) async {
     BuildContext context = event.context;
-    isLoader =  true;
+    isLoader = true;
     _eventCompleted(emit);
     var textFiledValidation = await AddTLPSurveyHelper.textFieldValidation(
         context: context,
@@ -508,9 +476,15 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
         allowedTLPType: allowedTLPType,
         acCurrentDischargeController: acCurrentDischargeController,
         allowedTLPCondition: allowedTLPCondition);
+    // NOTE: To validate the NEW fields, add these named params to
+    // AddTLPSurveyHelper.textFieldValidation and pass them here:
+    //   tlpConnection1Data, sectionCodeController, dcInterferenceController,
+    //   acceptableAcPspVoltController, soilResistivityController,
+    //   couponDcCurrentDensityController, couponAcCurrentDensityController,
+    //   remarks2Controller
 
-    if(textFiledValidation == false){
-      isLoader =  false;
+    if (textFiledValidation == false) {
+      isLoader = false;
       _eventCompleted(emit);
     }
 
@@ -549,7 +523,13 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
         taskIdController: taskIdController,
         acCurrentDischargeController: acCurrentDischargeController,
         allowedTLPCondition: allowedTLPCondition);
-    if(res != null){
+    // NOTE: To submit the NEW fields, add these named params to
+    // AddTLPSurveyHelper.submit and pass them here:
+    //   tlpConnection1Data, sectionCodeController, dcInterferenceController,
+    //   acceptableAcPspVoltController, soilResistivityController,
+    //   couponDcCurrentDensityController, couponAcCurrentDensityController,
+    //   remarks2Controller
+    if (res != null) {
       // Region
       regionList = [];
       regionData = RegionTypeModel();
@@ -582,65 +562,23 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
       tlpConnectionList = [];
       tlpConnectionData = TlpConnectionModel();
 
+      // TLP Connection 1  // NEW
+      tlpConnection1List = [];
+      tlpConnection1Data = TlpConnectionModel();
+
       taskIdController = TextEditingController();
       chainageKMController = TextEditingController();
       locationDetaolController = TextEditingController();
       yearController = TextEditingController();
 
-      // PSP Reading (-mV)
-      pspOnController = TextEditingController();
-      pspOffController = TextEditingController();
-
-      // Casing PSP (-mV)
-      casingPspOnController = TextEditingController();
-      casingPspOffController = TextEditingController();
-
-      // Integrity of Casing & Carrier Pipe
-      casingIntegrityController = TextEditingController();
-
-      // Foreign Pipeline PSP (-mV)
-      foreignPspOnController = TextEditingController();
-      foreignPspOffController = TextEditingController();
-
-      // AC PSP (At HT Crossing/Parallel) Volts
-      acPspVoltController = TextEditingController();
-
-      // IJ Reading (Un-protected Side) (-mV)
-      ijOnController = TextEditingController();
-      ijOffController = TextEditingController();
-
-      // Integrity of IJ
-      ijIntegrityController = TextEditingController();
-
-      // Condition of Surge Diverter
-      surgeDiverterConditionController = TextEditingController();
-
-      // PSP Polarisation Coupon (-mV)
-      couponOnController = TextEditingController();
-      couponOffController = TextEditingController();
-
-      // Current Measurement
-      calibrationController = TextEditingController();
-      mvAcrossTerminalController = TextEditingController();
-      testStationCurrentController = TextEditingController();
-
-      // Polarisation Cell
-      cellConditionController = TextEditingController();
-      groundingResistanceController = TextEditingController();
-
-      // Other
-      dateOfReadingController = TextEditingController();
-      remarksController = TextEditingController();
-      acCurrentDischargeController = TextEditingController();
+      _initControllers();
 
       var resRegion = await AddTLPSurveyHelper.fetchArea();
       if (resRegion != null) {
         regionList = resRegion;
       }
 
-      tlpTaslPeriodList = TlpTaskPeriodModel().getData(DateTime
-          .now()
-          .year);
+      tlpTaslPeriodList = TlpTaskPeriodModel().getData(DateTime.now().year);
 
       tlpTypeLIst = TlpTypeModel().getData();
       tlpTaskData = TlpTaskModel();
@@ -648,7 +586,30 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
       allowedTLPCondition = "A";
       _eventCompleted(emit);
     }
-    isLoader =  false;
+    isLoader = false;
+    _eventCompleted(emit);
+  }
+
+
+  void _scanQrCode(ScanQrCodeEvent event, emit) async {
+    final result = await Navigator.push(
+      event.context,
+      MaterialPageRoute(builder: (context) => const QrScannerScreen()),
+    );
+
+    if (result != null) {
+      add(QrDataScannedEvent(qrData: result));
+    }
+  }
+
+  void _handleQrDataScanned(QrDataScannedEvent event, emit) {
+    final dataMap = event.qrData is Map ? event.qrData : event.qrData.toJson();
+
+    // Auto-fill fields
+    if (dataMap['psp_on'] != null)
+      pspOnController.text = dataMap['psp_on'].toString();
+    if (dataMap['psp_off'] != null)
+      pspOffController.text = dataMap['psp_off'].toString();
     _eventCompleted(emit);
   }
 
@@ -665,6 +626,8 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
         regionList: regionList,
         tlpConnectionData: tlpConnectionData,
         tlpConnectionList: tlpConnectionList,
+        tlpConnection1Data: tlpConnection1Data, // NEW
+        tlpConnection1List: tlpConnection1List, // NEW
         tlpNumberData: tlpNumberData,
         tlpNumberList: tlpNumberList,
         tlpTaskPeriodData: tlpTaskPeriodData,
@@ -678,11 +641,18 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
         casingIntegrityController: casingIntegrityController,
         foreignPspOnController: foreignPspOnController,
         foreignPspOffController: foreignPspOffController,
+        dcInterferenceController: dcInterferenceController, // NEW
         acPspVoltController: acPspVoltController,
+        acceptableAcPspVoltController: acceptableAcPspVoltController, // NEW
+        soilResistivityController: soilResistivityController, // NEW
         ijOnController: ijOnController,
         ijOffController: ijOffController,
         ijIntegrityController: ijIntegrityController,
         surgeDiverterConditionController: surgeDiverterConditionController,
+        couponDcCurrentDensityController:
+        couponDcCurrentDensityController, // NEW
+        couponAcCurrentDensityController:
+        couponAcCurrentDensityController, // NEW
         couponOnController: couponOnController,
         couponOffController: couponOffController,
         calibrationController: calibrationController,
@@ -692,9 +662,11 @@ class AddTlpSurveyBloc extends Bloc<AddTlpSurveyEvent, AddTlpSurveyState> {
         groundingResistanceController: groundingResistanceController,
         dateOfReadingController: dateOfReadingController,
         remarksController: remarksController,
+        remarks2Controller: remarks2Controller, // NEW
         chainageKMController: chainageKMController,
         locationDetaolController: locationDetaolController,
         taskIdController: taskIdController,
+        sectionCodeController: sectionCodeController, // NEW
         yearController: yearController,
         allowedTLPCondition: allowedTLPCondition,
         acCurrentDischargeController: acCurrentDischargeController,

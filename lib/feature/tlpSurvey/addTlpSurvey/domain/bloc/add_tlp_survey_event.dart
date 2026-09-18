@@ -75,6 +75,14 @@ class SelectTlpConnectionEvent extends AddTlpSurveyEvent {
   List<Object?> get props => [tlpConnectionData];
 }
 
+// Select TLP Connection 1 (Additional TLP Connection 1)  // NEW
+class SelectTlpConnection1Event extends AddTlpSurveyEvent {
+  final TlpConnectionModel tlpConnection1Data;
+  const SelectTlpConnection1Event({required this.tlpConnection1Data});
+  @override
+  List<Object?> get props => [tlpConnection1Data];
+}
+
 class SelectYearEvent extends AddTlpSurveyEvent {
   final BuildContext context;
   const SelectYearEvent({required this.context});
@@ -94,4 +102,21 @@ class SubmitTlpEvent extends AddTlpSurveyEvent {
   const SubmitTlpEvent({required this.context});
   @override
   List<Object?> get props => [context];
+}
+class ScanQrCodeEvent extends AddTlpSurveyEvent {
+  final BuildContext context;
+  const ScanQrCodeEvent({required this.context});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [context];
+}
+
+class QrDataScannedEvent extends AddTlpSurveyEvent {
+  final dynamic qrData;
+  const QrDataScannedEvent({required this.qrData});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [qrData];
 }
