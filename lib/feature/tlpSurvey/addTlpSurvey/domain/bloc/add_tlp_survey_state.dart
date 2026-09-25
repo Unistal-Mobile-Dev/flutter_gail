@@ -9,13 +9,16 @@ final class AddTlpSurveyInitial extends AddTlpSurveyState {
   List<Object> get props => [];
 }
 
-final class AddTlpSurveyPageLoadState extends AddTlpSurveyInitial {
+final class AddTlpSurveyPageLoadState extends AddTlpSurveyState {
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
-final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
+final class FetchAddTlpSurveyDataState extends AddTlpSurveyState {
   final bool isLoader;
+  final bool isQrDataLoaded;
+  final bool isAutoFilling; // ✅ NEW: Track auto-fill progress
+
   final List<RegionTypeModel> regionList;
   final RegionTypeModel regionData;
 
@@ -40,7 +43,6 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
   final List<TlpConnectionModel> tlpConnectionList;
   final TlpConnectionModel tlpConnectionData;
 
-  // NEW: Additional TLP Connection 1
   final List<TlpConnectionModel> tlpConnection1List;
   final TlpConnectionModel tlpConnection1Data;
 
@@ -49,94 +51,83 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
   final TextEditingController locationDetaolController;
   final TextEditingController yearController;
 
-  // NEW: Section Code
   final TextEditingController sectionCodeController;
 
-  // PSP Reading (-mV)
   final TextEditingController pspOnController;
   final TextEditingController pspOffController;
 
-  // Casing PSP (-mV)
   final TextEditingController casingPspOnController;
   final TextEditingController casingPspOffController;
 
-  // Integrity of Casing & Carrier Pipe
   final TextEditingController casingIntegrityController;
 
-  // Foreign Pipeline PSP (-mV)
   final TextEditingController foreignPspOnController;
   final TextEditingController foreignPspOffController;
 
-  // NEW: DC Interference (Yes/No)
   final TextEditingController dcInterferenceController;
 
-  // AC PSP (At HT Crossing/Parallel) Volts
   final TextEditingController acPspVoltController;
 
-  // NEW: Acceptable AC PSP (Volts)
   final TextEditingController acceptableAcPspVoltController;
 
-  // NEW: Soil Resistivity (Ω·m)
   final TextEditingController soilResistivityController;
 
-  // IJ Reading (Un-protected Side) (-mV)
   final TextEditingController ijOnController;
   final TextEditingController ijOffController;
 
-  // Integrity of IJ
   final TextEditingController ijIntegrityController;
 
-  // Condition of Surge Diverter
   final TextEditingController surgeDiverterConditionController;
 
-  // NEW: Coupon current density (A/m²)
   final TextEditingController couponDcCurrentDensityController;
   final TextEditingController couponAcCurrentDensityController;
 
-  // PSP Polarisation Coupon (-mV)
   final TextEditingController couponOnController;
   final TextEditingController couponOffController;
 
-  // Current Measurement
   final TextEditingController calibrationController;
   final TextEditingController mvAcrossTerminalController;
   final TextEditingController testStationCurrentController;
 
-  // Polarisation Cell
   final TextEditingController cellConditionController;
   final TextEditingController groundingResistanceController;
 
-  // Other
   final TextEditingController dateOfReadingController;
   final TextEditingController remarksController;
   final TextEditingController acCurrentDischargeController;
 
-  // NEW: Remarks 2
   final TextEditingController remarks2Controller;
 
   final String allowedTLPType;
   final String allowedTLPCondition;
 
-  FetchAddTlpSurveyDataState({
+  const FetchAddTlpSurveyDataState({
     required this.isLoader,
-    required this.sectionData,
-    required this.maintenanceBaseData,
-    required this.pipelineData,
-    required this.regionData,
-    required this.sectionList,
-    required this.pipelineList,
-    required this.maintenanceBaseList,
+    this.isQrDataLoaded = false,
+    this.isAutoFilling = false, // ✅ ADD THIS
     required this.regionList,
-    required this.tlpConnectionData,
-    required this.tlpConnectionList,
-    required this.tlpConnection1Data,
-    required this.tlpConnection1List,
-    required this.tlpNumberData,
-    required this.tlpNumberList,
-    required this.tlpTaskPeriodData,
+    required this.regionData,
+    required this.maintenanceBaseList,
+    required this.maintenanceBaseData,
+    required this.pipelineList,
+    required this.pipelineData,
+    required this.sectionList,
+    required this.sectionData,
     required this.tlpTaslPeriodList,
-    required this.tlpTypeData,
+    required this.tlpTaskPeriodData,
+    required this.tlpNumberList,
+    required this.tlpNumberData,
     required this.tlpTypeLIst,
+    required this.tlpTypeData,
+    required this.tlpConnectionList,
+    required this.tlpConnectionData,
+    required this.tlpConnection1List,
+    required this.tlpConnection1Data,
+    required this.taskIdController,
+    required this.chainageKMController,
+    required this.locationDetaolController,
+    required this.yearController,
+    required this.sectionCodeController,
     required this.pspOnController,
     required this.pspOffController,
     required this.casingPspOnController,
@@ -163,20 +154,17 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
     required this.groundingResistanceController,
     required this.dateOfReadingController,
     required this.remarksController,
+    required this.acCurrentDischargeController,
     required this.remarks2Controller,
-    required this.taskIdController,
-    required this.sectionCodeController,
-    required this.chainageKMController,
-    required this.locationDetaolController,
-    required this.yearController,
     required this.allowedTLPType,
     required this.allowedTLPCondition,
-    required this.acCurrentDischargeController,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
     isLoader,
+    isQrDataLoaded,
+    isAutoFilling, // ✅ ADD THIS
     regionList,
     regionData,
     maintenanceBaseList,
@@ -195,6 +183,11 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
     tlpConnectionData,
     tlpConnection1List,
     tlpConnection1Data,
+    taskIdController,
+    chainageKMController,
+    locationDetaolController,
+    yearController,
+    sectionCodeController,
     pspOnController,
     pspOffController,
     casingPspOnController,
@@ -221,14 +214,9 @@ final class FetchAddTlpSurveyDataState extends AddTlpSurveyInitial {
     groundingResistanceController,
     dateOfReadingController,
     remarksController,
+    acCurrentDischargeController,
     remarks2Controller,
-    taskIdController,
-    sectionCodeController,
-    chainageKMController,
-    locationDetaolController,
-    yearController,
     allowedTLPType,
     allowedTLPCondition,
-    acCurrentDischargeController,
   ];
 }

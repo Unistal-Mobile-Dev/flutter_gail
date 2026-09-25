@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 
-ThemeData appTheme() {
+import 'environment_config.dart';
+
+ThemeData appTheme({required BuildContext context}) {
+  final primary = EnvironmentConfig.of(context)!.primaryTheme;
   return ThemeData(
     colorScheme: ColorScheme.light(
-      primary: AppColor.themeColor,
+      primary: primary,
       onPrimary: AppColor.white,
       onSurface: Colors.black,
     ),
     checkboxTheme: CheckboxThemeData(
       fillColor: WidgetStateColor.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return AppColor.themeColor; // the color when checkbox is selected;
+          return primary; // the color when checkbox is selected;
         }
         return Colors.white; //the color when checkbox is unselected;
       }),
@@ -23,25 +26,25 @@ ThemeData appTheme() {
         foregroundColor: WidgetStateProperty.all<Color>(AppColor.black),
       ),
     ),
-    primaryColor: AppColor.themeColor,
+    primaryColor: primary,
     appBarTheme: AppBarTheme(
       iconTheme: IconThemeData(color: AppColor.white),
-      color: AppColor.themeColor,
+      color: primary,
     ),
     datePickerTheme: DatePickerThemeData(
-      headerBackgroundColor: AppColor.themeColor,
+      headerBackgroundColor: primary,
       headerForegroundColor: Colors.white,
       backgroundColor: Colors.white,
       confirmButtonStyle: ButtonStyle(
-        foregroundColor: WidgetStateProperty.all<Color>(AppColor.themeColor),
+        foregroundColor: WidgetStateProperty.all<Color>(primary),
       ),
       cancelButtonStyle: ButtonStyle(
         foregroundColor: WidgetStateProperty.all<Color>(AppColor.grey),
       ),
       surfaceTintColor: Colors.white,
-      dayStyle: TextStyle(color: AppColor.themeColor),
+      dayStyle: TextStyle(color: primary),
       weekdayStyle: TextStyle(
-        color: AppColor.themeColor,
+        color: primary,
         fontWeight: FontWeight.w700,
       ),
     ),
@@ -59,7 +62,7 @@ ThemeData appTheme() {
       color: Colors.white,
       surfaceTintColor: Colors.white,
     ),
-    navigationBarTheme: const NavigationBarThemeData(
+    navigationBarTheme: NavigationBarThemeData(
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
     ),

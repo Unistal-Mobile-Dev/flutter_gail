@@ -8,6 +8,7 @@ import 'package:flutter_gail/services/app_lifecycle_channel.dart';
 import 'package:flutter_gail/services/background_location_service.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
 import 'package:flutter_gail/utils/commonWidgets/message_box_two_button_pop.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,6 +30,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final primary = EnvironmentConfig.of(context)!.primaryTheme;
+    final secondary = EnvironmentConfig.of(context)!.secondaryTheme;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, Object? result) async {
@@ -50,7 +53,7 @@ class _HomePageState extends State<HomePage> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: <Color>[AppColor.themeLightColor, AppColor.themeColor],
+                colors: <Color>[secondary, primary],
               ),
             ),
           ),

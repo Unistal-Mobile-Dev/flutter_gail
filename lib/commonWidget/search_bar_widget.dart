@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class SearchBarWidget extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -62,7 +63,7 @@ class SearchBarWidget extends StatelessWidget {
           prefixIcon: const Icon(
             Icons.search,
           ),
-          prefixIconColor: AppColor.themeColor,
+          prefixIconColor: EnvironmentConfig.of(context)!.primaryTheme,
         ),
       ),
     );

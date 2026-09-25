@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/otp/domain/domain/bloc/otp_bloc.dart';
-import 'package:flutter_gail/utils/commonWidgets/center_loader_widget.dart';
-import 'package:flutter_gail/utils/commonWidgets/text_widget.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 
 class OtpPage extends StatefulWidget {
@@ -142,7 +140,7 @@ class _OtpPageState extends State<OtpPage> {
                                 child: TextWidget(
                                   "Re-send",
                                   fontSize: AppFont.font_14,
-                                  color: AppColor.themeColor,
+                                  color: EnvironmentConfig.of(context)!.primaryTheme,
                                   textDecoration: TextDecoration.underline,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -190,8 +188,8 @@ class _OtpPageState extends State<OtpPage> {
       numberOfFields: numberOfFields,
       fieldWidth: fieldWidth,
       margin: const EdgeInsets.symmetric(horizontal: fieldSpacing),
-      borderColor: AppColor.themeColor,
-      focusedBorderColor: AppColor.themeColor,
+      borderColor: EnvironmentConfig.of(context)!.primaryTheme,
+      focusedBorderColor: EnvironmentConfig.of(context)!.primaryTheme,
       clearText: dataState.clearText,
       showFieldAsBox: true,
       textStyle: theme.textTheme.titleMedium,

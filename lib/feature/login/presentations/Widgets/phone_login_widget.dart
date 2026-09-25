@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/login/domain/bloc/login_event.dart';
 import 'package:flutter_gail/feature/login/domain/bloc/login_state.dart';
 import 'package:flutter_gail/feature/login/presentations/Widgets/header_widget.dart';
-import 'package:flutter_gail/feature/task/createTask/domain/bloc/create_task_bloc.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class PhoneLoginWidget extends StatefulWidget {
   final FetchLoginStateData dataState;
@@ -50,6 +48,7 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
   }
 
   Widget _itemBuilder({required FetchLoginStateData dataState}) {
+    final primary = EnvironmentConfig.of(context)!.primaryTheme;
     return Container(
       margin: const EdgeInsets.all(10.0),
       padding: const EdgeInsets.all(10.0),
@@ -62,7 +61,7 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
                 "GAIL Login",
                 fontSize: AppFont.font_22,
                 fontWeight: FontWeight.w800,
-                color: AppColor.themeColor,
+                color: primary,
               ),
             ),
             _verticalSpace(),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class MessageBoxTwoButtonPopWidget extends StatelessWidget {
   final String message;
@@ -83,7 +84,7 @@ class MessageBoxTwoButtonPopWidget extends StatelessWidget {
                             child: TextWidget(
                               okButtonText ?? "OK",
                               fontWeight: FontWeight.w700,
-                              color: okButtonColour ?? AppColor.themeColor,
+                              color: okButtonColour ?? EnvironmentConfig.of(context)!.primaryTheme,
                               fontSize: AppFont.font_14,
                             ),
                           ),

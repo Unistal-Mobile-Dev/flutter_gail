@@ -35,7 +35,7 @@ class _RootState extends State<Root> {
         navigatorKey: navigatorKey,
         title: 'Gail',
         debugShowCheckedModeBanner: false,
-        theme: appTheme(),
+        theme: appTheme(context: context),
         initialRoute: '/',
         routes: {'/second': (context) => const TestPage()},
         builder: (context, child) {

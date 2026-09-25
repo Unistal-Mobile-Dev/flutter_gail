@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class CameraPermissionPopWidget extends StatelessWidget {
@@ -65,13 +66,13 @@ class CameraPermissionPopWidget extends StatelessWidget {
     return TextButton(
         style: ButtonStyle(
             padding:
-                MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(15)),
+                WidgetStateProperty.all<EdgeInsets>(const EdgeInsets.all(15)),
             foregroundColor:
-                MaterialStateProperty.all<Color>(AppColor.themeColor),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                WidgetStateProperty.all<Color>(EnvironmentConfig.of(context)!.primaryTheme),
+            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
-                    side: BorderSide(color: AppColor.themeColor)))),
+                    side: BorderSide(color: EnvironmentConfig.of(context)!.primaryTheme)))),
         onPressed: () async {
           await openAppSettings();
           Navigator.pop(!context.mounted ? context : context);
@@ -83,7 +84,7 @@ class CameraPermissionPopWidget extends StatelessWidget {
             textAlign: TextAlign.center,
             fontSize: AppFont.font_16,
             fontWeight: FontWeight.w500,
-            color: AppColor.themeColor,
+            color: EnvironmentConfig.of(context)!.primaryTheme,
           ),
         ));
   }

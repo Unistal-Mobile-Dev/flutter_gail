@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/domain/bloc/view_task_bloc.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class TaskFilterWidget extends StatelessWidget {
   final FetchViewTaskDataState dataState;
@@ -21,7 +22,7 @@ class TaskFilterWidget extends StatelessWidget {
                isSideBoard: dataState.taskFilterList[index].isSelected == true ? false : true,
                fontSize: AppFont.font_11,
                backgroundColor: dataState.taskFilterList[index].isSelected == true
-                   ? AppColor.themeColor : AppColor.white,
+                   ? EnvironmentConfig.of(context)!.primaryTheme : AppColor.white,
                height: MediaQuery.of(context).size.width * 0.10,
                text: dataState.taskFilterList[index].name.toString(),
                onPressed: () {

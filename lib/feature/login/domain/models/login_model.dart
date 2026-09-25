@@ -10,7 +10,7 @@ class LoginDataModel {
   Users? users;
   List<Modules>? modules;
   List<Roles>? roles;
-  List<dynamic>? groups;
+  List<Group>? groups;
   List<dynamic>? verificationDetails;
   Tokens? tokens;
   String? name;
@@ -28,6 +28,9 @@ class LoginDataModel {
   LoginDataModel.fromJson(Map<String, dynamic> json) {
     name =  json['user_name'] ?? "";
     users = json['users'] != null ? Users.fromJson(json['users']) : null;
+    groups = json['groups'] != null
+        ? List<Group>.from(json['groups'].map((x) => Group.fromJson(x)))
+        : <Group>[];
     if (json['group_roles'] != null) {
       modules = <Modules>[];
       json['group_roles'].forEach((v) {
@@ -58,8 +61,25 @@ class LoginDataModel {
     if (tokens != null) {
       data['tokens'] = tokens!.toJson();
     }
+    if (groups != null) data['groups'] = groups!.map((g) => g.toJson()).toList();
     return data;
   }
+}
+class Group {
+  int? groupId;
+  String? groupName;
+
+  Group({this.groupId, this.groupName});
+
+  Group.fromJson(Map<String, dynamic> json) {
+    groupId = json['group_id'];
+    groupName = json['group_name'] ?? "";
+  }
+
+  Map<String, dynamic> toJson() => {
+    'group_id': groupId,
+    'group_name': groupName,
+  };
 }
 
 class Users {

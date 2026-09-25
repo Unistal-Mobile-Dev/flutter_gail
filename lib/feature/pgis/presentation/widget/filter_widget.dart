@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gail/feature/pgis/domain/bloc/pgis_bloc.dart';
 import 'package:flutter_gail/feature/pgis/helper/pgis_helper.dart';
 import 'package:flutter_gail/utils/commonWidgets/SpinLoader.dart';
-import 'package:flutter_gail/utils/res/app_color.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 import 'TypeAheadFieldWidget.dart';
 
@@ -140,7 +140,7 @@ class FilterWidget extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text("Cancel",style: TextStyle(color: AppColor.themeColor,),),
+                      child: Text("Cancel",style: TextStyle(color: EnvironmentConfig.of(context)!.primaryTheme,),),
                     ),
                   ),
                 ],

@@ -11,11 +11,13 @@ import 'package:flutter_gail/feature/task/viewTask/presentation/page/task_page.d
 import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/presentation/page/add_tlp_survey_page.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class HomeDrawerWidget extends StatelessWidget {
   HomeDrawerWidget({super.key});
 
   final LoginDataModel _userData = UserInfo.instance!.userData!;
+
   LoginDataModel get userData => _userData;
 
   bool isAssignTask = false;
@@ -39,15 +41,15 @@ class HomeDrawerWidget extends StatelessWidget {
 
     // Get the dashboard module object safely
     final dashboardModule = userData.modules!.firstWhere(
-      (element) => element.moduleName!.toLowerCase() == "dashboard",
+          (element) => element.moduleName!.toLowerCase() == "dashboard",
       orElse: () => Modules(moduleName: ""), // provide a default Modules object
     );
     final dashboardName = dashboardModule.moduleName;
 
     // Get the pipeline_patrolling_suervielliance module object safely
     final taskModule = userData.modules!.firstWhere(
-      (element) =>
-          element.moduleName!.toLowerCase() ==
+          (element) =>
+      element.moduleName!.toLowerCase() ==
           "pipeline_patrolling_suervielliance",
       orElse: () => Modules(moduleName: ""), // provide a default Modules object
     );
@@ -55,21 +57,22 @@ class HomeDrawerWidget extends StatelessWidget {
 
     // Get the pipeline_cp_system module object safely
     final tlpSurveyModule = userData.modules!.firstWhere(
-      (element) => element.moduleName!.toLowerCase() == "pipeline_cp_system",
+          (element) =>
+      element.moduleName!.toLowerCase() == "pipeline_cp_system",
       orElse: () => Modules(moduleName: ""), // provide a default Modules object
     );
     final tlpSurveyName = tlpSurveyModule.moduleName;
 
 
     final imageSharingModule = userData.modules!.firstWhere(
-      (element) => element.moduleName!.toLowerCase() == "image_sharing",
+          (element) => element.moduleName!.toLowerCase() == "image_sharing",
       orElse: () => Modules(moduleName: ""),
     );
     final imageSharingName = imageSharingModule.moduleName;
 
 
     final pgisModule = userData.modules!.firstWhere(
-      (element) => element.moduleName!.toLowerCase() == "pgis",
+          (element) => element.moduleName!.toLowerCase() == "pgis",
       orElse: () => Modules(moduleName: ""),
     );
     final pgisName = pgisModule.moduleName;
@@ -82,42 +85,57 @@ class HomeDrawerWidget extends StatelessWidget {
             child: Container(
               // color: AppColor.white,
               width: MediaQuery.of(context).size.width / 1.5,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color.fromARGB(255, 230, 55, 70),
-                    Color.fromARGB(230, 216, 77, 89),
-                    Color.fromARGB(255, 230, 55, 70),
+                    EnvironmentConfig.of(context)!.primaryTheme,
+                    EnvironmentConfig.of(context)!.secondaryTheme,
+                    EnvironmentConfig.of(context)!.primaryTheme,
                   ],
                 ),
               ),
-              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.03),
+              padding: EdgeInsets.all(MediaQuery
+                  .of(context)
+                  .size
+                  .width * 0.03),
               child: ListView(
                 children: [
                   _header(context: context),
-                  SizedBox(height: MediaQuery.of(context).size.width * 0.10),
+                  SizedBox(height: MediaQuery
+                      .of(context)
+                      .size
+                      .width * 0.10),
 
-                  pgisName.toString().isNotEmpty
+                  pgisName
+                      .toString()
+                      .isNotEmpty
                       ? _pgis(context: context)
                       : const SizedBox.shrink(),
 
 
-
-                  taskName.toString().isNotEmpty
+                  taskName
+                      .toString()
+                      .isNotEmpty
                       ? _task(context: context)
                       : const SizedBox.shrink(),
 
-                  tlpSurveyName.toString().isNotEmpty
+                  tlpSurveyName
+                      .toString()
+                      .isNotEmpty
                       ? _tlpSurvey(context: context)
                       : const SizedBox.shrink(),
 
-                  imageSharingName.toString().isNotEmpty
+                  imageSharingName
+                      .toString()
+                      .isNotEmpty
                       ? _imageSharing(context: context)
                       : const SizedBox.shrink(),
 
-                  dashboardName.toString().isNotEmpty
+                  dashboardName
+                      .toString()
+                      .isNotEmpty
                       ? _dashboard(context: context)
                       : const SizedBox.shrink(),
 
@@ -142,17 +160,27 @@ class HomeDrawerWidget extends StatelessWidget {
             AppConfig.instanceInit()!.client == Client.gail
                 ? AppIcon.gailLogo
                 : AppIcon.gailLogo,
-            height: MediaQuery.of(context).size.width * 0.15,
-            width: MediaQuery.of(context).size.width * 0.15,
+            height: MediaQuery
+                .of(context)
+                .size
+                .width * 0.15,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.15,
           ),
         ),
-        SizedBox(width: MediaQuery.of(context).size.width * 0.03),
+        SizedBox(width: MediaQuery
+            .of(context)
+            .size
+            .width * 0.03),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextWidget(
-                "${userData.users!.firstName.toString()} ${userData.users!.surName.toString()}",
+                "${userData.users!.firstName.toString()} ${userData.users!
+                    .surName.toString()}",
                 fontSize: AppFont.font_14,
                 color: AppColor.white,
               ),
@@ -171,8 +199,14 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _dashboard({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).size.width * 0.02,
-        bottom: MediaQuery.of(context).size.width * 0.02,
+        top: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
+        bottom: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
       ),
       child: GestureDetector(
         onTap: () {
@@ -196,7 +230,10 @@ class HomeDrawerWidget extends StatelessWidget {
                 child: Icon(Icons.home_outlined, color: AppColor.white),
               ),
             ),
-            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+            SizedBox(width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.02),
             TextWidget(
               AppString.dashboard,
               fontSize: AppFont.font_14,
@@ -211,8 +248,14 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _task({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).size.width * 0.02,
-        bottom: MediaQuery.of(context).size.width * 0.02,
+        top: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
+        bottom: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
       ),
       child: GestureDetector(
         onTap: () {
@@ -236,7 +279,10 @@ class HomeDrawerWidget extends StatelessWidget {
                 child: Icon(Icons.task_outlined, color: AppColor.white),
               ),
             ),
-            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+            SizedBox(width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.02),
             TextWidget(
               AppString.task,
               fontSize: AppFont.font_14,
@@ -251,8 +297,14 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _tlpSurvey({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).size.width * 0.02,
-        bottom: MediaQuery.of(context).size.width * 0.02,
+        top: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
+        bottom: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
       ),
       child: GestureDetector(
         onTap: () {
@@ -276,7 +328,10 @@ class HomeDrawerWidget extends StatelessWidget {
                 child: Icon(Icons.add_chart, color: AppColor.white),
               ),
             ),
-            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+            SizedBox(width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.02),
             TextWidget(
               AppString.tlpSurvey,
               fontSize: AppFont.font_14,
@@ -291,8 +346,14 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _imageSharing({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).size.width * 0.02,
-        bottom: MediaQuery.of(context).size.width * 0.02,
+        top: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
+        bottom: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
       ),
       child: GestureDetector(
         onTap: () {
@@ -316,7 +377,10 @@ class HomeDrawerWidget extends StatelessWidget {
                 child: Icon(Icons.image_aspect_ratio, color: AppColor.white),
               ),
             ),
-            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+            SizedBox(width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.02),
             TextWidget(
               AppString.imageSharing,
               fontSize: AppFont.font_14,
@@ -331,8 +395,14 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _pgis({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).size.width * 0.02,
-        bottom: MediaQuery.of(context).size.width * 0.02,
+        top: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
+        bottom: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
       ),
       child: GestureDetector(
         onTap: () {
@@ -358,7 +428,10 @@ class HomeDrawerWidget extends StatelessWidget {
                 child: Icon(Icons.gps_fixed_sharp, color: AppColor.white),
               ),
             ),
-            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+            SizedBox(width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.02),
             TextWidget(
               AppString.pgis,
               fontSize: AppFont.font_14,
@@ -373,8 +446,14 @@ class HomeDrawerWidget extends StatelessWidget {
   Widget _logout({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).size.width * 0.02,
-        bottom: MediaQuery.of(context).size.width * 0.02,
+        top: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
+        bottom: MediaQuery
+            .of(context)
+            .size
+            .width * 0.02,
       ),
       child: GestureDetector(
         onTap: () {
@@ -395,7 +474,10 @@ class HomeDrawerWidget extends StatelessWidget {
                 child: Icon(Icons.logout, color: AppColor.white),
               ),
             ),
-            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+            SizedBox(width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.02),
             TextWidget(
               AppString.logout,
               fontSize: AppFont.font_14,

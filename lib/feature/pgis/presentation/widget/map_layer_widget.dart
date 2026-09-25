@@ -2,12 +2,9 @@ import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gail/feature/pgis/domain/bloc/pgis_bloc.dart';
-import 'package:flutter_gail/feature/pgis/helper/pgis_helper.dart';
 import 'package:flutter_gail/feature/pgis/presentation/widget/custom_switch_widget.dart';
 import 'package:flutter_gail/utils/commonWidgets/SpinLoader.dart';
-import 'package:flutter_gail/utils/res/app_color.dart';
-
-import 'TypeAheadFieldWidget.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class MapLayerWidget extends StatelessWidget {
   final ArcGISMapViewController controller;
@@ -111,7 +108,7 @@ class MapLayerWidget extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text("Cancel",style: TextStyle(color: AppColor.themeColor,),),
+                      child: Text("Cancel",style: TextStyle(color: EnvironmentConfig.of(context)!.primaryTheme,),),
                     ),
                   ),
                 ],

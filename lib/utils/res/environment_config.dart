@@ -37,6 +37,24 @@ class EnvironmentConfig extends InheritedWidget {
         return "https://gailgis.gail.co.in/";
     }
   }
+
+  Color get primaryTheme {
+    switch (flavours) {
+      case EnvironmentFlavours.productionIglCng:
+        return Color(0xFFE63746);
+      case EnvironmentFlavours.developmentIglCng:
+        return Color(0xFFE63746);
+    }
+  }
+
+  Color get secondaryTheme {
+    switch (flavours) {
+      case EnvironmentFlavours.productionIglCng:
+        return Color(0xFFE74957);
+      case EnvironmentFlavours.developmentIglCng:
+        return Color(0xFFE74957);
+    }
+  }
 }
 
 enum EnvironmentFlavours { productionIglCng, developmentIglCng }

@@ -1,14 +1,10 @@
 import 'dart:convert';
-
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incident_bloc.dart';
 import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
-import 'package:flutter_gail/feature/map/domain/model/map_model.dart';
-import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
-import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/map/presentation/widget/sample_state_support.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
 import 'package:flutter_gail/feature/task/addCrossing/presentation/page/add_crossing_page.dart';
@@ -18,14 +14,11 @@ import 'package:flutter_gail/feature/task/addMarker/domain/bloc/add_marker_bloc.
 import 'package:flutter_gail/feature/task/addMarker/presentation/page/add_marker_page.dart';
 import 'package:flutter_gail/feature/task/deviation/domain/bloc/deviation_bloc.dart';
 import 'package:flutter_gail/feature/task/deviation/presentation/page/deviation_page.dart';
-import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
-import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
-import 'package:flutter_gail/pdf_helper.dart';
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
 import 'package:flutter_gail/utils/commonWidgets/message_box_pop_button_widget.dart';
 import 'package:flutter_gail/utils/commonWidgets/message_box_two_button_pop.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -444,7 +437,7 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
         label: TextWidget('Marker',
           color: AppColor.black,
           fontSize: AppFont.font_11,),
-        icon: Icon(Icons.location_searching_sharp, color: AppColor.themeColor,
+        icon: Icon(Icons.location_searching_sharp, color: EnvironmentConfig.of(context)!.primaryTheme,
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () {
           BlocProvider.of<AddMarkerBloc>(context).add(AddMarkerPageLoadEvent(context: context, data: ""));
@@ -471,7 +464,7 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
         label: TextWidget('Crossing',
           color: AppColor.black,
           fontSize: AppFont.font_11,),
-        icon: Icon(Icons.transgender_outlined, color: AppColor.themeColor,
+        icon: Icon(Icons.transgender_outlined, color: EnvironmentConfig.of(context)!.primaryTheme,
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () {
           BlocProvider.of<AddCrossingBloc>(context)
@@ -526,7 +519,7 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
         label: TextWidget('Add Structures',
           color: AppColor.black,
           fontSize: AppFont.font_11,),
-        icon: Icon(Icons.fence_rounded, color: AppColor.themeColor,
+        icon: Icon(Icons.fence_rounded, color: EnvironmentConfig.of(context)!.primaryTheme,
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () async {
           BlocProvider.of<EncroachmentBloc>(context).add(PageLoadEvent(context: context));
@@ -553,7 +546,7 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
         label: TextWidget('Add Deviation',
           color: AppColor.black,
           fontSize: AppFont.font_11,),
-        icon: Icon(Icons.developer_board, color: AppColor.themeColor,
+        icon: Icon(Icons.developer_board, color: EnvironmentConfig.of(context)!.primaryTheme,
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () async {
           BlocProvider.of<DeviationBloc>(context).add(DeviationPageLoadEvent(context: context));
@@ -585,7 +578,7 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
               : dataSate.taskData.taskStatus == TaskStatus.resume ? AppString.pause : AppString.completed,
           color: AppColor.black,
           fontSize: AppFont.font_11,),
-        icon: Icon(Icons.task_outlined, color: AppColor.themeColor,
+        icon: Icon(Icons.task_outlined, color: EnvironmentConfig.of(context)!.primaryTheme,
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () {
 
@@ -628,7 +621,7 @@ class _MapPageState extends State<MapPage> with SampleStateSupport {
         label: TextWidget(AppString.end,
           color: AppColor.black,
           fontSize: AppFont.font_11,),
-        icon: Icon(Icons.task_outlined, color: AppColor.themeColor,
+        icon: Icon(Icons.task_outlined, color: EnvironmentConfig.of(context)!.primaryTheme,
           size: MediaQuery.of(context).size.width * 0.05,),
         onPressed: () async {
           var res =  await showDialog(

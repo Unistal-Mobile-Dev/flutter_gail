@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/domain/bloc/add_tlp_survey_bloc.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
+
 class AddTlpSurveyFormNew extends StatelessWidget {
   final FetchAddTlpSurveyDataState dataState;
   const AddTlpSurveyFormNew({super.key, required this.dataState});
@@ -14,8 +16,7 @@ class AddTlpSurveyFormNew extends StatelessWidget {
             padding: const EdgeInsets.all(10.0),
             child: Column(
               children: [
-
-                // ---- Original dropdowns -------------------------------------
+                // ---- Original dropdowns
                 _regionDropDown(context: context),
                 _verticalSpace(context: context),
 
@@ -28,7 +29,7 @@ class AddTlpSurveyFormNew extends StatelessWidget {
                 _sectionDropDown(context: context),
                 _verticalSpace(context: context),
 
-                _sectionCodeField(), // XL ADD: Section Code
+                _sectionCodeField(),
                 _verticalSpace(context: context),
 
                 _yearField(context),
@@ -55,56 +56,55 @@ class AddTlpSurveyFormNew extends StatelessWidget {
                 _tlpConnectionDropDown(context: context),
                 _verticalSpace(context: context),
 
-                _tlpConnection1DropDown(context: context), // XL ADD: Add. TLP Conn1
+                _tlpConnection1DropDown(context: context),
                 _verticalSpace(context: context),
 
-                // ---- PSP Reading (-mV) — always -----------------------------
+                // ---- PSP Reading (-mV)
                 _pspOnField(context),
                 _pspOffField(context),
 
-                // ---- Casing PSP (C, D) + Integrity (C, D, F, I) -------------
+                // ---- Casing PSP
                 _casingPspOnField(context),
                 _casingPspOffField(context),
                 _casingIntegrityField(context),
 
-                // ---- Foreign Pipeline PSP (A, C, D, I) ----------------------
+                // ---- Foreign Pipeline PSP
                 _foreignPspOnField(context),
                 _foreignPspOffField(context),
-                _dcInterferenceField(context), // XL ADD: DC Interference
+                _dcInterferenceField(context),
 
-                // ---- AC PSP + Acceptable + Soil -----------------------------
+                // ---- AC PSP
                 _acPspVoltField(context),
-                _acceptableAcPspVoltField(context), // XL ADD: Acceptable AC PSP
-                _soilResistivityField(context), // XL ADD: Soil Resistivity
+                _acceptableAcPspVoltField(context),
+                _soilResistivityField(context),
 
-                // ---- Monitoring of Coupons (K) ------------------------------
-                _couponDcCurrentDensityField(context), // XL ADD: Coupon DC Density
-                _couponAcCurrentDensityField(context), // XL ADD: Coupon AC Density
+                // ---- Monitoring of Coupons
+                _couponDcCurrentDensityField(context),
+                _couponAcCurrentDensityField(context),
                 _couponOnField(context),
                 _couponOffField(context),
 
-                // ---- IJ Reading (K, P) --------------------------------------
+                // ---- IJ Reading
                 _ijOnField(context),
                 _ijOffField(context),
                 _ijIntegrityField(context),
                 _surgeDiverterField(context),
 
-
-                // ---- Current Measurement (B) --------------------------------
+                // ---- Current Measurement
                 _calibrationField(context),
                 _mvAcrossTerminalField(context),
                 _testStationCurrentField(context),
 
-                // ---- Polarisation Cell (H) ----------------------------------
+                // ---- Polarisation Cell
                 _cellConditionField(context),
                 _groundingResistanceField(context),
                 _acCurrentDischargeField(context),
 
-                // ---- Others -------------------------------------------------
+                // ---- Others
                 _dateOfReadingField(context),
                 _verticalSpace(context: context),
                 _remarksField(context),
-                _remarks2Field(context), // XL ADD: Remarks2
+                _remarks2Field(context),
                 _submit(context: context),
                 _verticalSpace(context: context),
                 _verticalSpace(context: context),
@@ -112,46 +112,54 @@ class AddTlpSurveyFormNew extends StatelessWidget {
             ),
           ),
         ),
-        // Floating Action Button on the right side
+        // ✅ QR Scan FAB - Bottom Right
         Positioned(
           bottom: 30,
           right: 20,
-          child: _buildQrScanFAB(context),  // ✅ Pass context
+          child: _buildQrScanFAB(context),
         ),
       ],
     );
   }
 
-  // =========================================================================
-
-  // ✅ UPDATED: FAB with working onPressed and context parameter
+  // ========================================================================
+  // ✅ QR SCAN FAB - WORKING VERSION
+  // ========================================================================
   Widget _buildQrScanFAB(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: AppColor.themeColor.withValues(alpha: 0.3),
+            color: Colors.blue
+                .withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: FloatingActionButton(
-        onPressed: () {
-          BlocProvider.of<AddTlpSurveyBloc>(context)
-              .add(ScanQrCodeEvent(context: context));
+        onPressed:  () {
+          context.read<AddTlpSurveyBloc>().add(
+            ScanQrCodeEvent(
+              context: context,
+            ),
+          );
         },
-        backgroundColor: AppColor.themeColor,
+        backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
         foregroundColor: Colors.white,
         elevation: 6,
-        child: const Icon(Icons.qr_code_scanner, size: 28),
         tooltip: 'Scan QR Code',
+        child: Icon(Icons.qr_code_scanner,
+          size: 28,
+        ),
       ),
     );
   }
-  // Dropdowns
-  // =========================================================================
+
+  // ========================================================================
+  // Dropdown Widgets
+  // ========================================================================
   Widget _regionDropDown({required BuildContext context}) {
     return DropDownSearchWidget(
       isRequired: true,
@@ -213,7 +221,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // XL ADD: Section Code (read-only; filled on section select)
   Widget _sectionCodeField() {
     return TextFieldWidget(
       labelText: "Section Code",
@@ -287,7 +294,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // XL ADD: Add. TLP Conn1
   Widget _tlpConnection1DropDown({required BuildContext context}) {
     return DropDownSearchWidget(
       isRequired: false,
@@ -304,9 +310,9 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // =========================================================================
-  // PSP Reading (-mV) — always
-  // =========================================================================
+  // ========================================================================
+  // Text Field Widgets
+  // ========================================================================
   Widget _pspOnField(BuildContext context) {
     return Column(
       children: [
@@ -335,9 +341,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // =========================================================================
-  // Casing PSP (-mV) — types C, D (integrity C, D, F, I)
-  // =========================================================================
   Widget _casingPspOnField(BuildContext context) {
     return Column(
       children: [
@@ -379,9 +382,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // =========================================================================
-  // Foreign Pipeline PSP (-mV) + DC Interference — types A, C, D, I
-  // =========================================================================
   Widget _foreignPspOnField(BuildContext context) {
     return Column(
       children: [
@@ -410,8 +410,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // XL ADD: DC Interference (Yes/No). For a strict picker use
-  // DropDownSearchWidget with items: ['Yes', 'No'].
   Widget _dcInterferenceField(BuildContext context) {
     return Column(
       children: [
@@ -425,9 +423,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // =========================================================================
-  // AC PSP / Acceptable AC PSP / Soil Resistivity — always
-  // =========================================================================
   Widget _acPspVoltField(BuildContext context) {
     return Column(
       children: [
@@ -442,7 +437,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // XL ADD: Acceptable AC PSP (Volts)
   Widget _acceptableAcPspVoltField(BuildContext context) {
     return Column(
       children: [
@@ -457,7 +451,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // XL ADD: Soil Resistivity (Ω·m)
   Widget _soilResistivityField(BuildContext context) {
     return Column(
       children: [
@@ -472,10 +465,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // =========================================================================
-  // Monitoring of Coupons — type K
-  // =========================================================================
-  // XL ADD: Coupon DC Current Density (A/m²)
   Widget _couponDcCurrentDensityField(BuildContext context) {
     return Column(
       children: [
@@ -490,7 +479,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // XL ADD: Coupon AC Current Density (A/m²)
   Widget _couponAcCurrentDensityField(BuildContext context) {
     return Column(
       children: [
@@ -533,9 +521,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // =========================================================================
-  // IJ Reading (Un-protected Side) — types K, P
-  // =========================================================================
   Widget _ijOnField(BuildContext context) {
     return Column(
       children: [
@@ -603,9 +588,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // =========================================================================
-  // Current Measurement — type B
-  // =========================================================================
   Widget _calibrationField(BuildContext context) {
     return Column(
       children: [
@@ -634,7 +616,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // Magnitude of current (A) with direction
   Widget _testStationCurrentField(BuildContext context) {
     return Column(
       children: [
@@ -648,9 +629,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // =========================================================================
-  // Polarisation Cell — type H
-  // =========================================================================
   Widget _cellConditionField(BuildContext context) {
     return Column(
       children: [
@@ -678,9 +656,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // =========================================================================
-  // Others
-  // =========================================================================
   Widget _dateOfReadingField(BuildContext context) {
     return TextFieldWidget(
       labelText: "Date of Survey (dd-mm-yyyy)",
@@ -709,7 +684,6 @@ class AddTlpSurveyFormNew extends StatelessWidget {
     );
   }
 
-  // XL ADD: Remarks 2
   Widget _remarks2Field(BuildContext context) {
     return Column(
       children: [

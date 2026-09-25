@@ -257,7 +257,6 @@ class AddTLPSurveyHelper {
 
   static Future<dynamic> submit({
     required BuildContext context,
-    // Dropdown Selections
     required RegionTypeModel regionData,
     required MaintenanceTypeModel maintenanceBaseData,
     required PipelineModel pipelineData,
@@ -266,7 +265,6 @@ class AddTLPSurveyHelper {
     required TlpNumberModel tlpNumberData,
     required TlpTypeModel tlpTypeData,
     required TlpConnectionModel tlpConnectionData,
-    // TextEditingControllers
     required TextEditingController pspOnController,
     required TextEditingController pspOffController,
     required TextEditingController casingPspOnController,
@@ -292,6 +290,12 @@ class AddTLPSurveyHelper {
     required TextEditingController taskIdController,
     required String allowedTLPType,
     required String allowedTLPCondition,
+    required TextEditingController dcInterferenceController,
+    required TextEditingController acceptableAcPspVoltController,
+    required TextEditingController soilResistivityController,
+    required TextEditingController couponDcCurrentDensityController,
+    required TextEditingController couponAcCurrentDensityController,
+    required TextEditingController remarks2Controller,
   }) async {
     try {
         String url =  APIs.addTlpApi;
@@ -314,7 +318,7 @@ class AddTLPSurveyHelper {
           "pspForeignPipelineOff": foreignPspOffController.text.trim(),
           "acPsp": acPspVoltController.text.trim(),
           "ijReadingOn": ijOnController.text.trim(),
-          "ijReadingOff":ijOffController.text.trim(),
+          "ijReadingOff": ijOffController.text.trim(),
           "integrityIj": ijIntegrityController.text.trim(),
           "conditionSurgeDiverter": surgeDiverterConditionController.text.trim(),
           "pspPolarisationCouponOn": couponOnController.text.trim(),
@@ -327,7 +331,16 @@ class AddTLPSurveyHelper {
           "acCurrentDischarge": acCurrentDischargeController.text.trim(),
           "dateOfReading": dateOfReadingController.text.trim(),
           "remarks": remarksController.text.trim(),
-          "fromDate_toDate": "${DateTime.now()}"
+          "fromDate_toDate": "${DateTime.now()}",
+
+          // ✅ NEW parameters
+          "maintbaseCode": "${maintenanceBaseData.code}",
+          "acceptableAcPsp": acceptableAcPspVoltController.text.trim(),
+          "soilResistivity": soilResistivityController.text.trim(),
+          "couponsDcCurrentDensity": couponDcCurrentDensityController.text.trim(),
+          "couponsAcCurrentDensity": couponAcCurrentDensityController.text.trim(),
+          "dcInterference": dcInterferenceController.text.trim(),
+          "remarks2": remarks2Controller.text.trim(),
         }];
         var res  =  await ServerRequest.postData(urlEndPoint: url, body: jsonEncode(json), context: context);
         if(res != null && res['message'] != null) {

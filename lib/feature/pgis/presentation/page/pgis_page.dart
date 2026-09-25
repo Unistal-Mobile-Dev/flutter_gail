@@ -4,6 +4,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/pgis/domain/bloc/pgis_bloc.dart';
 import 'package:flutter_gail/feature/pgis/presentation/widget/show_station_table_widget.dart';
 import 'package:flutter_gail/utils/commonWidgets/SpinLoader.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class PgisPage extends StatefulWidget {
   const PgisPage({super.key});
@@ -173,7 +174,7 @@ class _PgisPageState extends State<PgisPage> {
                 shape: BoxShape.circle,
                 boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 6)],
               ),
-              child: Icon(Icons.navigation, color: AppColor.themeColor, size: 21),
+              child: Icon(Icons.navigation, color: EnvironmentConfig.of(context)!.primaryTheme, size: 21),
             ),
           ),
         );
@@ -205,7 +206,7 @@ class _PgisPageState extends State<PgisPage> {
                       Icon(
                         Icons.dashboard_outlined,
                         size: 21,
-                        color: AppColor.themeColor,
+                        color: EnvironmentConfig.of(context)!.primaryTheme,
                       ),
                       SizedBox(width: 8),
                       Text("Basemap"),
@@ -215,7 +216,7 @@ class _PgisPageState extends State<PgisPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Divider(color: AppColor.themeColor),
+                        Divider(color: EnvironmentConfig.of(context)!.primaryTheme),
                         _basemapOption(
                           context,
                           "Streets (Light)",
@@ -252,7 +253,7 @@ class _PgisPageState extends State<PgisPage> {
                             onPressed: () => Navigator.pop(context),
                             child: Text(
                               "Cancel",
-                              style: TextStyle(color: AppColor.themeColor),
+                              style: TextStyle(color: EnvironmentConfig.of(context)!.primaryTheme),
                             ),
                           ),
                         ),
@@ -345,7 +346,7 @@ class _PgisPageState extends State<PgisPage> {
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(children: [Icon(Icons.map, color: AppColor.themeColor,), SizedBox(width: 8), Text(name)]),
+        child: Row(children: [Icon(Icons.map, color: EnvironmentConfig.of(context)!.primaryTheme,), SizedBox(width: 8), Text(name)]),
       ),
     );
   }

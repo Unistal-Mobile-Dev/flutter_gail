@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/bloc/create_task_bloc.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/lineWalker_user_model.dart';
-import 'package:flutter_gail/feature/task/createTask/domain/model/repeat_frequency_model.dart';
 import 'package:flutter_gail/feature/task/createTask/domain/model/shift_type_model.dart';
-import 'package:flutter_gail/feature/task/createTask/domain/model/user_name_model.dart';
-import 'package:flutter_gail/utils/commonWidgets/cupertino_date_picker_widget.dart';
-import 'package:flutter_gail/utils/commonWidgets/cupertino_time_picker_widget.dart';
 import 'package:flutter_gail/utils/commonWidgets/dropdown_multiselection_widget.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class CreateTaskPage extends StatefulWidget {
   const CreateTaskPage({super.key});
@@ -72,7 +69,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
               alignment: Alignment.topLeft,
               child: TextWidget(AppString.walkerDetails+"*",
                 fontWeight: FontWeight.w700,
-                color: AppColor.themeColor,),
+                color: EnvironmentConfig.of(context)!.primaryTheme,),
             ),
             _verticalSpace(),
             _repeatFrequencyDropdown(dataState: dataState),
@@ -262,7 +259,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
 
   Widget _shiftTimeSetWidget({required FetchCreateTaskDataState dataState}) {
     return Card(
-      shadowColor: AppColor.themeColor,
+      shadowColor: EnvironmentConfig.of(context)!.primaryTheme,
       elevation: 2,
       child: ListView.builder(
           itemCount: dataState.shiftGroupList.length,

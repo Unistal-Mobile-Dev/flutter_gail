@@ -7,6 +7,6 @@ class SpinLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SpinKitCubeGrid(color: AppColor.themeColor);
+    return SpinKitCubeGrid(color: EnvironmentConfig.of(context)!.primaryTheme);
   }
 }

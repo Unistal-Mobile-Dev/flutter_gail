@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/domain/bloc/view_task_bloc.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/domain/model/task_data_model.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class TaskDayCalendarWidget extends StatelessWidget {
   final FetchViewTaskDataState dataState;
@@ -25,7 +26,7 @@ class TaskDayCalendarWidget extends StatelessWidget {
               elevation: 2,
               shadowColor: Colors.black,
               color: index == dataState.selectedDay
-                  ? AppColor.themeColor
+                  ? EnvironmentConfig.of(context)!.primaryTheme
                   : AppColor.white,
               child: InkWell(
                 onTap:  () {

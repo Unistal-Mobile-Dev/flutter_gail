@@ -99,7 +99,7 @@ class HomeHelper {
         }
         pageList.add(
           DrawerModel(
-            widget: TaskPage(isAssignTask: isAssignTask),
+            widget: TaskPage(isAssignTask: isAssignTask,),
             label: AppString.task,
           ),
         );

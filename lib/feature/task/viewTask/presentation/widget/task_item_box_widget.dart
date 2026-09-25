@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 import 'package:geolocator/geolocator.dart';
 
 class TaskItemBoxWidget extends StatelessWidget {
@@ -30,7 +29,7 @@ class TaskItemBoxWidget extends StatelessWidget {
 
     return Card(
       elevation: 2,
-      shadowColor: AppColor.themeColor,
+      shadowColor: EnvironmentConfig.of(context)!.primaryTheme,
       child: Padding(padding: const EdgeInsets.all(0.0),
        child: Column(
          crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +48,7 @@ class TaskItemBoxWidget extends StatelessWidget {
                   : taskData.taskId.toString(),
                 fontWeight: FontWeight.w700,
                 fontSize: AppFont.font_12,
-                color: AppColor.themeColor,),
+                color: EnvironmentConfig.of(context)!.primaryTheme,),
            ),
 
            taskData.region.toString().isNotEmpty

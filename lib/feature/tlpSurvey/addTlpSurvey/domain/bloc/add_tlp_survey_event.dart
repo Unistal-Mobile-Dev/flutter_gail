@@ -75,7 +75,7 @@ class SelectTlpConnectionEvent extends AddTlpSurveyEvent {
   List<Object?> get props => [tlpConnectionData];
 }
 
-// Select TLP Connection 1 (Additional TLP Connection 1)  // NEW
+// Select TLP Connection 1
 class SelectTlpConnection1Event extends AddTlpSurveyEvent {
   final TlpConnectionModel tlpConnection1Data;
   const SelectTlpConnection1Event({required this.tlpConnection1Data});
@@ -103,20 +103,25 @@ class SubmitTlpEvent extends AddTlpSurveyEvent {
   @override
   List<Object?> get props => [context];
 }
+
 class ScanQrCodeEvent extends AddTlpSurveyEvent {
   final BuildContext context;
   const ScanQrCodeEvent({required this.context});
-
   @override
-  // TODO: implement props
   List<Object?> get props => [context];
 }
 
 class QrDataScannedEvent extends AddTlpSurveyEvent {
   final dynamic qrData;
   const QrDataScannedEvent({required this.qrData});
-
   @override
-  // TODO: implement props
   List<Object?> get props => [qrData];
+}
+
+// ✅ NEW: Auto-fill form event
+class AutoFillFormEvent extends AddTlpSurveyEvent {
+  final Map<String, dynamic> dataMap;
+  const AutoFillFormEvent({required this.dataMap});
+  @override
+  List<Object?> get props => [dataMap];
 }

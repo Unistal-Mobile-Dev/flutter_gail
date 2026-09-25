@@ -26,8 +26,8 @@ class _AddTlpSurveyPageState extends State<AddTlpSurveyPage> {
     return BlocBuilder<AddTlpSurveyBloc, AddTlpSurveyState>(
       builder: (context, state) {
         if(state is FetchAddTlpSurveyDataState) {
-         //  return AddTlpSurveyFormNew(dataState: state);
-           return AddTlpSurveyForm(dataState: state);
+           return AddTlpSurveyFormNew(dataState: state);
+          // return AddTlpSurveyForm(dataState: state);
         } else {
           return const Center(child: CenterLoaderWidget());
         }

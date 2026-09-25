@@ -6,6 +6,7 @@ import 'package:flutter_gail/feature/pgis/domain/model/structure_boundary_point_
 import 'package:flutter_gail/feature/pgis/helper/pgis_helper.dart';
 import 'package:flutter_gail/feature/pgis/presentation/widget/filter_widget.dart';
 import 'package:flutter_gail/feature/pgis/presentation/widget/map_layer_widget.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 part 'pgis_event.dart';
@@ -372,7 +373,7 @@ class PgisBloc extends Bloc<PgisEvent, PgisState> {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.themeColor,
+                    backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

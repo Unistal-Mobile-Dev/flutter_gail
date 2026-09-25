@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class DropdownWidget extends StatelessWidget {
   final dynamic dropdownValue;
@@ -41,7 +42,7 @@ class DropdownWidget extends StatelessWidget {
                     TextSpan(
                         text: hint,
                         style: TextStyle(
-                          color: AppColor.themeColor,
+                          color: EnvironmentConfig.of(context)!.primaryTheme,
                           fontSize: AppFont.font_14,
                         )),
                     TextSpan(
@@ -59,7 +60,7 @@ class DropdownWidget extends StatelessWidget {
               TextSpan(
                   text: hint,
                   style: TextStyle(
-                    color: AppColor.themeColor,
+                    color: EnvironmentConfig.of(context)!.primaryTheme,
                     fontSize: AppFont.font_14,
                   )),
               TextSpan(

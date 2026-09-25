@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/login/presentations/Widgets/phone_login_widget.dart';
-import 'package:flutter_gail/feature/login/presentations/Widgets/tablet_login_widget.dart';
-
+import 'package:flutter_gail/utils/res/environment_config.dart';
 import '../../domain/bloc/login_event.dart';
 import '../../domain/bloc/login_state.dart';
 
@@ -22,7 +21,8 @@ class _LoginScreenPageState extends State<LoginScreenPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final primary = EnvironmentConfig.of(context)!.primaryTheme;
+    final secondary = EnvironmentConfig.of(context)!.secondaryTheme;
     return Scaffold(
       backgroundColor: AppColor.appBackgroundColor,
       resizeToAvoidBottomInset: true,
@@ -32,14 +32,11 @@ class _LoginScreenPageState extends State<LoginScreenPage> {
               gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: <Color>[
-                    AppColor.themeLightColor,
-                    AppColor.themeColor,
-                  ])
+                  colors: <Color>[secondary, primary,])
           ),
         ),
         elevation: 0,
-        title: Theme(data:  theme.copyWith(
+        title: Theme(data:  Theme.of(context).copyWith(
           brightness: Brightness.light,
         ), child: const SizedBox.shrink()),
       ),

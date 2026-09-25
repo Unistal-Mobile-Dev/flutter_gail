@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class DataTableWidget<T> extends StatefulWidget {
   final T fixedCornerCell;
@@ -52,7 +53,7 @@ class DataTableWidgetState<T> extends State<DataTableWidget<T>> {
       '$data',
       fontSize: AppFont.font_12,
       fontWeight: FontWeight.w700,
-      color: AppColor.themeColor,
+      color: EnvironmentConfig.of(context)!.primaryTheme,
       textAlign: TextAlign.center,
     ),
   );

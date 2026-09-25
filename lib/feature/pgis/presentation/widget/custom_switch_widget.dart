@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class CustomSwitch extends StatelessWidget {
   final String label;
@@ -19,7 +20,7 @@ class CustomSwitch extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: TextStyle(
-          color: AppColor.themeLightColor,
+          color: EnvironmentConfig.of(context)!.secondaryTheme,
           fontWeight: FontWeight.bold
         ),),
         GestureDetector(
@@ -32,7 +33,7 @@ class CustomSwitch extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
               color: value
-                  ? AppColor.themeLightColor
+                  ? EnvironmentConfig.of(context)!.secondaryTheme
                   : const Color(0xFFE5E5EA),
             ),
             child: AnimatedAlign(

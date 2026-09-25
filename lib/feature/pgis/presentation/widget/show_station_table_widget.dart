@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gail/feature/pgis/domain/bloc/pgis_bloc.dart';
 import 'package:flutter_gail/feature/pgis/domain/model/structure_boundary_point_model.dart';
-import 'package:flutter_gail/utils/res/app_color.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class ShowStationTable {
   static void showStationTable({
@@ -40,7 +40,7 @@ class ShowStationTable {
                         const Spacer(),
                         TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: Text("Cancel",style: TextStyle(color: AppColor.themeColor,),),
+                          child: Text("Cancel",style: TextStyle(color: EnvironmentConfig.of(context)!.primaryTheme,),),
                         ),
                       ],
                     ),
@@ -144,7 +144,7 @@ class ShowStationTable {
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColor.themeColor,
+                                backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),

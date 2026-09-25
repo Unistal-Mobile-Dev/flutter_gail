@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/utils/commonWidgets/voideRecord/audio_player.dart';
 import 'package:flutter_gail/utils/commonWidgets/voideRecord/audio_recorder.dart';
+import 'package:flutter_gail/utils/res/environment_config.dart';
 
 class VoiceRecordWidget extends StatefulWidget {
   const VoiceRecordWidget({super.key});
@@ -43,7 +44,7 @@ class _VoiceRecordWidgetState extends State<VoiceRecordWidget> {
                       }
                     }
                     Navigator.pop(!context.mounted? context : context);
-                  }, icon: Icon(Icons.close, color: AppColor.themeColor,)),
+                  }, icon: Icon(Icons.close, color: EnvironmentConfig.of(context)!.primaryTheme,)),
             ) : const SizedBox.shrink(),
 
             Expanded(
@@ -98,7 +99,7 @@ class _VoiceRecordWidgetState extends State<VoiceRecordWidget> {
         IconButton(
             onPressed: () {
               Navigator.pop(context, audioPath.toString());
-        }, icon: Icon(Icons.done, color: AppColor.themeColor,)),
+        }, icon: Icon(Icons.done, color: EnvironmentConfig.of(context)!.primaryTheme,)),
       ],
     );
   }
