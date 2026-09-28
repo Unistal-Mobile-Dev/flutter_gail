@@ -246,7 +246,7 @@ PODS:
 
 DEPENDENCIES:
   - arcgis_maps (from `.symlinks/plugins/arcgis_maps/ios`)
-  - "arcgis_maps_ffi (from `/Users/ankushkumar/.pub-cache/hosted/pub.dev/arcgis_maps-200.8.0+4672/arcgis_maps_core/ios/arcgis_maps_ffi.podspec`)"
+  - arcgis_maps_ffi (from `../arcgis_maps_core/ios/arcgis_maps_ffi.podspec`)
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/darwin`)
   - battery_plus (from `.symlinks/plugins/battery_plus/ios`)
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/darwin`)
@@ -275,7 +275,7 @@ DEPENDENCIES:
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - qr_code_scanner_plus (from `.symlinks/plugins/qr_code_scanner_plus/ios`)
   - record_ios (from `.symlinks/plugins/record_ios/ios`)
-  - "Runtimecore (from `/Users/ankushkumar/.pub-cache/hosted/pub.dev/arcgis_maps-200.8.0+4672/arcgis_maps_core/ios/Runtimecore.podspec`)"
+  - Runtimecore (from `../arcgis_maps_core/ios/Runtimecore.podspec`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqlite3_flutter_libs (from `.symlinks/plugins/sqlite3_flutter_libs/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
@@ -315,7 +315,7 @@ EXTERNAL SOURCES:
   arcgis_maps:
     :path: ".symlinks/plugins/arcgis_maps/ios"
   arcgis_maps_ffi:
-    :podspec: "/Users/ankushkumar/.pub-cache/hosted/pub.dev/arcgis_maps-200.8.0+4672/arcgis_maps_core/ios/arcgis_maps_ffi.podspec"
+    :podspec: "../arcgis_maps_core/ios/arcgis_maps_ffi.podspec"
   audioplayers_darwin:
     :path: ".symlinks/plugins/audioplayers_darwin/darwin"
   battery_plus:
@@ -373,7 +373,7 @@ EXTERNAL SOURCES:
   record_ios:
     :path: ".symlinks/plugins/record_ios/ios"
   Runtimecore:
-    :podspec: "/Users/ankushkumar/.pub-cache/hosted/pub.dev/arcgis_maps-200.8.0+4672/arcgis_maps_core/ios/Runtimecore.podspec"
+    :podspec: "../arcgis_maps_core/ios/Runtimecore.podspec"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sqlite3_flutter_libs:
@@ -391,7 +391,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   arcgis_maps: 6d106cfb78b7b54941bb6a8d04540ce8dcfa7304
-  arcgis_maps_ffi: 9dcae213768e7171f798afc3b6176380a3182f7e
+  arcgis_maps_ffi: 57db4ad0664103996e44e8bf8f1592bebab86844
   audioplayers_darwin: 835ced6edd4c9fc8ebb0a7cc9e294a91d99917d5
   battery_plus: b42253f6d2dde71712f8c36fef456d99121c5977
   camera_avfoundation: 968a9a5323c79a99c166ad9d7866bfd2047b5a9b
@@ -440,7 +440,7 @@ SPEC CHECKSUMS:
   qr_code_scanner_plus: c6e79405d5fc87c45349daed2da322bcb2728961
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   record_ios: 980fd386a97a35987d0fce3dfda4b26a38c90f4c
-  Runtimecore: 45e00d5ff3babff92c0e81e64a1d56fc1bdf86db
+  Runtimecore: a05ef100adb4825d4c1c632e92a86b432c01037a
   SDWebImage: e9fc87c1aab89a8ab1bbd74eba378c6f53be8abf
   SDWebImageWebPCoder: 0e06e365080397465cc73a7a9b472d8a3bd0f377
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
@@ -453,6 +453,6 @@ SPEC CHECKSUMS:
   video_player_avfoundation: 3453f792138786248960ca029747fcd9f318ef52
   wakelock_plus: e29112ab3ef0b318e58cfa5c32326458be66b556
 
-PODFILE CHECKSUM: 5206a65285cb97f2e5503b98fd31cc9d7eb82de6
+PODFILE CHECKSUM: efc138bb897ba46d683ce2fba74df56c6272d104
 
 COCOAPODS: 1.16.2

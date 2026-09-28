@@ -239,45 +239,45 @@ class DashboardHelper {
   }
 
   static Future<void> checkAppVersion(BuildContext context) async {
-      try {
-          String baseUrl = "https://dev.indiait360.com:8441/unistalchat";
-           String url = "$baseUrl/api/gail-app?id=1";
-           var res =  await ServerRequest.getGoogleData(url: Uri.parse(url));
-           if(res != null && res['download'] != null){
-              if(res['download'].toString().isNotEmpty){
-                String downloadUrl  =  baseUrl+res['download'].toString();
-                String version  =    res['version'].toString();
-                String versionCode  =  res['versionCode'].toString();
+    try {
+      String baseUrl = "https://dev.indiait360.com:8441/unistalchat";
+      String url = "$baseUrl/api/gail-app?id=1";
+      var res =  await ServerRequest.getGoogleData(url: Uri.parse(url));
+      if(res != null && res['download'] != null){
+        if(res['download'].toString().isNotEmpty){
+          String downloadUrl  =  baseUrl+res['download'].toString();
+          String version  =    res['version'].toString();
+          String versionCode  =  res['versionCode'].toString();
 
-                PackageInfo packageInfo = await PackageInfo.fromPlatform();
-                String appVersion       = packageInfo.version;        // 1.0.0
-                String buildNumber   = packageInfo.buildNumber;    // versionCode (Android)
+          PackageInfo packageInfo = await PackageInfo.fromPlatform();
+          String appVersion       = packageInfo.version;        // 1.0.0
+          String buildNumber   = packageInfo.buildNumber;    // versionCode (Android)
 
-                if(version.toString() != appVersion.toString()
-                     && buildNumber.toString() != versionCode.toString()){
+          if(version.toString() != appVersion.toString()
+              && buildNumber.toString() != versionCode.toString()){
 
-                  var result =  await showDialog(
-                    barrierDismissible: false,
-                    context: !context.mounted ? context : context,
-                    builder: (context) {
-                      return WillPopScope(
-                        onWillPop: () async => false, // Disable back button
-                        child: MessageBoxPopButtonWidget(
-                          title: "New Update Available",
-                          message: "A new mandatory update is available. You must update the app to continue using its services.",
-                          buttonText: "Update",
-                          onPressed: () => Navigator.pop(context, true),
-                        ),
-                      );
-                    },
-                  );
-                  if(result == true){
-                    downloadAndInstallApk(downloadUrl, !context.mounted ? context : context);
-                  }
-                }
-              }
-           }
-      }catch(_){}
+            var result =  await showDialog(
+              barrierDismissible: false,
+              context: !context.mounted ? context : context,
+              builder: (context) {
+                return WillPopScope(
+                  onWillPop: () async => false, // Disable back button
+                  child: MessageBoxPopButtonWidget(
+                    title: "New Update Available",
+                    message: "A new mandatory update is available. You must update the app to continue using its services.",
+                    buttonText: "Update",
+                    onPressed: () => Navigator.pop(context, true),
+                  ),
+                );
+              },
+            );
+            if(result == true){
+              downloadAndInstallApk(downloadUrl, !context.mounted ? context : context);
+            }
+          }
+        }
+      }
+    }catch(_){}
   }
 
   static Future<void> downloadAndInstallApk(String url, BuildContext context) async {
@@ -315,7 +315,7 @@ class DashboardHelper {
     // Install APK
     try {
       await InstallPlugin.installApk(filePath);
-      await checkAppVersion(!context.mounted ? context : context);
+      // await checkAppVersion(!context.mounted ? context : context);
     } catch (e) {
       ScaffoldMessenger.of(!context.mounted ? context : context)
           .showSnackBar(SnackBar(content: Text("Install error: $e")));
