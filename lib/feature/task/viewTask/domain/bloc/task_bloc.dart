@@ -6,6 +6,7 @@ import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/login/domain/models/permissions_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/helper/task_helper.dart';
+import 'package:flutter_gail/services/background_location_service.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
 
 part 'task_event.dart';
@@ -62,6 +63,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     searchTaskList  =  taskList;
     taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList();
     _eventComplete(emit);
+    _syncBackgroundService(res);
 
     if(taskList.isNotEmpty){
       // TaskHelper.showNotificationWithNumber();
@@ -127,6 +129,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
 
   _pageRefresh(TaskPagRefreshDataEvent event, emit) async {
     var res = await TaskHelper.fetchTask(startDate: startDate.toString(), endDate: endDate.toString());
+    _syncBackgroundService(res);
     taskList =  res ?? [];
     searchTaskList  =  taskList;
     if(tabIndex == 0){
@@ -140,6 +143,15 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed  ).toList();
     }
     _eventComplete(emit);
+  }
+
+  /// Stop/start the background service based on the server task list.
+  /// Only when the list covers today, otherwise a running task may be missing.
+  void _syncBackgroundService(dynamic tasks) {
+    if (tasks is! List<TaskModel>) return;
+    final today = DateUtils.dateOnly(DateTime.now());
+    if (DateUtils.dateOnly(endDate).isBefore(today)) return;
+    BackgroundManager().syncWithTasks(tasks);
   }
 
   _eventComplete(Emitter<TaskState> emit) {

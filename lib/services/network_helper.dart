@@ -9,7 +9,7 @@ class NetworkHelper {
   /// Check if device is connected to internet (Wi-Fi, mobile data, etc.)
   static Future<bool> isConnected() async {
     var result = await _connectivity.checkConnectivity();
-    if (result == ConnectivityResult.none) return false;
+    if (result.isEmpty || result.every((r) => r == ConnectivityResult.none)) return false;
 
     // Optional: verify actual internet access (not just Wi-Fi connection)
     try {

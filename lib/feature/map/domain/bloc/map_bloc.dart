@@ -18,7 +18,6 @@ import 'package:flutter_gail/services/background_location_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -92,15 +91,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         permission == LocationPermission.deniedForever) {
       permission = await Geolocator.requestPermission();
     }
-
-    // 🔹 Listen to background updates
-    final service = FlutterBackgroundService();
-    service.on('update').listen((data) {
-      if (data != null) {
-        String lastLocation =
-            "📍 Lat: ${data['lat']} | Lng: ${data['lng']}\n🕒 ${data['timestamp']}";
-      }
-    });
 
     taskList = BlocProvider.of<TaskBloc>(!event.context.mounted ? event.context : event.context).searchTaskList;
     taskData = BlocProvider.of<TaskBloc>(!event.context.mounted ? event.context : event.context).taskData;
@@ -258,20 +248,29 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           : DateTime.now().toString(),
     );
 
-    final List<TaskModel> tempList =
-    taskList.where((data) {
-      return data.taskStatus == TaskStatus.started &&
-          taskData.subTaskId != data.subTaskId;
-    }).toList();
+    // Only one task can run at a time: block Start/Resume while another task
+    // is started, resumed or paused (not completed yet)
+    final bool isStartingTask =
+        taskStatus == TaskStatus.started || taskStatus == TaskStatus.resume;
+    final List<TaskModel> tempList = !isStartingTask
+        ? []
+        : taskList.where((data) {
+            return (data.taskStatus == TaskStatus.started ||
+                    data.taskStatus == TaskStatus.resume ||
+                    data.taskStatus == TaskStatus.pause) &&
+                taskData.subTaskId != data.subTaskId;
+          }).toList();
 
-    if (dt1.compareTo(dt2) < 0) {
+    // Date checks apply only to Start/Resume, so an old running task can
+    // still be paused or completed after the day changes
+    if (isStartingTask && dt1.compareTo(dt2) < 0) {
       SnackBarErrorWidget(
         event.context,
       ).show(message: "This task are future date");
       isLoader = false;
       _eventComplete(emit);
       return;
-    } else if (dt1.compareTo(dt2) > 0) {
+    } else if (isStartingTask && dt1.compareTo(dt2) > 0) {
       SnackBarErrorWidget(
         event.context,
       ).show(message: "This task are Back date");
@@ -281,7 +280,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     } else if (tempList.isNotEmpty) {
       SnackBarErrorWidget(event.context).show(
         message:
-        "Your already start another task.So please complete first old task then start.",
+        "You have already started another task. Please complete that task first, then start a new one.",
       );
       isLoader = false;
       _eventComplete(emit);
@@ -295,42 +294,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       );
     } else {
       add(StopTracking());
-    }
-
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString("taskStatus", "0");
-    print("Task Id ======================== ${taskData.taskId}");
-    await prefs.setString("taskId", taskData.taskId.toString());
-    await prefs.setString("subTaskId", taskData.subTaskId.toString());
-
-    if (taskStatus == TaskStatus.started) {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("taskStatus", "1");
-      if( ! await manager.isRunning()){
-        manager.startService();
-      }
-
-    }
-    else if (taskStatus == TaskStatus.pause) {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("taskStatus", "2");
-      if(await manager.isRunning()){
-         manager.stopService();
-      }
-    }
-    else if (taskStatus == TaskStatus.resume) {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("taskStatus", "5");
-      if( ! await manager.isRunning()){
-        manager.startService();
-      }
-    }
-    else if (taskStatus == TaskStatus.completed) {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("taskStatus", "3");
-      if(await manager.isRunning()){
-        manager.stopService();
-      }
     }
 
     var res = await TaskHelper.updateTask(
@@ -349,6 +312,26 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       pointsCount: routeLength,
     );
     if (res != null) {
+      // Update local task state & background service only after the server
+      // accepted the status change
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("taskId", taskData.taskId.toString());
+      await prefs.setString("subTaskId", taskData.subTaskId.toString());
+
+      if (taskStatus == TaskStatus.started) {
+        await prefs.setString("taskStatus", "1");
+        await manager.startService();
+      } else if (taskStatus == TaskStatus.pause) {
+        await prefs.setString("taskStatus", "2");
+        await manager.stopService();
+      } else if (taskStatus == TaskStatus.resume) {
+        await prefs.setString("taskStatus", "5");
+        await manager.startService();
+      } else if (taskStatus == TaskStatus.completed) {
+        await prefs.setString("taskStatus", "3");
+        await manager.stopService();
+      }
+
       taskData.taskStatus = taskStatus;
       isTaskStatusChange = true;
       isStartPatrolling = true;

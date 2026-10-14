@@ -113,7 +113,7 @@ class LocationHelper {
   static Future<dynamic> getLocationFetchForBackground() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
-      if (permission != LocationPermission.denied) {
+      if (permission != LocationPermission.denied && permission != LocationPermission.deniedForever) {
         LocationSettings locationSettings = const LocationSettings(
           accuracy: LocationAccuracy.bestForNavigation, //accuracy of the location data
           distanceFilter: 0, //minimum distance (measured in meters) a

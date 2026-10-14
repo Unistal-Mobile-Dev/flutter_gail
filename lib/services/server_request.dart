@@ -19,8 +19,10 @@ class ServerRequest {
       String url = APIs.baseUrl + urlEndPoint;
       log(Uri.parse(url.toString()).toString());
       log(header.toString());
-      final response = await get(Uri.parse(url.toString()), headers: header)
-          .timeout(const Duration(minutes: 1));
+      final response = await get(
+        Uri.parse(url.toString()),
+        headers: header,
+      ).timeout(const Duration(minutes: 1));
       log(response.body);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
@@ -42,58 +44,34 @@ class ServerRequest {
     return null;
   }
 
-  static Future<dynamic> getDataGail({required var urlEndPoint}) async {
-    try {
-
-      String url = APIs.baseGailUrl + urlEndPoint;
-      log(Uri.parse(url.toString()).toString());
-      log(header.toString());
-      final response = await get(Uri.parse(url.toString()),)
-          .timeout(const Duration(minutes: 1));
-      log(response.body);
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else if (response.statusCode == 500) {
-        return jsonDecode(response.body);
-      }
-    } catch (e) {
-      if (e is SocketException) {
-        log("SocketException : ${e.toString()}");
-        return e.toString();
-      } else if (e is TimeoutException) {
-        log("TimeoutException : ${e.toString()}");
-        return e.toString();
-      } else {
-        log("Unhandled exception : ${e.toString()}");
-        return e.toString();
-      }
-    }
-    return null;
-  }
-
-  static Future<dynamic> putData(
-      {required var urlEndPoint, required var body, required BuildContext context}) async {
+  static Future<dynamic> putData({
+    required var urlEndPoint,
+    required var body,
+    required BuildContext context,
+  }) async {
     try {
       await addToken();
       String url = APIs.baseUrl + urlEndPoint;
       log(url);
       log(body);
-      final response =
-          await put(Uri.parse(url), headers: header, body: body)
-              .timeout(const Duration(minutes: 1));
+      final response = await put(
+        Uri.parse(url),
+        headers: header,
+        body: body,
+      ).timeout(const Duration(minutes: 1));
       log(response.body);
       if (response.statusCode == 200) {
         updateCookie(response);
         return jsonDecode(response.body);
-      }
-      else if (response.statusCode == 201) {
+      } else if (response.statusCode == 201) {
         updateCookie(response);
         return jsonDecode(response.body);
-      }
-      else {
+      } else {
         var json = jsonDecode(response.body);
-        if(json.toString().contains("message")){
-          SnackBarErrorWidget(!context.mounted ? context : context).show(message: json['message'].toString());
+        if (json.toString().contains("message")) {
+          SnackBarErrorWidget(
+            !context.mounted ? context : context,
+          ).show(message: json['message'].toString());
         }
         return null;
       }
@@ -112,15 +90,18 @@ class ServerRequest {
     return null;
   }
 
-  static Future<dynamic> backgroundServicePost(
-      {required var urlEndPoint, required var body}) async {
+  static Future<dynamic> backgroundServicePost({
+    required var urlEndPoint,
+    required var body,
+  }) async {
     try {
-/*      if(await ConnectivityHelper.allConnectivityCheck(context: context!) == false){
+      /*      if(await ConnectivityHelper.allConnectivityCheck(context: context!) == false){
         return null;
       }*/
 
-      String baseUrl =
-          await SharedPreferencesUtils.getString(key: PreferencesName.baseUrl);
+      String baseUrl = await SharedPreferencesUtils.getString(
+        key: PreferencesName.baseUrl,
+      );
       if (kDebugMode) {
         print("Base Url ====================  $baseUrl");
       }
@@ -128,9 +109,11 @@ class ServerRequest {
       log(url);
       log(jsonEncode(body).toString());
       log(header.toString());
-      final response =
-          await post(Uri.parse(url), headers: header, body: jsonEncode(body))
-              .timeout(const Duration(minutes: 1));
+      final response = await post(
+        Uri.parse(url),
+        headers: header,
+        body: jsonEncode(body),
+      ).timeout(const Duration(minutes: 1));
       log(response.body);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
@@ -155,29 +138,35 @@ class ServerRequest {
     return null;
   }
 
-  static Future<dynamic> postData(
-      {required var urlEndPoint, required var body, required BuildContext context}) async {
+  static Future<dynamic> postData({
+    required var urlEndPoint,
+    required var body,
+    required BuildContext context,
+  }) async {
     try {
       String url = APIs.baseUrl + urlEndPoint;
       log(url);
       await addToken();
       print(body);
       log(header.toString());
-      final response = await post(Uri.parse(url), headers: header, body: body)
-          .timeout(const Duration(minutes: 1));
+      final response = await post(
+        Uri.parse(url),
+        headers: header,
+        body: body,
+      ).timeout(const Duration(minutes: 1));
       log(response.body);
       if (response.statusCode == 200) {
         updateCookie(response);
         return jsonDecode(response.body);
-      }
-      else if (response.statusCode == 201) {
+      } else if (response.statusCode == 201) {
         updateCookie(response);
         return jsonDecode(response.body);
-      }
-      else {
+      } else {
         var json = jsonDecode(response.body);
-        if(json.toString().contains("message")){
-          SnackBarErrorWidget(!context.mounted ? context : context).show(message: json['message'].toString());
+        if (json.toString().contains("message")) {
+          SnackBarErrorWidget(
+            !context.mounted ? context : context,
+          ).show(message: json['message'].toString());
         }
         return null;
       }
@@ -198,10 +187,12 @@ class ServerRequest {
     }
   }
 
-  static Future<dynamic> backgroundPostData(
-      {required var urlEndPoint, required var body}) async {
+  static Future<dynamic> backgroundPostData({
+    required var urlEndPoint,
+    required var body,
+  }) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String baseUrl =  prefs.getString("baseUrl") ?? "";
+    String baseUrl = prefs.getString("baseUrl") ?? "";
     String url = baseUrl + urlEndPoint;
     log(url);
     try {
@@ -209,14 +200,16 @@ class ServerRequest {
       print(body);
       await addToken();
       log(header.toString());
-      final response = await post(Uri.parse(url), headers: header, body: body)
-          .timeout(const Duration(minutes: 1));
+      final response = await post(
+        Uri.parse(url),
+        headers: header,
+        body: body,
+      ).timeout(const Duration(minutes: 1));
       log(response.body);
       if (response.statusCode == 200) {
         // updateCookie(response);
         return jsonDecode(response.body);
-      }
-      else if (response.statusCode == 201) {
+      } else if (response.statusCode == 201) {
         // updateCookie(response);
         return jsonDecode(response.body);
       }
@@ -241,8 +234,10 @@ class ServerRequest {
   static Future<dynamic> getGoogleData({required var url}) async {
     try {
       log(url.toString());
-      final response =
-          await get(url, headers: header).timeout(const Duration(minutes: 1));
+      final response = await get(
+        url,
+        headers: header,
+      ).timeout(const Duration(minutes: 1));
       // log(response.body);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
@@ -269,12 +264,15 @@ class ServerRequest {
       var headerData = {
         HttpHeaders.authorizationHeader:
             "key=AAAAvUcSq7Y:APA91bHC67iO0x0DER3_DU37-ZoaVq7CgKqpi3P2GhBxAMSu2Thhv93MydFigrXDuhf-Tx8OsfEtywE0pVxdA2TBa_JsQG8ZTHQ2lTzha1D0M63ZdljYYq0cD2db6Ll5LAB-ZZtbRzOc",
-        "Content-Type": "application/json; charset=UTF-8"
+        "Content-Type": "application/json; charset=UTF-8",
       };
       log(url);
       log(jsonEncode(body));
-      final response = await post(Uri.parse(url),
-          headers: headerData, body: jsonEncode(body));
+      final response = await post(
+        Uri.parse(url),
+        headers: headerData,
+        body: jsonEncode(body),
+      );
       log(response.body);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
@@ -291,13 +289,14 @@ class ServerRequest {
     return null;
   }
 
-  static Future<dynamic> postDataWithFile(
-      {required String urlEndPoint,
-      required var body,
-      required BuildContext context,
-      String? filePath,
-      String? keyWord,
-      List<FileModel>? fileList}) async {
+  static Future<dynamic> postDataWithFile({
+    required String urlEndPoint,
+    required var body,
+    required BuildContext context,
+    String? filePath,
+    String? keyWord,
+    List<FileModel>? fileList,
+  }) async {
     try {
       await addToken();
       String url = APIs.baseUrl + urlEndPoint;
@@ -312,20 +311,25 @@ class ServerRequest {
           if (fileData.file.path.isNotEmpty) {
             String fileExtention = fileData.file.path.split(".").last;
             String filePath0 =
-                (fileExtention.toString().toLowerCase() != "png"
-                    || fileExtention.toString().toLowerCase() != "jpg"
-                    || fileExtention.toString().toLowerCase() != "jpeg")
+                (fileExtention.toString().toLowerCase() != "png" ||
+                        fileExtention.toString().toLowerCase() != "jpg" ||
+                        fileExtention.toString().toLowerCase() != "jpeg")
                     ? fileData.file.path.toString()
                     : await fileCompress(file: fileData.file);
             if (fileData.file.toString().isNotEmpty) {
               var uploadFile = await MultipartFile.fromPath(
-                  fileData.keyName, filePath0,
-                  contentType: MediaType("file", fileExtention));
+                fileData.keyName,
+                filePath0,
+                contentType: MediaType("file", fileExtention),
+              );
               request.files.add(uploadFile);
             }
           } else if (fileData.keyName.isNotEmpty) {
-            var uploadFile = await MultipartFile.fromPath(fileData.keyName, "",
-                contentType: MediaType("file", ""));
+            var uploadFile = await MultipartFile.fromPath(
+              fileData.keyName,
+              "",
+              contentType: MediaType("file", ""),
+            );
             request.files.add(uploadFile);
           }
         }
@@ -334,13 +338,17 @@ class ServerRequest {
           if (filePath.isNotEmpty) {
             File file = File(filePath);
             String fileExtention = filePath.split(".").last;
-            String filePath1 = fileExtention.toString().toLowerCase() == "png"
-                || fileExtention.toString().toLowerCase() == "jpg"
-                || fileExtention.toString().toLowerCase() == "jpeg"
-                ? await fileCompress(file: file)
-                : file.path.toString();
-            var uploadFile = await MultipartFile.fromPath(keyWord, filePath1,
-                contentType: MediaType("file", fileExtention));
+            String filePath1 =
+                fileExtention.toString().toLowerCase() == "png" ||
+                        fileExtention.toString().toLowerCase() == "jpg" ||
+                        fileExtention.toString().toLowerCase() == "jpeg"
+                    ? await fileCompress(file: file)
+                    : file.path.toString();
+            var uploadFile = await MultipartFile.fromPath(
+              keyWord,
+              filePath1,
+              contentType: MediaType("file", fileExtention),
+            );
             request.files.add(uploadFile);
           }
         }
@@ -355,14 +363,16 @@ class ServerRequest {
         var result = json.decode(String.fromCharCodes(responseData));
         log(result.toString());
         return result;
-      }  else if (response.statusCode == 201) {
+      } else if (response.statusCode == 201) {
         var result = json.decode(String.fromCharCodes(responseData));
         log(result.toString());
         return result;
       } else {
         var result = json.decode(String.fromCharCodes(responseData));
-        if(result.toString().contains("message")){
-          SnackBarErrorWidget(!context.mounted ? context : context).show(message: result['message'].toString());
+        if (result.toString().contains("message")) {
+          SnackBarErrorWidget(
+            !context.mounted ? context : context,
+          ).show(message: result['message'].toString());
         }
         return null;
       }
@@ -382,11 +392,13 @@ class ServerRequest {
   }
 
   static addToken() async {
-    try{
-      String token = await SharedPreferencesUtils.getString(key: PreferencesName.token);
+    try {
+      String token = await SharedPreferencesUtils.getString(
+        key: PreferencesName.token,
+      );
       header["X-Auth-Token"] = token;
       // header["Authorization"] = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjk2LCJlbWFpbCI6Im5hdXNoYWRhQHVuaXN0YWwuY29tIiwiaWF0IjoxNzU4MjYxMDQ2LCJleHAiOjE3NTgzNDc0NDZ9.TpdpfpLcTx92j2O9DwX603EtKE7KWPdlcV8IkjxdkaU";
-    } catch(_){
+    } catch (_) {
       header["X-Auth-Token"] = "";
     }
   }
@@ -407,8 +419,10 @@ class ServerRequest {
   static Future<dynamic> imageUrlConvertToByte64({required var url}) async {
     try {
       log(url);
-      final response = await get(Uri.parse(url.toString()), headers: header)
-          .timeout(const Duration(minutes: 1));
+      final response = await get(
+        Uri.parse(url.toString()),
+        headers: header,
+      ).timeout(const Duration(minutes: 1));
       if (response.statusCode == 200) {
         final bytes = response.bodyBytes;
         return base64Encode(bytes);
@@ -425,17 +439,25 @@ class ServerRequest {
     return null;
   }
 
-  static Future<dynamic> iglPost({var url, var body,
-         required String userName, required String password}) async {
+  static Future<dynamic> iglPost({
+    var url,
+    var body,
+    required String userName,
+    required String password,
+  }) async {
     try {
       var headerData = {
-      "Authorization" : 'Basic ${base64.encode(utf8.encode('$userName:$password'))}',
-      "Content-Type": "application/json; charset=UTF-8"
+        "Authorization":
+            'Basic ${base64.encode(utf8.encode('$userName:$password'))}',
+        "Content-Type": "application/json; charset=UTF-8",
       };
       log(url);
       log(jsonEncode(body));
-      final response = await post(Uri.parse(url),
-          headers: headerData, body: jsonEncode(body));
+      final response = await post(
+        Uri.parse(url),
+        headers: headerData,
+        body: jsonEncode(body),
+      );
       log(response.body);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);

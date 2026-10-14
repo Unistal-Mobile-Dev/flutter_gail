@@ -24,17 +24,8 @@ class EnvironmentConfig extends InheritedWidget {
       case EnvironmentFlavours.productionIglCng:
         return "https://oil-pims-prod.oilindia.in/";
       case EnvironmentFlavours.developmentIglCng:
+        return "https://tpimso.smartgasnet.com/";
         return "https://tpimsdev.smartgasnet.com/";
-    }
-  }
-
-  String get generalGailUrlBaseOnFlavour {
-    switch (flavours) {
-      case EnvironmentFlavours.productionIglCng:
-        return "https://gailgis.gail.co.in/";
-      case EnvironmentFlavours.developmentIglCng:
-        // return "http://115.241.54.252:8000/";
-        return "https://gailgis.gail.co.in/";
     }
   }
 }

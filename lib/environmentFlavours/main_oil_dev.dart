@@ -70,7 +70,9 @@ Future<void> main() async {
 
     // ✅ 5. Background service management
     final backgroundManager = BackgroundManager();
-    backgroundManager.initializeService();
+    await backgroundManager.initializeService();
+    // App reopen: stop background service if no task is running
+    await backgroundManager.stopIfNoActiveTask();
 
     BackgroundManager.isServiceRunning.addListener(() {
       debugPrint(

@@ -15,7 +15,6 @@ import 'package:flutter_gail/feature/map/domain/model/route_points_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/marker_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
-import 'package:flutter_gail/services/background_location_service.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
 import 'package:flutter_gail/services/network_helper.dart';
@@ -190,36 +189,66 @@ class MapHelper {
     return false;
   }
 
-  /// Save location data for a task
+  static const String _locationBoxName = 'location_box';
+  static const int _syncBatchSize = 100;
+  static Future<Box<HiveLocationModel>>? _locationBoxFuture;
+
+  /// Opens the offline location box once per isolate.
+  static Future<Box<HiveLocationModel>> _openLocationBox() {
+    return _locationBoxFuture ??= () async {
+      await Hive.initFlutter();
+      if (!Hive.isAdapterRegistered(1)) {
+        Hive.registerAdapter(HiveLocationModelAdapter());
+      }
+      return Hive.openBox<HiveLocationModel>(_locationBoxName);
+    }().catchError((Object e) {
+      _locationBoxFuture = null;
+      throw e;
+    });
+  }
+
+  /// Number of locations saved offline and not yet uploaded.
+  static Future<int> pendingLocationCount() async {
+    final box = await _openLocationBox();
+    return box.length;
+  }
+
+  /// Fetch the current location and save it offline (Hive) for the active task.
+  /// Uploading is done separately by [syncOfflineLocations], so points are never
+  /// lost when there is no internet.
   static Future<Map<String, dynamic>> locationSave() async {
     try {
-      // 1. Get current location
-      var locationRes = await LocationHelper.getLocationFetchForBackground();
-      LocationModel locationData = locationRes ?? LocationModel();
+      // 1. Active task (reload: main isolate may have changed it)
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.reload();
+      String taskId = prefs.getString("taskId") ?? "";
+      if (taskId.isEmpty) {
+        return {"status": "error", "message": "No active task"};
+      }
+      String subTaskId = prefs.getString("subTaskId") ?? "";
 
-      // 2. Calculate distance & bearing
+      // 2. Get current location (works offline, GPS only)
+      LocationModel? locationData = await LocationHelper.getLocationFetchForBackground();
+      if (locationData == null || locationData.lat == null || locationData.long == null) {
+        return {"status": "error", "message": "Location not available"};
+      }
+
+      // 3. Calculate distance & bearing
       double distance = 0;
       double bearing = 0;
       if (lastPoint.y != null) {
         distance = calculateDistance(lastPoint.y, lastPoint.x, locationData.lat, locationData.long) * 1000;
         bearing = calculateBearing(locationData.lat, locationData.long, lastPoint.y, lastPoint.x);
       }
-
       lastPoint = PointsModel(x: locationData.long, y: locationData.lat);
 
-      // 3. Get battery
-      var battery = Battery();
-      int batteryPercentage = await battery.batteryLevel;
+      // 4. Get battery
+      int batteryPercentage = 0;
+      try {
+        batteryPercentage = await Battery().batteryLevel;
+      } catch (_) {}
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      String taskId =  prefs.getString("taskId") ?? "";
-      print("--------------------Task Id $taskId");
-      if(taskId.isEmpty){
-        return {"status": "error", "message": ""};
-      }
-      String subTaskId =  prefs.getString("subTaskId") ?? "";
-
-      // 4. Create Hive model
+      // 5. Save offline in Hive
       HiveLocationModel hiveLocation = HiveLocationModel(
         taskId: taskId,
         subTaskId: subTaskId,
@@ -227,89 +256,84 @@ class MapHelper {
         gpsY: locationData.lat ?? 0.0,
         distance: distance,
         bearing: bearing,
-        speed: double.parse(locationData.speed ?? "0.0"),
-        gpsAccuracy: double.parse(locationData.accuracy.toString().isEmpty ? "0.0" : locationData.accuracy.toString()),
+        speed: double.tryParse(locationData.speed ?? "") ?? 0.0,
+        gpsAccuracy: double.tryParse(locationData.accuracy ?? "") ?? 0.0,
         battery: batteryPercentage,
         inspectedDateTime: DateTime.now(),
       );
-
-      // 5. Save offline in Hive
-      await Hive.initFlutter();
-      if (!Hive.isAdapterRegistered(1)) {
-        Hive.registerAdapter(HiveLocationModelAdapter());
-        print("📦 Hive Adapter Registered (typeId: 1)");
-      } else {
-        print("⚠️ Hive Adapter already registered (typeId: 1)");
-      }
-      await Hive.openBox<HiveLocationModel>('location_box');
-      var box = Hive.box<HiveLocationModel>('location_box');
+      final box = await _openLocationBox();
       await box.add(hiveLocation);
 
-      List<Map<String, dynamic>> payload = [];
-      payload.add(hiveLocation.toServerJson());
-
-      // 6. Check network
-      bool connected = await NetworkHelper.isConnected();
-      print("Check connection 1 $connected");
-      if (connected) {
-        try {
-          await syncOfflineLocations();
-        } catch (e) {
-          print("Server upload failed, keeping offline: $e");
-        }
-      }
-
-      // 7. Return status
-      return {"status": "saved", "isSynced": hiveLocation.isSynced};
+      return {
+        "status": "saved",
+        "taskId": taskId,
+        "lat": hiveLocation.gpsY,
+        "lng": hiveLocation.gpsX,
+      };
     } catch (e) {
       print("Location Save Error: $e");
       return {"status": "error", "message": e.toString()};
     }
   }
 
+  /// Upload offline locations to the server, grouped by task and in batches.
+  /// Uploaded points are deleted from Hive; on failure they stay for the next try.
+  /// Returns the task ids the server reported as closed (close_status == 3).
+  static Future<Set<String>> syncOfflineLocations() async {
+    final Set<String> closedTaskIds = {};
+    final box = await _openLocationBox();
+    if (box.isEmpty) return closedTaskIds;
 
-  static Future<void> syncOfflineLocations() async {
-    var box = Hive.box<HiveLocationModel>('location_box');
     bool connected = await NetworkHelper.isConnected();
-    print("Check connection 2 $connected");
-    if (!connected) return;
+    if (!connected) return closedTaskIds;
 
-    // Collect all unsynced locations
-    List<Map<String, dynamic>> payload = [];
-
-    for (var location in box.values) {
-      if (!location.isSynced) {
-        payload.add(location.toServerJson());
-      }
+    // Snapshot keys so points added during upload are not touched
+    final Map<String, List<dynamic>> keysByTask = {};
+    for (final key in box.keys.toList()) {
+      final location = box.get(key);
+      if (location == null) continue;
+      keysByTask.putIfAbsent(location.taskId, () => []).add(key);
     }
 
-    if (payload.isEmpty) return;
+    for (final entry in keysByTask.entries) {
+      final keys = entry.value;
+      for (int i = 0; i < keys.length; i += _syncBatchSize) {
+        final batchKeys = keys.sublist(i, math.min(i + _syncBatchSize, keys.length));
+        final payload = batchKeys
+            .map((key) => box.get(key))
+            .whereType<HiveLocationModel>()
+            .map((location) => location.toServerJson())
+            .toList();
+        if (payload.isEmpty) continue;
 
-    try {
-      // Send all unsynced locations in a single array
-      var res = await ServerRequest.backgroundPostData(
-        urlEndPoint: APIs.saveLocationDataApi,
-        body: jsonEncode(payload),
-      );
-
-      // If server response is successful, mark all as synced
-      if (res != null && res['close_status'] != null && res['close_status'] != 3) {
-        for (var location in box.values) {
-          if (!location.isSynced) {
-            location.isSynced = true;
-            await location.delete();
-          }
+        dynamic res;
+        try {
+          res = await ServerRequest.backgroundPostData(
+            urlEndPoint: APIs.saveLocationDataApi,
+            body: jsonEncode(payload),
+          );
+        } catch (e) {
+          print("Batch sync failed: $e");
+          return closedTaskIds;
         }
-      } else if (res != null && res['close_status'] != null && res['close_status'] == 3) {
-        final manager = BackgroundManager();
-        if(await manager.isRunning()){
-          manager.stopService();
+
+        // Network/server error: keep data offline and retry on next tick
+        if (res is! Map || res['close_status'] == null) {
+          print("Batch sync failed, keeping offline: $res");
+          return closedTaskIds;
+        }
+
+        // Accepted (or task already closed on server): remove uploaded points
+        await box.deleteAll(batchKeys);
+
+        if (res['close_status'].toString() == "3") {
+          closedTaskIds.add(entry.key);
+          // Task is closed, remaining points for it are not needed
+          await box.deleteAll(keys.sublist(math.min(i + _syncBatchSize, keys.length)));
+          break;
         }
       }
-    } catch (e) {
-      print("Batch sync failed: $e");
     }
+    return closedTaskIds;
   }
-
-
 }
