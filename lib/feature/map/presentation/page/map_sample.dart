@@ -8,6 +8,9 @@ import 'package:flutter_gail/feature/incident/add_incident/domain/bloc/add_incid
 import 'package:flutter_gail/feature/incident/add_incident/presentation/page/add_incident_page.dart';
 import 'package:flutter_gail/feature/map/domain/bloc/map_bloc.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
+import 'package:flutter_gail/feature/map/presentation/widget/text_button_icon_widget.dart';
+import 'package:flutter_gail/feature/task/addAsset/domain/bloc/add_asset_bloc.dart';
+import 'package:flutter_gail/feature/task/addAsset/presentation/page/add_asset_page.dart';
 import 'package:flutter_gail/feature/task/addCrossing/domain/bloc/add_crossing_bloc.dart';
 import 'package:flutter_gail/feature/task/addCrossing/presentation/page/add_crossing_page.dart';
 import 'package:flutter_gail/feature/task/addEncroachment/domain/bloc/encroachment_bloc.dart';
@@ -160,7 +163,6 @@ class MapSampleState extends State<MapSample> {
         distanceFilter: 5,
       ),
     ).listen((Position newPos) {
-
       context.read<MapBloc>().add(
         MapRouteLocationCheck(
           context: !context.mounted ? context : context,
@@ -327,22 +329,29 @@ class MapSampleState extends State<MapSample> {
                         return Polyline(
                           polylineId: PolylineId('route_$index'),
                           points: polylinePoints,
-                          color:   Colors.primaries[index % Colors.primaries.length],
+                          color:
+                              Colors.primaries[index % Colors.primaries.length],
                           width: 4,
                         );
                       }).toSet(),
 
                   /// ✅ Draw rounded buffer polygons (5m)
-                  polygons: state.routes.asMap().entries.map((entry) {
+                  polygons:
+                      state.routes.asMap().entries.map((entry) {
                         final index = entry.key;
                         final route = entry.value;
                         final polylinePoints =
-                            route.map((p) => LatLng(p.y ?? 0.0, p.x ?? 0.0)).toList();
-                        final mapData = BlocProvider.of<MapBloc>(context).mapData;
+                            route
+                                .map((p) => LatLng(p.y ?? 0.0, p.x ?? 0.0))
+                                .toList();
+                        final mapData =
+                            BlocProvider.of<MapBloc>(context).mapData;
                         final link = AppConfig.instanceInit()?.groupRoles.link;
-                        final double buffer = (mapData.buffer is num)
+                        final double buffer =
+                            (mapData.buffer is num)
                                 ? mapData.buffer.toDouble()
-                                : double.tryParse(mapData.buffer.toString()) ?? 0.0;
+                                : double.tryParse(mapData.buffer.toString()) ??
+                                    0.0;
                         final polygonPoints = MapHelper.createBufferPolygon(
                           polylinePoints,
                           buffer,
@@ -351,7 +360,9 @@ class MapSampleState extends State<MapSample> {
                         return Polygon(
                           polygonId: PolygonId('buffer_$index'),
                           points: polygonPoints,
-                          fillColor: Colors.primaries[index % Colors.primaries.length].withOpacity(0.25),
+                          fillColor: Colors
+                              .primaries[index % Colors.primaries.length]
+                              .withOpacity(0.25),
                           strokeColor: Colors.transparent,
                           strokeWidth: 0,
                         );
@@ -412,27 +423,25 @@ class MapSampleState extends State<MapSample> {
                   //      : const SizedBox.shrink(),
                   SizedBox(height: MediaQuery.of(context).size.width * 0.03),
                   _recentButton(),
-                  SizedBox(height: MediaQuery.of(context).size.width * 0.03),
+                  _vertical(),
                   dataState.taskData.taskStatus == TaskStatus.started ||
                           dataState.taskData.taskStatus == TaskStatus.resume
                       ? _addMarkerButton()
                       : const SizedBox.shrink(),
-                  dataState.taskData.taskStatus == TaskStatus.started ||
-                          dataState.taskData.taskStatus == TaskStatus.resume
-                      ? SizedBox(
-                        height: MediaQuery.of(context).size.width * 0.03,
-                      )
-                      : const SizedBox.shrink(),
+                  // dataState.taskData.taskStatus == TaskStatus.started ||
+                  //         dataState.taskData.taskStatus == TaskStatus.resume
+                  //     ? SizedBox(
+                  //       height: MediaQuery.of(context).size.width * 0.03,
+                  //     )
+                  //     : const SizedBox.shrink(),
 
+                  // dataState.taskData.taskStatus == TaskStatus.started ||
+                  //         dataState.taskData.taskStatus == TaskStatus.resume
+                  //     ? _addCrossingButton()
+                  //     : const SizedBox.shrink(),
                   dataState.taskData.taskStatus == TaskStatus.started ||
                           dataState.taskData.taskStatus == TaskStatus.resume
-                      ? _addCrossingButton()
-                      : const SizedBox.shrink(),
-                  dataState.taskData.taskStatus == TaskStatus.started ||
-                          dataState.taskData.taskStatus == TaskStatus.resume
-                      ? SizedBox(
-                        height: MediaQuery.of(context).size.width * 0.03,
-                      )
+                      ? _vertical()
                       : const SizedBox.shrink(),
 
                   dataState.taskData.taskStatus == TaskStatus.started ||
@@ -441,9 +450,7 @@ class MapSampleState extends State<MapSample> {
                       : const SizedBox.shrink(),
                   dataState.taskData.taskStatus == TaskStatus.started ||
                           dataState.taskData.taskStatus == TaskStatus.resume
-                      ? SizedBox(
-                        height: MediaQuery.of(context).size.width * 0.03,
-                      )
+                      ? _vertical()
                       : const SizedBox.shrink(),
 
                   dataState.taskData.taskStatus == TaskStatus.started ||
@@ -453,9 +460,7 @@ class MapSampleState extends State<MapSample> {
 
                   dataState.taskData.taskStatus == TaskStatus.started ||
                           dataState.taskData.taskStatus == TaskStatus.resume
-                      ? SizedBox(
-                        height: MediaQuery.of(context).size.width * 0.03,
-                      )
+                      ? _vertical()
                       : const SizedBox.shrink(),
 
                   dataState.taskData.taskStatus == TaskStatus.started ||
@@ -475,270 +480,230 @@ class MapSampleState extends State<MapSample> {
     );
   }
 
+  // Widget _addMarkerButton() {
+  //   return SizedBox(
+  //     height: MediaQuery.of(context).size.width * 0.10,
+  //     child: TextButton.icon(
+  //       label: TextWidget(
+  //         'Marker',
+  //         color: AppColor.black,
+  //         fontSize: AppFont.font_11,
+  //       ),
+  //       icon: Icon(
+  //         Icons.location_searching_sharp,
+  //         color: EnvironmentConfig.of(context)!.primaryTheme,
+  //         size: MediaQuery.of(context).size.width * 0.05,
+  //       ),
+  //       onPressed: () {
+  //         BlocProvider.of<AddMarkerBloc>(
+  //           context,
+  //         ).add(AddMarkerPageLoadEvent(context: context, data: ""));
+  //         Navigator.push(
+  //           !context.mounted ? context : context,
+  //           FadeRoute(page: const AddMarkerPage()),
+  //         );
+  //       },
+  //       style: ButtonStyle(
+  //         backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
+  //         foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+  //         elevation: WidgetStateProperty.all<double>(3.0),
+  //         shadowColor: WidgetStateProperty.all<Color>(Colors.black),
+  //       ),
+  //     ),
+  //   );
+  // }
+
   Widget _statusButton({required FetchMapPageDataState dataSate}) {
-    return dataSate.taskData.taskStatus != TaskStatus.completed
-        ? SizedBox(
-          height: MediaQuery.of(context).size.width * 0.10,
-          child: TextButton.icon(
-            label: TextWidget(
-              dataSate.taskData.taskStatus == TaskStatus.notStarted
-                  ? AppString.start
-                  : dataSate.taskData.taskStatus == TaskStatus.started
-                  ? AppString.pause
-                  : dataSate.taskData.taskStatus == TaskStatus.pause
-                  ? AppString.resume
-                  : dataSate.taskData.taskStatus == TaskStatus.resume
-                  ? AppString.pause
-                  : AppString.completed,
-              color: AppColor.black,
-              fontSize: AppFont.font_11,
-            ),
-            icon: Icon(
-              Icons.task_outlined,
-              color: EnvironmentConfig.of(context)!.primaryTheme,
-              size: MediaQuery.of(context).size.width * 0.05,
-            ),
-            onPressed: () {
-              TaskStatus taskStatus = TaskStatus.notStarted;
-              if (dataSate.taskData.taskStatus == TaskStatus.notStarted) {
-                taskStatus = TaskStatus.started;
-              } else if (dataSate.taskData.taskStatus == TaskStatus.started) {
-                taskStatus = TaskStatus.pause;
-              } else if (dataSate.taskData.taskStatus == TaskStatus.pause) {
-                taskStatus = TaskStatus.resume;
-              } else if (dataSate.taskData.taskStatus == TaskStatus.resume) {
-                taskStatus = TaskStatus.pause;
-              }
-              BlocProvider.of<MapBloc>(context).add(
-                MapPageUpdateTaskEvent(
-                  context: context,
-                  taskStatus: taskStatus,
-                ),
-              );
-            },
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-              foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-              elevation: WidgetStateProperty.all<double>(3.0),
-              shadowColor: WidgetStateProperty.all<Color>(Colors.black),
-            ),
-          ),
-        )
-        : const SizedBox.shrink();
+    final current = dataSate.taskData.taskStatus;
+
+    return TextButtonIconWidget(
+      visible: current != TaskStatus.completed,
+      icon: Icons.task_outlined,
+      label: switch (current) {
+        TaskStatus.notStarted => AppString.start,
+        TaskStatus.started => AppString.pause,
+        TaskStatus.pause => AppString.resume,
+        TaskStatus.resume => AppString.pause,
+        _ => AppString.completed,
+      },
+      onPressed: () {
+        final next = switch (current) {
+          TaskStatus.notStarted => TaskStatus.started,
+          TaskStatus.started => TaskStatus.pause,
+          TaskStatus.pause => TaskStatus.resume,
+          TaskStatus.resume => TaskStatus.pause,
+          _ => TaskStatus.notStarted,
+        };
+        BlocProvider.of<MapBloc>(
+          context,
+        ).add(MapPageUpdateTaskEvent(context: context, taskStatus: next));
+      },
+    );
   }
 
   Widget _endPatrollingButton({required FetchMapPageDataState dataSate}) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.width * 0.10,
-      child: TextButton.icon(
-        label: TextWidget(
-          AppString.end,
-          color: AppColor.black,
-          fontSize: AppFont.font_11,
-        ),
-        icon: Icon(
-          Icons.task_outlined,
-          color: EnvironmentConfig.of(context)!.primaryTheme,
-          size: MediaQuery.of(context).size.width * 0.05,
-        ),
-        onPressed: () {
-          BlocProvider.of<MapBloc>(context).add(
-            MapPageUpdateTaskEvent(
-              context: context,
-              taskStatus: TaskStatus.completed,
-            ),
-          );
-        },
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          elevation: WidgetStateProperty.all<double>(3.0),
-          shadowColor: WidgetStateProperty.all<Color>(Colors.black),
-        ),
-      ),
+    return TextButtonIconWidget(
+      label: AppString.end,
+      icon: Icons.task_outlined,
+      onPressed: () {
+        BlocProvider.of<MapBloc>(context).add(
+          MapPageUpdateTaskEvent(
+            context: context,
+            taskStatus: TaskStatus.completed,
+          ),
+        );
+      },
     );
   }
 
   Widget _addMarkerButton() {
-    return SizedBox(
-      height: MediaQuery.of(context).size.width * 0.10,
-      child: TextButton.icon(
-        label: TextWidget(
-          'Marker',
-          color: AppColor.black,
-          fontSize: AppFont.font_11,
-        ),
-        icon: Icon(
-          Icons.location_searching_sharp,
-          color: EnvironmentConfig.of(context)!.primaryTheme,
-          size: MediaQuery.of(context).size.width * 0.05,
-        ),
-        onPressed: () {
-          BlocProvider.of<AddMarkerBloc>(
-            context,
-          ).add(AddMarkerPageLoadEvent(context: context, data: ""));
-          Navigator.push(
-            !context.mounted ? context : context,
-            FadeRoute(page: const AddMarkerPage()),
-          );
-        },
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          elevation: WidgetStateProperty.all<double>(3.0),
-          shadowColor: WidgetStateProperty.all<Color>(Colors.black),
-        ),
+    return TextButtonIconWidget(
+      label: 'Asset',
+      icon: Icons.location_searching_sharp,
+      onPressed: _showMarkerOptions,
+    );
+  }
+  /// ✅ Bottom sheet with Marker / Asset options
+  void _showMarkerOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.location_searching_sharp,
+                    color: EnvironmentConfig.of(context)!.primaryTheme,
+                  ),
+                  title: const Text('Marker'),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _openAddMarker();
+                  },
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: Icon(
+                    Icons.inventory_2_outlined,
+                    color: EnvironmentConfig.of(context)!.primaryTheme,
+                  ),
+                  title: const Text('Asset'),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _openAddAsset();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
+  /// ✅ Existing marker flow
+  void _openAddMarker() {
+    if (!mounted) return;
+    BlocProvider.of<AddMarkerBloc>(context)
+        .add(AddMarkerPageLoadEvent(context: context, data: ""));
+    Navigator.push(context, FadeRoute(page: const AddMarkerPage()));
+  }
+
+  /// ✅ Asset flow
+  void _openAddAsset() {
+    if (!mounted) return;
+
+    // // Option A: reuse AddMarkerPage and tell it this is an asset
+    // BlocProvider.of<AddMarkerBloc>(context)
+    //     .add(AddMarkerPageLoadEvent(context: context, data: "marker"));
+    // Navigator.push(context, FadeRoute(page: const AddMarkerPage()));
+
+   // Option B: if you have a separate asset screen, use that instead:
+    BlocProvider.of<AddAssetBloc>(context)
+        .add(AddAssetPageLoadEvent(context: context, data: ""));
+    Navigator.push(context, FadeRoute(page: const AddAssetPage()));
+  }
+
   Widget _addCrossingButton() {
-    return SizedBox(
-      height: MediaQuery.of(context).size.width * 0.10,
-      child: TextButton.icon(
-        label: TextWidget(
-          'Crossing',
-          color: AppColor.black,
-          fontSize: AppFont.font_11,
-        ),
-        icon: Icon(
-          Icons.transgender_outlined,
-          color: EnvironmentConfig.of(context)!.primaryTheme,
-          size: MediaQuery.of(context).size.width * 0.05,
-        ),
-        onPressed: () {
-          BlocProvider.of<AddCrossingBloc>(
-            context,
-          ).add(AddCrossingPageLoadEvent(context: context));
-          Navigator.push(
-            !context.mounted ? context : context,
-            FadeRoute(page: const AddCrossingPage()),
-          );
-        },
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          elevation: WidgetStateProperty.all<double>(3.0),
-          shadowColor: WidgetStateProperty.all<Color>(Colors.black),
-        ),
-      ),
+    return TextButtonIconWidget(
+      label: 'Crossing',
+      icon: Icons.transgender_outlined,
+      onPressed: () {
+        BlocProvider.of<AddCrossingBloc>(
+          context,
+        ).add(AddCrossingPageLoadEvent(context: context));
+        Navigator.push(context, FadeRoute(page: const AddCrossingPage()));
+      },
     );
   }
 
   Widget _addIncidentButton() {
-    return SizedBox(
-      height: MediaQuery.of(context).size.width * 0.10,
-      child: TextButton.icon(
-        label: TextWidget(
-          'Add Incident',
-          color: AppColor.black,
-          fontSize: AppFont.font_11,
-        ),
-        icon: Icon(
-          Icons.gpp_maybe_sharp,
-          color: AppColor.cardBlue,
-          size: MediaQuery.of(context).size.width * 0.05,
-        ),
-        onPressed: () async {
-          BlocProvider.of<AddIncidentBloc>(
-            context,
-          ).add(AddIncidentPageLoadEvent(context: context));
-          Navigator.push(
-            !context.mounted ? context : context,
-            FadeRoute(page: const AddIncidentPage()),
-          );
-        },
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          elevation: WidgetStateProperty.all<double>(3.0),
-          shadowColor: WidgetStateProperty.all<Color>(Colors.black),
-        ),
-      ),
+    return TextButtonIconWidget(
+      label: 'Report Incident',
+      icon: Icons.gpp_maybe_sharp,
+      iconColor: AppColor.cardBlue,
+      onPressed: () {
+        BlocProvider.of<AddIncidentBloc>(
+          context,
+        ).add(AddIncidentPageLoadEvent(context: context));
+        Navigator.push(context, FadeRoute(page: const AddIncidentPage()));
+      },
     );
   }
 
   Widget _addEncroachmentButton() {
-    return SizedBox(
-      height: MediaQuery.of(context).size.width * 0.10,
-      child: TextButton.icon(
-        label: TextWidget(
-          'Add Structures',
-          color: AppColor.black,
-          fontSize: AppFont.font_11,
-        ),
-        icon: Icon(
-          Icons.fence_rounded,
-          color: EnvironmentConfig.of(context)!.primaryTheme,
-          size: MediaQuery.of(context).size.width * 0.05,
-        ),
-        onPressed: () async {
-          BlocProvider.of<EncroachmentBloc>(
-            context,
-          ).add(PageLoadEvent(context: context));
-          Navigator.push(
-            !context.mounted ? context : context,
-            FadeRoute(page: const EncroachmentPage()),
-          );
-        },
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          elevation: WidgetStateProperty.all<double>(3.0),
-          shadowColor: WidgetStateProperty.all<Color>(Colors.black),
-        ),
-      ),
+    return TextButtonIconWidget(
+      label: 'Add Structures',
+      icon: Icons.fence_rounded,
+      onPressed: () {
+        BlocProvider.of<EncroachmentBloc>(
+          context,
+        ).add(PageLoadEvent(context: context));
+        Navigator.push(context, FadeRoute(page: const EncroachmentPage()));
+      },
     );
   }
 
   Widget _addDeviationButton() {
-    return SizedBox(
-      height: MediaQuery.of(context).size.width * 0.10,
-      child: TextButton.icon(
-        label: TextWidget(
-          'Add Deviation',
-          color: AppColor.black,
-          fontSize: AppFont.font_11,
-        ),
-        icon: Icon(
-          Icons.developer_board,
-          color: EnvironmentConfig.of(context)!.primaryTheme,
-          size: MediaQuery.of(context).size.width * 0.05,
-        ),
-        onPressed: () async {
-          BlocProvider.of<DeviationBloc>(
-            context,
-          ).add(DeviationPageLoadEvent(context: context));
-          Navigator.push(
-            !context.mounted ? context : context,
-            FadeRoute(page: const DeviationPage()),
-          );
-        },
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          elevation: WidgetStateProperty.all<double>(3.0),
-          shadowColor: WidgetStateProperty.all<Color>(Colors.black),
-        ),
-      ),
+    return TextButtonIconWidget(
+      label: 'Add Deviation',
+      icon: Icons.developer_board,
+      onPressed: () {
+        BlocProvider.of<DeviationBloc>(
+          context,
+        ).add(DeviationPageLoadEvent(context: context));
+        Navigator.push(context, FadeRoute(page: const DeviationPage()));
+      },
     );
   }
 
   Widget _recentButton() {
-    return SizedBox(
-      height: MediaQuery.of(context).size.width * 0.10,
-      child: TextButton.icon(
-        label: const Text("Re-centre", style: TextStyle(color: Colors.black)),
-        icon: const Icon(Icons.gps_fixed, color: Colors.blue),
-        onPressed: _recenterCamera,
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-          elevation: WidgetStateProperty.all<double>(3.0),
-          shadowColor: WidgetStateProperty.all<Color>(Colors.black),
-        ),
-      ),
+    return TextButtonIconWidget(
+      label: 'Re-centre',
+      fontSize: 13,
+      icon: Icons.gps_fixed,
+      iconColor: Colors.blue,
+      onPressed: _recenterCamera,
     );
   }
 
-
+  _vertical() {
+    return SizedBox(height: MediaQuery.of(context).size.width * 0.03);
+  }
 }

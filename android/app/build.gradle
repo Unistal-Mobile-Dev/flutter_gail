@@ -51,6 +51,16 @@ android {
 //            versionCode 1
 //            versionName "1.0.0-HPCL"
 //        }
+        prodHNGPL  {
+            resValue "string", "app_name", "HNGPL Line Patrolling"
+            applicationIdSuffix ".hngpl.smartgasnet.app"
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/unistal_logo",
+                    appIconRound: "@mipmap/unistal_logo"
+            ]
+            versionCode 1
+            versionName "1.0.0-HNGPL"
+        }
     }
     defaultConfig {
         applicationId = "unistal"

@@ -44,7 +44,6 @@ class APIs {
 
   static get getTaskApi => "api/patrollman-task/taskList";
 
-
   static get addMarkerPointApi => "api/marker/add-marker";
 
   static get addCrossingPointApi => "api/crossing/add-crossing";
@@ -53,9 +52,13 @@ class APIs {
 
   static get addIncidentDataApi => "api/incident/add-incident";
 
+  static get getConstantApi => "api/getConstant";
+  static get getMarkerTypesApi => "/api/steel/marker-types";
+
   // static get updateTaskApi => "api/patrollman-task/update-task-status";
 
-  static String updateTaskApi({required String moduleName}) => "api/$moduleName/update-task-status";
+  static String updateTaskApi({required String moduleName}) =>
+      "api/$moduleName/update-task-status";
 
   static get createTaskValuesListApi => "api/patrollman-task/task-form-details";
 
@@ -67,7 +70,8 @@ class APIs {
 
   // static get getDailyTaskTrackingApi => "api/patrollman-task/taskList";
 
-  static String getDailyTaskTrackingApi({required String moduleName}) => "api/$moduleName/taskList";
+  static String getDailyTaskTrackingApi({required String moduleName}) =>
+      "api/$moduleName/taskList";
 
   static get createDailyTaskApi => "api/daily-task-tracking/create";
 
@@ -77,17 +81,20 @@ class APIs {
 
   static get getMovingPointApi => "api/mis/covered-points";
 
- // static get getRouteApi => "api/patrollman-route/gps-coordinates/";
+  // static get getRouteApi => "api/patrollman-route/gps-coordinates/";
 
-  static String getRouteApi({required String moduleName}) => "api/$moduleName/gps-coordinates/";
+  static String getRouteApi({required String moduleName}) =>
+      "api/$moduleName/gps-coordinates/";
 
   static get addRouteObserveApi => "api/route-observer/add-type";
 
   static get addDeviceApi => "api/device/add-user-device";
 
- // static get getMarkerCrossingInidentTypePointsApi => "api/route-observer/point-details";
+  // static get getMarkerCrossingInidentTypePointsApi => "api/route-observer/point-details";
 
-  static String getMarkerCrossingInidentTypePointsApi({required String moduleName}) => "api/$moduleName/point-details";
+  static String getMarkerCrossingInidentTypePointsApi({
+    required String moduleName,
+  }) => "api/$moduleName/point-details";
 
   static get getEncroachmentTypeApi => "api/encroachment/types";
 
@@ -105,7 +112,8 @@ class APIs {
 
   static get pipelineSummary => "pipeline-master/summary/summary?";
 
-  static get pipelineMaster => "pipeline-master/master-data/assetManagementValues?";
+  static get pipelineMaster =>
+      "pipeline-master/master-data/assetManagementValues?";
 
   static get getTlpTaskApi => "cp-system/short-interval/tasks";
 

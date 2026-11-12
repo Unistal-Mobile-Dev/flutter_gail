@@ -37,8 +37,10 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextWidget("Warning Marker",color: AppColor.black,),
-            _markerListBuilder(dataState: dataState),
+            // TextWidget("Warning Marker",color: AppColor.black,),
+            // _markerListBuilder(dataState: dataState),
+            // _verticalSpace(),
+            _markerDropdownWidget(dataState: dataState),
             _verticalSpace(),
             _conditionRadioButton(dataState: dataState),
             _verticalSpace(),
@@ -101,7 +103,23 @@ class _AddMarkerPageState extends State<AddMarkerPage> {
       }),
     );
   }
-
+  Widget _markerDropdownWidget({required FetchAddMarkerDataState dataState}){
+    return DropdownWidget(
+      isRequired: false,
+      hint: "Select Marker Type",
+      dropdownValue: dataState.markerTypeValue.key != null ? dataState.markerTypeValue : null ,
+      onChanged: (value) {
+        BlocProvider.of<AddMarkerBloc>(context).add(AddMarkerSelectMarkerTypeEvent(
+            meterTypeValue: value
+        ));
+      },
+      items: dataState.listOfMarkerType.map((asset) => DropdownMenuItem<dynamic>(
+        value: asset,
+        child: Text(asset.value ?? ''),
+      ))
+          .toList(),
+    );
+  }
   Widget _conditionRadioButton({required FetchAddMarkerDataState dataState}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

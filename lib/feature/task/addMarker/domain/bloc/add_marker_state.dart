@@ -24,6 +24,8 @@ final class FetchAddMarkerDataState extends AddMarkerInitial {
   final File cameraFile;
   final File videoFile;
   final File voiceRecordFile;
+  final List<ConstantModel> listOfMarkerType;
+  final ConstantModel markerTypeValue;
 
   FetchAddMarkerDataState({
    required this.isLoader,
@@ -35,6 +37,8 @@ final class FetchAddMarkerDataState extends AddMarkerInitial {
    required this.cameraFile,
    required this.videoFile,
    required this.voiceRecordFile,
+    required this.listOfMarkerType,
+    required this.markerTypeValue,
 });
 
   @override
@@ -48,5 +52,7 @@ final class FetchAddMarkerDataState extends AddMarkerInitial {
     cameraFile,
     videoFile,
     voiceRecordFile,
+    listOfMarkerType,
+    markerTypeValue,
   ];
 }

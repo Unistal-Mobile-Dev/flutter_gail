@@ -11,14 +11,18 @@ import 'package:geolocator/geolocator.dart';
 
 class BackgroundManager {
   static String get _channelId =>
-      AppConfig.instanceInit()!.client == Client.hpcl
+          AppConfig.instanceInit()!.client == Client.hpcl
           ? "link_walker_hpcl"
+          : AppConfig.instanceInit()!.client == Client.hngpl
+          ? "link_walker_hngpl"
           : 'link_walker_hpoil';
 
   static int get _notificationId =>
-      AppConfig.instanceInit()!.client == Client.hpcl
-          ? 1234567890
-          : 987654321;
+              AppConfig.instanceInit()!.client == Client.hpcl
+              ? 1234567890
+              : AppConfig.instanceInit()!.client == Client.hngpl
+              ? 5678901234
+              : 987654321;
   // static const _channelId = 'my_foreground_oil';
   // static const _notificationId = 941678999;
 

@@ -64,7 +64,12 @@ class AddMarkerSelectMediaEvent extends AddMarkerEvent {
   @override
   List<Object?> get props => [context, mediaType,isVideo];
 }
-
+class AddMarkerSelectMarkerTypeEvent extends AddMarkerEvent {
+  final ConstantModel meterTypeValue;
+  const AddMarkerSelectMarkerTypeEvent({required this.meterTypeValue});
+  @override
+  List<Object?> get props => [meterTypeValue];
+}
 class AddMarkerSelectVoiceEvent extends AddMarkerEvent {
   final String audioPath;
 

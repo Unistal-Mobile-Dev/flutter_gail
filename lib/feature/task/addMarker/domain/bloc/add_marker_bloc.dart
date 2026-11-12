@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
+import 'package:flutter_gail/feature/task/addAsset/domain/model/constant_model.dart';
+import 'package:flutter_gail/feature/task/addAsset/helper/add_asset_helper.dart';
 import 'package:flutter_gail/feature/task/addMarker/domain/model/marker_type_model.dart';
 import 'package:flutter_gail/feature/task/addMarker/helper/add_marker_helper.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
@@ -15,6 +17,9 @@ class AddMarkerBloc extends Bloc<AddMarkerEvent, AddMarkerState> {
   bool isLoader =  false;
   List<MarkerTypeModel> markerTypeList = [];
   MarkerTypeModel markerTypeData =  MarkerTypeModel();
+
+  List<ConstantModel> listOfMarkerType = [];
+  ConstantModel markerTypeValue = ConstantModel();
   String condition = "1";
   String painting = "1";
   TextEditingController remarkController  =  TextEditingController();
@@ -31,6 +36,7 @@ class AddMarkerBloc extends Bloc<AddMarkerEvent, AddMarkerState> {
     on<AddMarkerSelectPaintingEvent>(_selectPainting);
     on<AddMarkerSelectMediaEvent>(_selectMedia);
     on<AddMarkerSelectVoiceEvent>(_selectAudio);
+    on<AddMarkerSelectMarkerTypeEvent>(_selectMarkerType);
     on<AddMarkerSubmitEvent>(_submit);
   }
 
@@ -46,6 +52,8 @@ class AddMarkerBloc extends Bloc<AddMarkerEvent, AddMarkerState> {
     videoFile = File("");
     voiceRecordFile = File("");
     markerData =  MarkerModel();
+    listOfMarkerType = [];
+     markerTypeValue = ConstantModel();
     var data =  event.data;
 
     if(data.toString().isNotEmpty){
@@ -66,7 +74,7 @@ class AddMarkerBloc extends Bloc<AddMarkerEvent, AddMarkerState> {
         }
       }
     }
-
+    listOfMarkerType = await AddAssetHelper.fetchMarkerTypesApi();
     _eventCompleted(emit);
   }
 
@@ -113,7 +121,10 @@ class AddMarkerBloc extends Bloc<AddMarkerEvent, AddMarkerState> {
      }
      _eventCompleted(emit);
   }
-
+  _selectMarkerType(AddMarkerSelectMarkerTypeEvent event, emit) {
+    markerTypeValue = event.meterTypeValue;
+    _eventCompleted(emit);
+  }
   _selectAudio(AddMarkerSelectVoiceEvent event, emit) async {
     if(event.audioPath.isNotEmpty){
       voiceRecordFile =  File(event.audioPath);
@@ -162,6 +173,8 @@ class AddMarkerBloc extends Bloc<AddMarkerEvent, AddMarkerState> {
         cameraFile: cameraFile,
         videoFile: videoFile,
         voiceRecordFile: voiceRecordFile,
+      listOfMarkerType: listOfMarkerType,
+      markerTypeValue: markerTypeValue,
     ));
   }
 }
