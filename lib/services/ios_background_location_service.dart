@@ -57,7 +57,8 @@ class IosBackgroundLocationService {
               "| lat=${data['lat']} lng=${data['lng']} "
               "| acc=${data['accuracy']}m speed=${data['speed']}m/s "
               "bearing=${data['bearing']}° dist=${data['distance']}m "
-              "batt=${data['battery']}% | task=${data['taskId']}");
+              "batt=${data['battery']}% | task=${data['taskId']} "
+              "| sent_datetime=${data['sentDatetime']}");
           break;
         case 'QUEUED':
           log("📦 Queued — ${data['pending']} point(s) waiting to upload");

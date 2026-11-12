@@ -62,6 +62,19 @@ import UIKit
     return formatter
   }()
 
+  /// Must match what the Android side sends, which is Dart's
+  /// `DateTime.now().toIso8601String()`: local time, no timezone suffix.
+  /// An ISO8601DateFormatter was used here first and emitted UTC with a "Z",
+  /// so every iOS point reached the server 5h30m behind the Indian local
+  /// time the server stores.
+  private lazy var serverDateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone.current
+    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+    return formatter
+  }()
+
   /// Serialises queue reads and writes; CoreLocation calls in on the main
   /// queue while uploads finish on a URLSession queue.
   private let queueLock = DispatchQueue(label: "com.gail.app.tracking.queue")
@@ -210,9 +223,6 @@ import UIKit
     let battery = UIDevice.current.batteryLevel
     let batteryPercent = battery < 0 ? 0 : Int((battery * 100).rounded())
 
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
     let point: [String: Any] = [
       "task_id": config.taskId,
       "subtask_id": config.subTaskId,
@@ -225,7 +235,7 @@ import UIKit
         "bearing": String(bearing),
         "distance": String(format: "%.2f", distance),
         "battery": String(batteryPercent),
-        "inspected_datetime": formatter.string(from: now),
+        "inspected_datetime": serverDateFormatter.string(from: now),
         "provider": "GPS1",
         "buffer": 15.0,
       ]],
@@ -236,6 +246,7 @@ import UIKit
     report("SAVED", [
       "point": pointCount,
       "time": logTimeFormatter.string(from: now),
+      "sentDatetime": serverDateFormatter.string(from: now),
       "gap": gapText,
       "lat": location.coordinate.latitude,
       "lng": location.coordinate.longitude,
