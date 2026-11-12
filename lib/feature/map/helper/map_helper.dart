@@ -15,6 +15,7 @@ import 'package:flutter_gail/feature/task/viewTask/domain/model/point_model.dart
 import 'package:flutter_gail/services/location/location_helper.dart';
 import 'package:flutter_gail/services/location/location_model.dart';
 import 'package:flutter_gail/services/network_helper.dart';
+import 'package:flutter_gail/services/session_helper.dart';
 import 'package:flutter_gail/utils/commonWidgets/gps_alert_pop_widget.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -53,13 +54,32 @@ class MapHelper {
     if (permission == LocationPermission.deniedForever) return;
 
     _positionSubscription = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 5,
-      ),
+      locationSettings: _locationSettings(),
     ).listen((position) {
       _locationController?.add(LatLng(position.latitude, position.longitude));
     });
+  }
+
+  /// Platform specific settings for the GPS stream.
+  ///
+  /// On iOS the plain [LocationSettings] stops delivering as soon as the app
+  /// is backgrounded; [AppleSettings] with background updates enabled keeps
+  /// CoreLocation feeding the app while patrolling is on.
+  LocationSettings _locationSettings() {
+    if (Platform.isIOS) {
+      return AppleSettings(
+        accuracy: LocationAccuracy.high,
+        activityType: ActivityType.otherNavigation,
+        distanceFilter: 5,
+        pauseLocationUpdatesAutomatically: false,
+        showBackgroundLocationIndicator: true,
+        allowBackgroundLocationUpdates: true,
+      );
+    }
+    return const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 5,
+    );
   }
 
   /// Stop GPS tracking
@@ -290,9 +310,9 @@ class MapHelper {
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String taskId = prefs.getString("taskId") ?? "";
-      String schema =
-          AppConfig.instanceInit()?.userData.schema.toString() ?? "";
-      // String schema = prefs.getString(PreferencesName.schema) ?? "";
+      // Same reason as the auth token: AppConfig is empty in the background
+      // isolate, which stamped every background point with a blank schema.
+      String schema = await SessionHelper.schema();
       print("--------------------Task Id $taskId");
       if (taskId.isEmpty) {
         return {"status": "error", "message": ""};
@@ -319,19 +339,8 @@ class MapHelper {
       );
 
       // 5. Save offline in Hive
-      await Hive.initFlutter();
-      if (!Hive.isAdapterRegistered(1)) {
-        Hive.registerAdapter(HiveLocationModelAdapter());
-        print("📦 Hive Adapter Registered (typeId: 1)");
-      } else {
-        print("⚠️ Hive Adapter already registered (typeId: 1)");
-      }
-      await Hive.openBox<HiveLocationModel>('location_box');
-      var box = Hive.box<HiveLocationModel>('location_box');
+      final box = await openLocationBox();
       await box.add(hiveLocation);
-
-      List<Map<String, dynamic>> payload = [];
-      payload.add(hiveLocation.toServerJson());
 
       // 6. Check network
       bool connected = await NetworkHelper.isConnected();
@@ -352,40 +361,68 @@ class MapHelper {
     }
   }
 
-  static Future<void> syncOfflineLocations() async {
-    var box = Hive.box<HiveLocationModel>('location_box');
-    bool connected = await NetworkHelper.isConnected();
-    print("Check connection 2 $connected");
-    if (!connected) return;
-
-    // Collect all unsynced locations
-    List<Map<String, dynamic>> payload = [];
-
-    for (var location in box.values) {
-      if (!location.isSynced) {
-        payload.add(location.toServerJson());
-      }
+  /// Open the offline location queue, registering the adapter once.
+  static Future<Box<HiveLocationModel>> openLocationBox() async {
+    if (Hive.isBoxOpen('location_box')) {
+      return Hive.box<HiveLocationModel>('location_box');
     }
+    await Hive.initFlutter();
+    if (!Hive.isAdapterRegistered(1)) {
+      Hive.registerAdapter(HiveLocationModelAdapter());
+      print("📦 Hive Adapter Registered (typeId: 1)");
+    }
+    return Hive.openBox<HiveLocationModel>('location_box');
+  }
 
-    if (payload.isEmpty) return;
+  /// Guards against two syncs overlapping — a connectivity change and the
+  /// tracking timer can both ask for one at the same moment.
+  static bool _isSyncing = false;
+
+  static Future<void> syncOfflineLocations() async {
+    if (_isSyncing) return;
+    _isSyncing = true;
 
     try {
-      // Send all unsynced locations in a single array
+      final box = await openLocationBox();
+
+      bool connected = await NetworkHelper.isConnected();
+      print("Check connection 2 $connected");
+      if (!connected) return;
+
+      // Snapshot the keys being uploaded, so only these are removed later.
+      // Points recorded while the request is in flight keep their place in
+      // the queue instead of being deleted unsent.
+      final List<dynamic> keysToSync = [];
+      final List<Map<String, dynamic>> payload = [];
+
+      for (final key in box.keys.toList()) {
+        final location = box.get(key);
+        if (location != null && !location.isSynced) {
+          keysToSync.add(key);
+          payload.add(location.toServerJson());
+        }
+      }
+
+      if (payload.isEmpty) return;
+
+      // Send all unsynced locations in a single array. A null response means
+      // the upload failed, so the queue is left untouched for the next try.
       var res = await ServerRequest.backgroundPostData(
         urlEndPoint: APIs.saveLocationDataApi,
         body: jsonEncode(payload),
       );
-      // If server response is successful, mark all as synced
-      if (res != null) {
-        for (var location in box.values) {
-          if (!location.isSynced) {
-            location.isSynced = true;
-            await location.delete();
-          }
-        }
+
+      if (res == null) {
+        print("⚠️ Location sync failed, ${payload.length} point(s) kept offline");
+        return;
       }
+
+      await box.deleteAll(keysToSync);
+      print("✅ Synced ${keysToSync.length} offline location(s)");
     } catch (e) {
       print("Batch sync failed: $e");
+    } finally {
+      _isSyncing = false;
     }
   }
 

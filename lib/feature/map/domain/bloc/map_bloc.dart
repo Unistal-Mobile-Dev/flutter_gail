@@ -16,6 +16,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'dart:math';
+import 'package:flutter_gail/services/tracking_config.dart';
 part 'map_event.dart';
 
 part 'map_state.dart';
@@ -78,10 +79,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     locationPath = [];
     lastPoint = PointsModel();
     configurationData = ConfigurationModel();
-    // Initialize background service (Android only)
-    if (Platform.isAndroid) {
-      await manager.initializeService();
-    }
+    // Initialize background service (no-op on iOS)
+    await manager.initializeService();
     final groupRoles = AppConfig.instanceInit()?.groupRoles;
     // 🔹 Request permission before starting service
     // LocationPermission permission = await Geolocator.checkPermission();
@@ -129,13 +128,20 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           configurationData.buffer != null
               ? double.parse(configurationData.buffer.toString())
               : mapData.buffer;
-      mapData.timeInterval =
-          configurationData.timeInterval != null
-              ? int.parse(configurationData.timeInterval.toString())
-              : mapData.timeInterval;
+      // time_interval is missing often enough that it must never be parsed
+      // blind: ConfigurationModel turns a missing key into "", and int.parse
+      // on that threw straight out of this handler. Anything unusable now
+      // falls through to the 30s default instead of crashing the page load
+      // or writing the string "null" into prefs.
+      final int resolvedInterval =
+          int.tryParse(configurationData.timeInterval?.toString() ?? "") ??
+          int.tryParse(mapData.timeInterval?.toString() ?? "") ??
+          TrackingConfig.defaultInterval.inSeconds;
+      mapData.timeInterval = resolvedInterval;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("timeInterval", mapData.timeInterval.toString());
+      await prefs.setString("timeInterval", resolvedInterval.toString());
+      print("Tracking interval: ${resolvedInterval}s");
 
       if (mapData.data != null) {
         print("Total Data: ${mapData.data!.length}");
@@ -228,7 +234,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     if (taskData.taskStatus == TaskStatus.started ||
         taskData.taskStatus == TaskStatus.resume) {
-      if (Platform.isAndroid && !await manager.isRunning()) {
+      if (!await manager.isRunning()) {
         manager.startService();
       }
       add(
@@ -355,8 +361,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       return;
     }
 
-    if (taskData.taskStatus == TaskStatus.started ||
-        taskData.taskStatus == TaskStatus.resume) {
+    // Must follow the status being applied, not taskData.taskStatus — that
+    // still holds the old one here (it is only updated after the server
+    // call below), which made Start stop the stream and Pause start it.
+    if (taskStatus == TaskStatus.started || taskStatus == TaskStatus.resume) {
       add(
         StartTracking(!event.context.mounted ? event.context : event.context),
       );
@@ -373,25 +381,25 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (taskStatus == TaskStatus.started) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "1");
-      if (Platform.isAndroid && !await manager.isRunning()) {
+      if (!await manager.isRunning()) {
         manager.startService();
       }
     } else if (taskStatus == TaskStatus.pause) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "2");
-      if (Platform.isAndroid && await manager.isRunning()) {
+      if (await manager.isRunning()) {
         manager.stopService();
       }
     } else if (taskStatus == TaskStatus.resume) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "5");
-      if (Platform.isAndroid && !await manager.isRunning()) {
+      if (!await manager.isRunning()) {
         manager.startService();
       }
     } else if (taskStatus == TaskStatus.completed) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("taskStatus", "3");
-      if (Platform.isAndroid && await manager.isRunning()) {
+      if (await manager.isRunning()) {
         manager.stopService();
       }
     }

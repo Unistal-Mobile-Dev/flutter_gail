@@ -5,6 +5,8 @@ import 'package:flutter_gail/root.dart';
 import 'package:flutter_gail/services/background_location_service.dart';
 import 'package:flutter_gail/services/battery_optimization_helper.dart';
 import 'package:flutter_gail/services/firebase/notification_service.dart';
+import 'package:flutter_gail/services/offline_sync_service.dart';
+import 'package:flutter_gail/services/ios_background_location_service.dart';
 import 'package:flutter_gail/utils/res/environment_config.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -80,6 +82,14 @@ Future<void> main() async {
   } catch (e) {
     debugPrint("Notification Init Error: $e");
   }
+
+  // ✅ 6. Flush any location points queued while the device was offline,
+  // and keep flushing them whenever the network comes back.
+  OfflineSyncService.instance.start();
+
+  // ✅ 7. iOS only: if the app was force quit mid-task and CoreLocation
+  // relaunched us, pick the patrolling back up.
+  await IosBackgroundLocationService.resumeIfTaskActive();
 
   // ✅ 7. App Config
   var configuredApp = const EnvironmentConfig(

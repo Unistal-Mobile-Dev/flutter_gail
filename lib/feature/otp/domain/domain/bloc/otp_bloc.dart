@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/home/presentation/page/home_page.dart';
@@ -138,12 +140,13 @@ class OtpBloc extends Bloc<OtpEvent, OtpState> {
         LoginDataModel _loginData = LoginDataModel();
         _loginData = loginResponse(res);
         AppConfig.instanceInit()!.userData = _loginData;
-       /* await SharedPreferencesUtils.setString(key: PreferencesName.token,
-            value: AppConfig.instanceInit()!.userData.tokens!.access.toString());
+        // Persist the session like the password login does, otherwise it
+        // lives only in this isolate's memory: the splash screen cannot
+        // restore it and the background service has no token at all.
         await SharedPreferencesUtils.setString(
-          key: PreferencesName.schema,
-          value: AppConfig.instanceInit()!.userData.schema!.toString(),
-        );*/
+          key: PreferencesName.userInfo,
+          value: jsonEncode(res),
+        );
         Navigator.pushAndRemoveUntil(
             !event.context.mounted ? event.context : event.context,
             MaterialPageRoute(builder: (_) => const HomePage()),

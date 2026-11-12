@@ -19,6 +19,7 @@ import 'package:flutter_gail/feature/task/deviation/presentation/page/deviation_
 import 'package:flutter_gail/utils/commonClass/fade_route.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_gail/services/tracking_config.dart';
 
 class MapSample extends StatefulWidget {
   const MapSample({super.key});
@@ -208,9 +209,12 @@ class MapSampleState extends State<MapSample> {
           ? mapData.buffer.toDouble()
           : double.tryParse(mapData.buffer.toString()) ?? 0.0;
 
+      // Same default as the background tracker, so the map and the saved
+      // points do not drift apart when the server sends no interval.
       final int timeInterval = (mapData.timeInterval is int)
           ? mapData.timeInterval
-          : int.tryParse(mapData.timeInterval.toString()) ?? 5;
+          : int.tryParse(mapData.timeInterval?.toString() ?? "") ??
+              TrackingConfig.defaultInterval.inSeconds;
       final now = DateTime.now();
       if (mounted && now.difference(_lastLocationUpdate).inSeconds >= timeInterval) {
         _lastLocationUpdate = now;

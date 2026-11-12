@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/file_model.dart';
+import 'package:flutter_gail/services/session_helper.dart';
 import 'package:flutter_gail/utils/commonClass/connectivity_helper.dart';
 import 'package:flutter_gail/utils/commonClass/user_info.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -223,16 +224,17 @@ class ServerRequest {
       if (kDebugMode) {
         print("${e}Post Data ");
       }
+      // Must return null on every failure: the caller keeps the offline
+      // queue only when this is null, so returning the error text here
+      // would look like a successful upload and drop unsynced data.
       if (e is SocketException) {
         log("SocketException : ${e.toString()}");
-        return e.toString();
       } else if (e is TimeoutException) {
         log("TimeoutException : ${e.toString()}");
-        return e.toString();
       } else {
         log("Unhandled exception : ${e.toString()}");
-        return e.toString();
       }
+      return null;
     }
   }
 
@@ -381,9 +383,10 @@ class ServerRequest {
 
   static addToken() async {
     try{
-     // String token = await SharedPreferencesUtils.getString(key: PreferencesName.token);
-      String token = AppConfig.instanceInit()?.userData.tokens!.access.toString() ?? "";
-      header["X-Auth-Token"] = token;
+      // Via SessionHelper, not AppConfig directly: the background isolate
+      // has its own empty AppConfig, so reading it there produced an empty
+      // token and every background upload was rejected.
+      header["X-Auth-Token"] = await SessionHelper.authToken();
     } catch(_){
       header["X-Auth-Token"] = "";
     }

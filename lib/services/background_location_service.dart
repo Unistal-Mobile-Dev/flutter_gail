@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
+import 'package:flutter_gail/services/ios_background_location_service.dart';
+import 'package:flutter_gail/services/tracking_config.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -19,6 +21,10 @@ class BackgroundManager {
   static final ValueNotifier<bool> isServiceRunning = ValueNotifier(false);
 
   /// 🔧 Initialize background service safely
+  ///
+  /// iOS does not use [FlutterBackgroundService] at all — see
+  /// [IosBackgroundLocationService] for why — so there is nothing to
+  /// configure there.
   Future<void> initializeService() async {
     if (Platform.isIOS) return;
     try {
@@ -47,7 +53,11 @@ class BackgroundManager {
 
   /// ✅ Start background service safely
   Future<void> startService() async {
-    if (Platform.isIOS) return;
+    if (Platform.isIOS) {
+      final started = await IosBackgroundLocationService.instance.start();
+      isServiceRunning.value = started;
+      return;
+    }
     try {
       final service = FlutterBackgroundService();
       final isRunning = await service.isRunning();
@@ -66,7 +76,11 @@ class BackgroundManager {
 
   /// ✅ Stop background service safely
   Future<void> stopService() async {
-    if (Platform.isIOS) return;
+    if (Platform.isIOS) {
+      await IosBackgroundLocationService.instance.stop();
+      isServiceRunning.value = false;
+      return;
+    }
     try {
       final service = FlutterBackgroundService();
       final isRunning = await service.isRunning();
@@ -86,7 +100,11 @@ class BackgroundManager {
 
   /// ✅ Check if running safely
   Future<bool> isRunning() async {
-    if (Platform.isIOS) return false;
+    if (Platform.isIOS) {
+      final running = IosBackgroundLocationService.instance.isRunning;
+      isServiceRunning.value = running;
+      return running;
+    }
     try {
       final service = FlutterBackgroundService();
       final running = await service.isRunning();
@@ -135,7 +153,11 @@ void onStart(ServiceInstance service) async {
     /// 🧭 Function to start periodic location updates
     Future<void> startLocationTimer() async {
       locationTimer?.cancel(); // Cancel any old timer before starting new one
-      locationTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+      // Interval comes from the server config MapBloc stored in prefs; it is
+      // re-read here because this runs in its own isolate.
+      final interval = await TrackingConfig.saveInterval();
+      log("⏱️ Background location interval: ${interval.inSeconds}s");
+      locationTimer = Timer.periodic(interval, (timer) async {
         try {
           if (!(await Geolocator.isLocationServiceEnabled())) {
             log("⚠️ Location service disabled");

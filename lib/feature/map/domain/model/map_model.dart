@@ -9,6 +9,9 @@ class MapModel {
 
   MapModel.fromJson(Map<String, dynamic> json) {
     buffer = json['buffer'] ?? "50";
+    // A named constructor does not pick up the default above, so without
+    // this timeInterval stayed null and the fallback in MapBloc was useless.
+    timeInterval = json['time_interval'] ?? 30;
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) { data!.add(Data.fromJson(v)); });
