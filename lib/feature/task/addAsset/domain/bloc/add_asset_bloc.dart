@@ -159,10 +159,12 @@ class AddAssetBloc extends Bloc<AddAssetEvent, AddAssetState> {
       cameraFile: cameraFile,
       voiceFile: voiceRecordFile,
       videoFile: videoFile,
+      assetTypeValue: assetTypeData,
     );
     if (res != null) {
       isLoader = false;
       markerTypeData = MarkerTypeModel();
+      assetTypeData = ConstantModel();
       condition = "1";
       painting = "1";
       remarkController.text = "";

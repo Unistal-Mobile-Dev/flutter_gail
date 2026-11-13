@@ -63,6 +63,7 @@ class AddAssetHelper {
      required BuildContext context,
      required TaskModel taskData,
      required MarkerTypeModel markerTypeData,
+     required ConstantModel  assetTypeValue,
      required String condition,
      required String painting,
      required String remark,
@@ -126,6 +127,7 @@ class AddAssetHelper {
           "gps_accuracy" : locationData.accuracy.toString(),
           "observation_subtype" : markerTypeData.name.toString(),
           "device_id" : deviceId.toString(),
+          "asset_id" : assetTypeValue.key.toString(),
         };
         var res =  await ServerRequest.postDataWithFile(urlEndPoint: url,
             body: json, context: !context.mounted ? context :context, fileList: fileList);

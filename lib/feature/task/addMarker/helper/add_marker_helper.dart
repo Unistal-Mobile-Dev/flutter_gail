@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/dashboard/domain/model/file_model.dart';
 import 'package:flutter_gail/feature/login/helper/login_helper.dart';
+import 'package:flutter_gail/feature/task/addAsset/domain/model/constant_model.dart';
 import 'package:flutter_gail/feature/task/addMarker/domain/model/marker_type_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/services/location/location_helper.dart';
@@ -68,6 +69,7 @@ class AddMarkerHelper {
      required BuildContext context,
      required TaskModel taskData,
      required MarkerTypeModel markerTypeData,
+     required ConstantModel markerTypeValue,
      required String condition,
      required String painting,
      required String remark,
@@ -131,6 +133,7 @@ class AddMarkerHelper {
           "gps_accuracy" : locationData.accuracy.toString(),
           "observation_subtype" : markerTypeData.name.toString(),
           "device_id" : deviceId.toString(),
+          "asset_id" : markerTypeValue.key.toString(),
         };
         var res =  await ServerRequest.postDataWithFile(urlEndPoint: url,
             body: json, context: !context.mounted ? context :context, fileList: fileList);
