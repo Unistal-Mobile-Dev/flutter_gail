@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/login/presentations/pages/login_screen_page.dart';
+import 'package:flutter_gail/services/tracking_lifecycle.dart';
 
 class LogoutWidget extends StatelessWidget {
   const LogoutWidget({super.key});
@@ -36,12 +37,15 @@ class LogoutWidget extends StatelessWidget {
           ButtonWidget(
               text: AppString.logout,
               onPressed: () async {
-                Navigator.pushAndRemoveUntil(
-                    context,
+                final navigator = Navigator.of(context);
+                // Tear the session down before leaving the screen: the
+                // background service used to keep tracking afterwards, and
+                // kept posting with the signed-out user's token.
+                await TrackingLifecycle.handleLogout();
+                navigator.pushAndRemoveUntil(
                     MaterialPageRoute(
                         builder: (context) => const LoginScreenPage()),
                     (route) => false);
-                SharedPreferencesUtils.clearAll();
               }),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.03,

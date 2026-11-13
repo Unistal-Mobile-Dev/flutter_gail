@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gail/ExportFile/app_export_file.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/feature/task/viewTask/helper/task_helper.dart';
+import 'package:flutter_gail/services/tracking_lifecycle.dart';
 part 'task_event.dart';
 part 'task_state.dart';
 
@@ -54,6 +55,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     var res = await TaskHelper.fetchTask(startDate: startDate.toString(), endDate: endDate.toString());
     taskList =  res ?? [];
     searchTaskList  =  taskList;
+    // The full list is the only view that can tell nothing is running, so
+    // the service is shut down from here rather than the map page.
+    await TrackingLifecycle.syncWithTasks(searchTaskList);
     taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList();
     _eventComplete(emit);
 

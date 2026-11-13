@@ -241,6 +241,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         StartTracking(!event.context.mounted ? event.context : event.context),
       );
     } else {
+      // Opening a task that is not running must also take the service down —
+      // stopping only the stream left it tracking for a finished task.
+      if (await manager.isRunning()) {
+        await manager.stopService();
+      }
       add(StopTracking());
     }
     _eventComplete(emit);
