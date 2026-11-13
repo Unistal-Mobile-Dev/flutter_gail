@@ -109,4 +109,29 @@ class APIs {
       "server/rest/services/UPIMS/MobileApp/MapServer/200052";
 
   static get forgotPasswordApi => "";
+
+  // CP Unit Monitoring
+  static get getRegionsApi => "get-regions";
+
+  static get cpUnitMonitoringOptionsApi =>
+      "short-interval-survey/cp-unit-monitoring/get-options";
+
+  static get cpUnitMonitoringTaskApi =>
+      "short-interval-survey/cp-unit-monitoring/get-task";
+
+  static get cpUnitMonitoringSubmitApi =>
+      "short-interval-survey/cp-unit-monitoring/store";
+
+  // PSP Monitoring
+  static get pspMonitoringOptionsApi =>
+      "short-interval-survey/psp-monitoring/get-options";
+
+  static get pspMonitoringTaskApi =>
+      "short-interval-survey/psp-monitoring/get-task";
+
+  static get pspMonitoringFieldsApi =>
+      "short-interval-survey/psp-monitoring/fields";
+
+  static get pspMonitoringSubmitApi =>
+      "short-interval-survey/psp-monitoring/store";
 }

@@ -372,7 +372,7 @@ class ServerRequest {
         if (result.toString().contains("message")) {
           SnackBarErrorWidget(
             !context.mounted ? context : context,
-          ).show(message: result['message'].toString());
+          ).show(message: responseMessage(result));
         }
         return null;
       }
@@ -389,6 +389,29 @@ class ServerRequest {
       header['cookie'] =
           (index == -1) ? rawCookie : rawCookie.substring(0, index);
     }
+  }
+
+  /// Server message with field errors, e.g.
+  /// {"message": "Validation failed.", "errors": {"ac_psp_volt": "..."}}
+  static String responseMessage(dynamic result) {
+    if (result is! Map) return result?.toString() ?? "";
+    final List<String> messages = [];
+    final errors = result['errors'];
+    if (errors is Map) {
+      for (final error in errors.values) {
+        if (error is List) {
+          messages.addAll(error.map((e) => e.toString()));
+        } else if (error != null) {
+          messages.add(error.toString());
+        }
+      }
+    } else if (errors is List) {
+      messages.addAll(errors.map((e) => e.toString()));
+    }
+    if (messages.isEmpty && result['message'] != null) {
+      messages.add(result['message'].toString());
+    }
+    return messages.join("\n");
   }
 
   static addToken() async {

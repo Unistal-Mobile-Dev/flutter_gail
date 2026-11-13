@@ -31,7 +31,11 @@ class DropDownSearchWidget extends StatelessWidget {
       child: DropdownSearch<dynamic>(
         selectedItem: selectedItem,
         enabled: enabled ?? true,
-        compareFn: (i, s) => i.isEqual(s),
+        // Models don't implement isEqual/==, so compare by instance or display text
+        compareFn: (i, s) =>
+            identical(i, s) ||
+            i == s ||
+            (itemAsString != null && itemAsString!(i) == itemAsString!(s)),
         decoratorProps: DropDownDecoratorProps(
           textAlign: TextAlign.start,
           textAlignVertical: TextAlignVertical.center,

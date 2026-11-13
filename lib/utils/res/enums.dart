@@ -16,6 +16,7 @@ enum RouteObservation {
   marker(3),
   deviation(4),
   incident(5);
+
   final int value;
   const RouteObservation(this.value);
 }

@@ -195,6 +195,10 @@ class AppString {
 
   static get tlpSurvey => "TLP Survey";
 
+  static get cpUnitMonitoring => "CP Unit Monitoring";
+
+  static get pspMonitoring => "PSP Monitoring";
+
 
   static get logoutMessage =>
       "Are you sure you want to logout? Once you logout, you will be return to login screen";

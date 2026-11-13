@@ -7,6 +7,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_gail/feature/map/helper/map_helper.dart';
 import 'package:flutter_gail/feature/task/viewTask/domain/model/task_model.dart';
 import 'package:flutter_gail/utils/res/enums.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BackgroundManager {
@@ -125,6 +126,11 @@ class BackgroundManager {
       await prefs.setString("taskId", task.taskId.toString());
       await prefs.setString("subTaskId", task.subTaskId.toString());
       await prefs.setString("taskStatus", task.taskStatus == TaskStatus.resume ? "5" : "1");
+      // A location foreground service can't start without location permission
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        return;
+      }
       if (!await isRunning()) {
         log("🟢 Active task found, starting background service");
         await startService();

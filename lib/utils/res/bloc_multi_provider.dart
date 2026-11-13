@@ -14,6 +14,8 @@ import 'package:flutter_gail/feature/task/viewTask/domain/bloc/task_bloc.dart';
 import 'package:flutter_gail/feature/taskManagement/addTask/domain/bloc/add_task_bloc.dart';
 import 'package:flutter_gail/feature/taskManagement/viewTask/domain/bloc/view_task_bloc.dart';
 import 'package:flutter_gail/feature/tlpSurvey/addTlpSurvey/domain/bloc/add_tlp_survey_bloc.dart';
+import 'package:flutter_gail/feature/cpUnitMonitoring/domain/bloc/cp_unit_monitoring_bloc.dart';
+import 'package:flutter_gail/feature/pspMonitoring/domain/bloc/psp_monitoring_bloc.dart';
 
 MultiProvider blocMultiProvider({required Widget child}) {
   return MultiProvider(
@@ -33,6 +35,8 @@ MultiProvider blocMultiProvider({required Widget child}) {
        BlocProvider(create: (BuildContext context) => DeviationBloc()),
        BlocProvider(create: (BuildContext context) => ImageShareBloc()),
        BlocProvider(create: (BuildContext context) => AddTlpSurveyBloc()),
+       BlocProvider(create: (BuildContext context) => CpUnitMonitoringBloc()),
+       BlocProvider(create: (BuildContext context) => PspMonitoringBloc()),
        BlocProvider(create: (BuildContext context) => OtpBloc()),
 
     ],

@@ -34,7 +34,11 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     on<TaskTabIndexEvent>(_tabIndex);
   }
 
+  int _pageLoadId = 0;
+
   _pageLoad(TaskPageLoadEvent event, emit) async {
+    // Switching Dashboard <-> Task quickly starts several loads; only the latest one wins
+    final loadId = ++_pageLoadId;
     emit(TaskPageLoadState());
     isLoader =  false;
     isAssignTask = false;
@@ -44,7 +48,6 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     taskData =  TaskModel();
     startDate = DateTime.now().subtract(const Duration(days: 7));
     endDate =  DateTime.now();
-    await DashboardHelper.requestMandatoryLocationPermission(event.context);
     userData =  UserInfo.instance!.userData!;
     if(userData.modules != null){
       for(var moduleData in userData.modules!) {
@@ -59,11 +62,18 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     }
 
     var res = await TaskHelper.fetchTask(startDate: startDate.toString(), endDate: endDate.toString());
-    taskList =  res ?? [];
+    if (loadId != _pageLoadId) return;
+    taskList =  _visibleTasks(res);
     searchTaskList  =  taskList;
     taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList();
     _eventComplete(emit);
     _syncBackgroundService(res);
+
+    // Ask for location after the list is shown, so a permission dialog/error
+    // never blocks the Assigned / Ongoing tabs
+    if (event.context.mounted) {
+      await DashboardHelper.requestMandatoryLocationPermission(event.context);
+    }
 
     if(taskList.isNotEmpty){
       // TaskHelper.showNotificationWithNumber();
@@ -88,7 +98,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         searchTaskList = [];
         _eventComplete(emit);
         var res = await TaskHelper.fetchTask(startDate: startDate.toString(), endDate: endDate.toString());
-        taskList =  res ?? [];
+        taskList =  _visibleTasks(res);
         searchTaskList  =  taskList;
         if(tabIndex == 0){
           taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList();
@@ -130,7 +140,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   _pageRefresh(TaskPagRefreshDataEvent event, emit) async {
     var res = await TaskHelper.fetchTask(startDate: startDate.toString(), endDate: endDate.toString());
     _syncBackgroundService(res);
-    taskList =  res ?? [];
+    taskList =  _visibleTasks(res);
     searchTaskList  =  taskList;
     if(tabIndex == 0){
       taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList();
@@ -143,6 +153,17 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       taskList = searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed  ).toList();
     }
     _eventComplete(emit);
+  }
+
+  /// Hide tasks assigned for a future date. Ongoing tasks are always shown.
+  List<TaskModel> _visibleTasks(dynamic tasks) {
+    if (tasks is! List<TaskModel>) return [];
+    final today = DateUtils.dateOnly(DateTime.now());
+    return tasks.where((task) {
+      if (task.taskStatus != TaskStatus.notStarted) return true;
+      final assignedDate = DateTime.tryParse(task.assignedDate.toString());
+      return assignedDate == null || !DateUtils.dateOnly(assignedDate).isAfter(today);
+    }).toList();
   }
 
   /// Stop/start the background service based on the server task list.

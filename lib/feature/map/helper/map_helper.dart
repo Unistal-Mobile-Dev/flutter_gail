@@ -193,6 +193,15 @@ class MapHelper {
   static const int _syncBatchSize = 100;
   static Future<Box<HiveLocationModel>>? _locationBoxFuture;
 
+  // GPS filter settings for background tracking
+  static const double _maxGpsAccuracyMeters = 30; // ignore weak GPS fixes
+  static const double _maxSpeedMps = 30; // ~108 km/h, faster means a GPS spike
+  static const double _minMovementMeters = 5; // smaller movement is GPS noise
+  static const int _maxSkippedJumps = 3;
+  static String? _lastSavedTaskId;
+  static DateTime? _lastSavedTime;
+  static int _skippedJumps = 0;
+
   /// Opens the offline location box once per isolate.
   static Future<Box<HiveLocationModel>> _openLocationBox() {
     return _locationBoxFuture ??= () async {
@@ -233,14 +242,49 @@ class MapHelper {
         return {"status": "error", "message": "Location not available"};
       }
 
-      // 3. Calculate distance & bearing
+      // 3. Filter GPS noise
+      final DateTime now = DateTime.now();
+      double accuracy = double.tryParse(locationData.accuracy ?? "") ?? 0.0;
+      double speed = double.tryParse(locationData.speed ?? "") ?? 0.0;
+      if (accuracy > _maxGpsAccuracyMeters) {
+        return {"status": "error", "message": "Low GPS accuracy (${accuracy.toStringAsFixed(0)} m), point skipped"};
+      }
+
+      // New task: don't measure distance from the previous task's last point
+      if (_lastSavedTaskId != taskId) {
+        lastPoint = PointsModel();
+        _lastSavedTime = null;
+        _skippedJumps = 0;
+      }
+
+      double lat = locationData.lat!;
+      double long = locationData.long!;
       double distance = 0;
       double bearing = 0;
-      if (lastPoint.y != null) {
-        distance = calculateDistance(lastPoint.y, lastPoint.x, locationData.lat, locationData.long) * 1000;
-        bearing = calculateBearing(locationData.lat, locationData.long, lastPoint.y, lastPoint.x);
+      if (lastPoint.y != null && lastPoint.x != null) {
+        distance = calculateDistance(lastPoint.y, lastPoint.x, lat, long) * 1000;
+        final int seconds = _lastSavedTime == null ? 0 : now.difference(_lastSavedTime!).inSeconds;
+
+        if (seconds > 0 && distance / seconds > _maxSpeedMps && _skippedJumps < _maxSkippedJumps) {
+          // Impossible jump (GPS spike): skip it. After a few skips accept, the user really moved.
+          _skippedJumps++;
+          return {"status": "error", "message": "GPS jump of ${distance.toStringAsFixed(0)} m skipped"};
+        }
+
+        if (distance < math.max(accuracy, _minMovementMeters)) {
+          // Movement is within GPS noise: user is standing still, keep the last position
+          lat = lastPoint.y!;
+          long = lastPoint.x!;
+          distance = 0;
+          speed = 0;
+        } else {
+          bearing = calculateBearing(lastPoint.y, lastPoint.x, lat, long);
+        }
       }
-      lastPoint = PointsModel(x: locationData.long, y: locationData.lat);
+      _skippedJumps = 0;
+      _lastSavedTaskId = taskId;
+      _lastSavedTime = now;
+      lastPoint = PointsModel(x: long, y: lat);
 
       // 4. Get battery
       int batteryPercentage = 0;
@@ -252,14 +296,14 @@ class MapHelper {
       HiveLocationModel hiveLocation = HiveLocationModel(
         taskId: taskId,
         subTaskId: subTaskId,
-        gpsX: locationData.long ?? 0.0,
-        gpsY: locationData.lat ?? 0.0,
+        gpsX: long,
+        gpsY: lat,
         distance: distance,
         bearing: bearing,
-        speed: double.tryParse(locationData.speed ?? "") ?? 0.0,
-        gpsAccuracy: double.tryParse(locationData.accuracy ?? "") ?? 0.0,
+        speed: speed,
+        gpsAccuracy: accuracy,
         battery: batteryPercentage,
-        inspectedDateTime: DateTime.now(),
+        inspectedDateTime: now,
       );
       final box = await _openLocationBox();
       await box.add(hiveLocation);

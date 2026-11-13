@@ -153,9 +153,15 @@ class CreateTaskBloc extends Bloc<CreateTaskEvent, CreateTaskState> {
     lineWalkerUsersData = [];
 
 
+    regionTypeList = [];
     var resRegion =  await CreateTaskHelper.fetchArea();
     if(resRegion !=  null){
       regionTypeList =  resRegion;
+    }
+    if (regionTypeList.isEmpty && event.context.mounted) {
+      SnackBarErrorWidget(event.context).show(
+        message: "Unable to load Region data. Please check internet and try again.",
+      );
     }
 
     var taskFromListRes = await CreateTaskHelper.fetchTaskDropDownValuesList();

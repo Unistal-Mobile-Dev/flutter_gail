@@ -26,6 +26,12 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +71,7 @@ class _TaskPageState extends State<TaskPage> with SingleTickerProviderStateMixin
                 tabs:  [
                   TabItem(title: AppString.assigned, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.notStarted).toList().length),
                   TabItem(title: AppString.onGoing, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.started
-                      || taskData.taskStatus == TaskStatus.pause).toList().length),
+                      || taskData.taskStatus == TaskStatus.pause || taskData.taskStatus == TaskStatus.resume).toList().length),
                   TabItem(title: AppString.completed, count: dataState.searchTaskList.where((taskData) => taskData.taskStatus == TaskStatus.completed).toList().length),
                 ],
                 onTap: (index) {

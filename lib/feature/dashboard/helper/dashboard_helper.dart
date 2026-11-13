@@ -143,7 +143,18 @@ class DashboardHelper {
     return sizeInMb;
   }
 
-  static Future<void> requestMandatoryLocationPermission(BuildContext context) async {
+  static Future<void>? _permissionRequest;
+
+  /// Dashboard and Task pages both call this. Only one request runs at a time,
+  /// otherwise permission_handler throws "a request is already running" and
+  /// the page load fails.
+  static Future<void> requestMandatoryLocationPermission(BuildContext context) {
+    return _permissionRequest ??= _requestMandatoryLocationPermission(context)
+        .catchError((Object e) => debugPrint("Location permission error: $e"))
+        .whenComplete(() => _permissionRequest = null);
+  }
+
+  static Future<void> _requestMandatoryLocationPermission(BuildContext context) async {
 
     // Step 1: Request Foreground Location
     var status = await Permission.location.status;
@@ -190,17 +201,18 @@ class DashboardHelper {
 
   static Future<void> _showReasonDialog(
       BuildContext context, String title, String msg) async {
+    if (!context.mounted) return;
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => WillPopScope(
+      builder: (dialogContext) => WillPopScope(
         onWillPop: () async => false, // ❌ Disable back button
         child: AlertDialog(
           title: Text(title),
           content: Text(msg),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text("OK"),
             ),
           ],
@@ -211,17 +223,18 @@ class DashboardHelper {
 
   static Future<void> _showSettingsDialog(
       BuildContext context, String title, String msg) async {
+    if (!context.mounted) return;
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(title),
         content: Text(msg),
         actions: [
           TextButton(
             child: const Text("Open Settings"),
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               await openAppSettings();
             },
           ),
