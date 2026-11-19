@@ -9,6 +9,7 @@ class AppIcon {
   static get hpOILLogo => "assets/logo/hp_oil_logo.png";
   static get hpclLogo => "assets/logo/hpcl_logo.png";
   static get hngplLogo => "assets/logo/hngpl_logo.png";
+  static get cuglLogo => "assets/logo/cugl_logo.png";
 
   static get unistalLogo => "assets/logo/unistal_logo.png";
   static get transperentBackground => "assets/transperent_background.png";
@@ -64,6 +65,8 @@ class AppIcon {
         return AppIcon.hpclLogo;
       case Client.hngpl:
         return AppIcon.hngplLogo;
+      case Client.cugl:
+        return AppIcon.cuglLogo;
         default:
     return AppIcon.unistalLogo;
     }
@@ -76,6 +79,8 @@ class AppIcon {
         return "HPCL Login";
       case Client.hngpl:
         return "HNGPL Login";
+      case Client.cugl:
+        return "CUGL Login";
       default:
         return "Unistal Login";
     }

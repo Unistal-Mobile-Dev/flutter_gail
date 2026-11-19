@@ -11,18 +11,23 @@ import 'package:geolocator/geolocator.dart';
 
 class BackgroundManager {
   static String get _channelId =>
-          AppConfig.instanceInit()!.client == Client.hpcl
+      AppConfig.instanceInit()!.client == Client.hpcl
           ? "link_walker_hpcl"
           : AppConfig.instanceInit()!.client == Client.hngpl
           ? "link_walker_hngpl"
+          : AppConfig.instanceInit()!.client == Client.cugl
+          ? "link_walker_cugl"
           : 'link_walker_hpoil';
 
   static int get _notificationId =>
-              AppConfig.instanceInit()!.client == Client.hpcl
-              ? 1234567890
-              : AppConfig.instanceInit()!.client == Client.hngpl
-              ? 5678901234
-              : 987654321;
+      AppConfig.instanceInit()!.client == Client.hpcl
+          ? 1234567890
+          : AppConfig.instanceInit()!.client == Client.hngpl
+          ? 5678901234
+          : AppConfig.instanceInit()!.client == Client.cugl
+          ? 5432167890
+          : 987654321;
+
   // static const _channelId = 'my_foreground_oil';
   // static const _notificationId = 941678999;
 
@@ -122,7 +127,9 @@ void onStart(ServiceInstance service) async {
     }
 
     final notifications = FlutterLocalNotificationsPlugin();
-    const initSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher_oil');
+    const initSettingsAndroid = AndroidInitializationSettings(
+      '@mipmap/ic_launcher_oil',
+    );
     const initSettings = InitializationSettings(android: initSettingsAndroid);
     await notifications.initialize(initSettings);
 
@@ -139,7 +146,9 @@ void onStart(ServiceInstance service) async {
     /// 🧭 Function to start periodic location updates
     Future<void> startLocationTimer() async {
       locationTimer?.cancel(); // Cancel any old timer before starting new one
-      locationTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+      locationTimer = Timer.periodic(const Duration(seconds: 30), (
+        timer,
+      ) async {
         try {
           if (!(await Geolocator.isLocationServiceEnabled())) {
             log("⚠️ Location service disabled");

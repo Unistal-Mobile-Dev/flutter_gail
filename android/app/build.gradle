@@ -61,6 +61,16 @@ android {
             versionCode 1
             versionName "1.0.0-HNGPL"
         }
+        prodCUGL  {
+            resValue "string", "app_name", "CUGL Line Patrolling"
+            applicationIdSuffix ".cugl.smartgasnet.app"
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/cugl_logo",
+                    appIconRound: "@mipmap/cugl_logo"
+            ]
+            versionCode 1
+            versionName "1.0.0-CUGL"
+        }
     }
     defaultConfig {
         applicationId = "unistal"

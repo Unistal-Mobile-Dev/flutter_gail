@@ -6,7 +6,7 @@ enum TaskStatus { notStarted, started, pause, completed, resume }
 
 enum DeviceType { phone, tablet }
 
-enum Client { hpoil , hpcl, hngpl}
+enum Client { hpoil , hpcl, hngpl, cugl}
 
 enum OtpType { login, loginEmail, loginMobile, registration }
 
